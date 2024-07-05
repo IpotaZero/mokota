@@ -4,17 +4,17 @@ from pygame.locals import *
 
 from Ifunctions import *
 
-moji = "あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをんがぎぐげござじずぜぞだぢづでどばびぶべぼぱぴぷぺぽぁぃぅぇぉゃゅょっー終"
+moji = "あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをんがぎぐげござじずぜぞだぢづでどばびぶべぼぱぴぷぺぽぁぃぅぇぉゃゅょっー消終"
 
 
 class NameScene:
-    def __init__(self, screen: pygame.Surface, pushed: list[int]) -> None:
+    def __init__(self, screen: pygame.Surface, pushed: list[int], mouse: dict) -> None:
         self.scene_name = "name"
         self.screen = screen
+        self.mouse = mouse
         self.pushed = pushed
 
-        self.font = pygame.font.Font("DotGothic16-Regular.ttf", 32)
-        self.font2 = pygame.font.Font("DotGothic16-Regular.ttf", 48)
+        self.font = pygame.font.Font("DotGothic16-Regular.ttf", 48)
 
         self.start()
 
@@ -45,6 +45,9 @@ class NameScene:
                 if len(self.name) > 0:
                     self.is_end = True
                     return self.name
+            elif self.num == len(moji) - 2:
+                if len(self.name) > 0:
+                    self.name = self.name[:-1]
 
             elif len(self.name) < 12:
                 self.name += moji[self.num]
@@ -57,35 +60,64 @@ class NameScene:
             self.screen,
             self.font,
             (255, 255, 255),
+            40,
             30,
-            30,
-            "Enter Your Name",
+            "Enter Your Name:",
         )
 
         Itext(
             self.screen,
-            self.font2,
+            self.font,
             (255, 255, 255),
-            400,
+            440,
             30,
             self.name,
         )
 
-        Itext(
-            self.screen,
-            self.font2,
-            (255, 255, 255),
-            40,
-            100,
-            moji,
-            max_width=740,
-        )
+        # Itext(
+        #     self.screen,
+        #     self.font,
+        #     (255, 255, 255),
+        #     40,
+        #     100,
+        #     moji,
+        #     max_width=740,
+        # )
+
+        for i, char in enumerate(moji):
+            size = 48
+            selected = Ibutton(
+                self.mouse,
+                self.screen,
+                self.font,
+                (255, 255, 255),
+                (255, 255, 255),
+                40 + (i % 15) * size,
+                112 + math.floor(i / 15) * self.font.get_height(),
+                size,
+                size,
+                char,
+                line_width=0,
+            )
+
+            if selected:
+                self.num = i
+                if self.num == len(moji) - 1:
+                    if len(self.name) > 0:
+                        self.is_end = True
+                        return self.name
+                elif self.num == len(moji) - 2:
+                    if len(self.name) > 0:
+                        self.name = self.name[:-1]
+
+                elif len(self.name) < 12:
+                    self.name += moji[self.num]
 
         m = ";" * math.floor(self.num / 15) + "  " * (self.num % 15) + moji[self.num]
 
         Itext(
             self.screen,
-            self.font2,
+            self.font,
             (255, 255, 0),
             40,
             100,

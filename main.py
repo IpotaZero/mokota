@@ -32,8 +32,8 @@ def main():
 
     scenes = {
         "main": main_scene.MainScene(screen, pushed, mouse, saves),
-        "name": name_scene.NameScene(screen, pushed),
-        "title": title_scene.TitleScene(screen, pushed, saves),
+        "name": name_scene.NameScene(screen, pushed, mouse),
+        "title": title_scene.TitleScene(screen, pushed, mouse, saves),
     }
 
     frame = 0

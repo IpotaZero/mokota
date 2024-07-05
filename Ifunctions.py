@@ -80,14 +80,23 @@ def Ibutton(
     width: int,
     height: int,
     text: str,
+    line_width=2,
+    text_alighn="center",
 ):
     button = pygame.Rect(x, y, width, height)  # creates a rect object
-    pygame.draw.rect(screen, colour, button, width=2)
+    if line_width > 0:
+        pygame.draw.rect(screen, colour, button, width=line_width)
 
     jtext = font.render(text, False, text_colour)
     text_width = jtext.get_rect().w / 2
-    text_height = jtext.get_rect().h / 2 + 1
-    screen.blit(jtext, (x + width / 2 - text_width, y + height / 2 - text_height))
+    text_height = jtext.get_rect().h / 2
+
+    if text_alighn == "center":
+        screen.blit(
+            jtext, (x + width / 2 - text_width, y + height / 2 - text_height - 1)
+        )
+    elif text_alighn == "left":
+        screen.blit(jtext, (x, y + height / 2 - text_height - 1))
 
     if (
         mouse["clicked"]
@@ -113,6 +122,7 @@ class RegexDict:
 class Icommand:
     def __init__(
         self,
+        mouse: dict,
         pushed: list[int],
         screen: pygame.Surface,
         font: pygame.font.Font,
@@ -121,6 +131,7 @@ class Icommand:
         y: int,
         options: RegexDict,
     ) -> None:
+        self.mouse = mouse
         self.pushed = pushed
         self.screen = screen
         self.font = font
@@ -161,14 +172,27 @@ class Icommand:
                 self.num += 1
                 self.num %= len(option)
 
-        Itext(
-            self.screen,
-            self.font,
-            self.colour,
-            self.x + self.font.get_height(),
-            self.y,
-            ";".join(option),
-        )
+        for i, text in enumerate(option):
+            width = self.font.render(text, False, (255, 255, 255)).get_rect().w
+            selected = Ibutton(
+                self.mouse,
+                self.screen,
+                self.font,
+                self.colour,
+                self.colour,
+                self.x + self.font.get_height(),
+                self.y + self.font.get_height() * i,
+                width,
+                self.font.get_height(),
+                text,
+                line_width=0,
+                text_alighn="left",
+            )
+
+            if selected:
+                self.branch += str(i)
+                self.num = 0
+                return
 
         Itext(
             self.screen,

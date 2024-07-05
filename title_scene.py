@@ -7,13 +7,16 @@ from Ifunctions import *
 
 
 class TitleScene:
-    def __init__(self, screen: pygame.Surface, pushed: list[int], saves) -> None:
+    def __init__(
+        self, screen: pygame.Surface, pushed: list[int], mouse: dict, saves
+    ) -> None:
         self.scene_name = "title"
         self.screen = screen
+        self.mouse = mouse
         self.pushed = pushed
         self.saves = saves
 
-        font = pygame.font.Font("DotGothic16-Regular.ttf", 74)
+        font = pygame.font.Font("DotGothic16-Regular.ttf", 48)
         self.font2 = pygame.font.Font("DotGothic16-Regular.ttf", 32)
 
         # フォントの設定
@@ -23,6 +26,7 @@ class TitleScene:
 
     def start(self):
         self.command = Icommand(
+            self.mouse,
             self.pushed,
             self.screen,
             self.font2,

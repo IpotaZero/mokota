@@ -9,6 +9,8 @@ serifs = [
         {
             "": [
                 "4月...",
+                # "question",
+                # ["a", "b", "c"],
                 # "next_chapter",
                 "俺の名前は{name}",
                 "今年、大阪公立大に入学するしがない猫(?)だ",
@@ -203,18 +205,28 @@ class MainScene:
 
         self.credits = [0, 0, 0]
 
-        self.select = 0
-
-        self.set_save_command()
-
-        self.title_command = Icommand(
+        self.story_command = Icommand(
+            self.mouse,
             self.pushed,
             self.screen,
             self.font,
             (255, 255, 255),
             50,
             400,
-            RegexDict({"": ["BACK TO TITLE", "RESUME"]}),
+            RegexDict({}),
+        )
+
+        self.set_save_command()
+
+        self.title_command = Icommand(
+            self.mouse,
+            self.pushed,
+            self.screen,
+            self.font,
+            (255, 255, 255),
+            50,
+            400,
+            RegexDict({"": ["BACK TO TITLE", "RESUME"], "0": ["YES", "NO"]}),
         )
 
         self.is_end = False
@@ -227,6 +239,7 @@ class MainScene:
         ] + ["nodata"]
 
         self.save_command = Icommand(
+            self.mouse,
             self.pushed,
             self.screen,
             self.font,
@@ -249,7 +262,7 @@ class MainScene:
                     self.font,
                     (255, 255, 255),
                     (255, 255, 255),
-                    50,
+                    30,
                     30,
                     100,
                     40,
@@ -323,8 +336,11 @@ class MainScene:
 
             self.title_command.run()
 
-            if self.title_command.branch == "0":
+            if self.title_command.branch == "00":
                 self.is_end = True
+
+            elif self.title_command.branch == "01":
+                self.title_command.cancel(2)
 
             elif self.title_command.branch == "1":
                 self.mode = "text"
@@ -338,40 +354,17 @@ class MainScene:
         element = serifs[self.chapter][self.branch][self.text_num]
 
         if element == "question":
-            options = serifs[self.chapter][self.branch][self.text_num + 1]
+            if self.frame == 1:
+                self.story_command.options.regex_dict[""] = serifs[self.chapter][
+                    self.branch
+                ][self.text_num + 1]
 
-            if K_DOWN in self.pushed:
-                self.select += 1
-                self.select %= len(options)
-            elif K_UP in self.pushed:
-                self.select += len(options) - 1
-                self.select %= len(options)
-            elif K_RETURN in self.pushed or K_SPACE in self.pushed:
-                self.branch += str(self.select)
+            self.story_command.run()
+
+            if re.match("^.$", self.story_command.branch):
+                self.branch += self.story_command.branch
                 self.text_num = 0
                 self.frame = 0
-
-            Itext(
-                self.screen,
-                self.font,
-                (255, 255, 255),
-                50,
-                400 + self.select * 48,
-                "→",
-                max_width=700,
-                frame=self.frame / 2,
-            )
-
-            Itext(
-                self.screen,
-                self.font,
-                (255, 255, 255),
-                50 + 32,
-                400,
-                ";".join(options),
-                max_width=700,
-                frame=self.frame / 2,
-            )
 
         elif element == "credit":
             num = serifs[self.chapter][self.branch][self.text_num + 1]
@@ -424,7 +417,21 @@ class MainScene:
                 self.log.append(t)
                 self.log_slicer = None
 
-            if K_RETURN in self.pushed or K_SPACE in self.pushed:
+            clicked = Ibutton(
+                self.mouse,
+                self.screen,
+                self.font,
+                (255, 255, 255),
+                (255, 255, 255),
+                50,
+                400,
+                700,
+                150,
+                "",
+                line_width=0,
+            )
+
+            if K_RETURN in self.pushed or K_SPACE in self.pushed or clicked:
                 text_length = len(t) * 2
 
                 if text_length > self.frame:
