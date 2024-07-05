@@ -1,4 +1,5 @@
-import time
+import json
+import os
 import pygame
 from pygame.locals import *
 
@@ -102,7 +103,7 @@ serifs = [
             ".###": [
                 "そんな顔をされたら俺は...",
                 "もこ:;～～～分かった分かった! 俺は、マイコン研究会に入部します!",
-                "俺がそういった瞬間、みんなの表情がパッと明るくなる",
+                "俺がそういった瞬間、みんなの表情がぱあっと明るくなる",
                 "ああ、ここが俺の居場所なのかもな;俺はなぜだか漠然と、そう思った",
                 "next_chapter",
             ],
@@ -161,19 +162,37 @@ serifs = [
                 "まったく、あいつらしいな;そう思った直後、駅の方から声が聞こえてくる",
                 "もこ子:;皆ー! ごめーん! おまたせー!",
                 "もこ子は息を切らせながら俺たちの方へ走ってきた",
+                "もこた:;",
             ],
-            "2": [""],
+            "2": [
+                "もこた:;お待たせお待たせ あれ? もこ美は?",
+                "もこ音:;まだ来てないですね",
+            ],
         }
     ),
 ]
 
 
 class MainScene:
-    def __init__(self, screen: pygame.Surface, pushed: list[int]) -> None:
+    def __init__(
+        self, screen: pygame.Surface, pushed: list[int], mouse: dict, saves: list[dict]
+    ) -> None:
+        self.scene_name = "main"
+
+        self.name = "ERROR"
+
         self.screen = screen
         self.pushed = pushed
+        self.mouse = mouse
+
+        self.saves = saves
 
         self.font = pygame.font.Font("DotGothic16-Regular.ttf", 32)
+
+        self.log = []
+        self.log_slicer = 0
+
+        self.mode = "text"
 
         self.chapter = 0
         self.text_num = 0
@@ -184,26 +203,104 @@ class MainScene:
 
         self.select = 0
 
+        self.set_save_command()
+
         self.is_end = False
 
         self.next_scene_name = "main_scene"
 
         pygame.mixer.init()  # 初期化
 
+    def set_save_command(self):
+        s = [save["name"] for save in self.saves] + ["nodata"]
+
+        self.save_command = Icommand(
+            self.pushed,
+            self.screen,
+            self.font,
+            (255, 255, 255),
+            50,
+            80,
+            RegexDict(
+                {"": s, ".": ["LOAD", "SAVE", "CANCEL"], ".[0-1]": ["YES", "NO"]}
+            ),
+        )
+
     def mainloop(self) -> None:
         self.screen.fill((0, 0, 0))  # 背景を黒
 
+        if self.mode == "text" or self.mode == "log":
+            is_pushed_log = (
+                Ibutton(
+                    self.mouse,
+                    self.screen,
+                    self.font,
+                    (255, 255, 255),
+                    (255, 255, 255),
+                    30,
+                    30,
+                    80,
+                    40,
+                    "LOG",
+                )
+                or K_l in self.pushed
+            )
+
+        if self.mode == "text" or self.mode == "save":
+            is_pushed_save = (
+                Ibutton(
+                    self.mouse,
+                    self.screen,
+                    self.font,
+                    (255, 255, 255),
+                    (255, 255, 255),
+                    690,
+                    30,
+                    80,
+                    40,
+                    "SAVE",
+                )
+                or K_s in self.pushed
+            )
+
+        if self.mode == "text":
+            if is_pushed_log:
+                self.mode = "log"
+
+            if is_pushed_save:
+                self.mode = "save"
+
+            self.mode_text()
+
+        elif self.mode == "log":
+            if is_pushed_log:
+                self.mode = "text"
+
+            self.mode_log()
+
+        elif self.mode == "save":
+            if is_pushed_save:
+                self.mode = "text"
+
+            self.mode_save()
+
+        pygame.display.update()  # 画面更新
+
+        self.frame += 1
+
+    def mode_text(self):
         element = serifs[self.chapter][self.branch][self.text_num]
 
         if element == "question":
             options = serifs[self.chapter][self.branch][self.text_num + 1]
+
             if K_DOWN in self.pushed:
                 self.select += 1
                 self.select %= len(options)
             elif K_UP in self.pushed:
                 self.select += len(options) - 1
                 self.select %= len(options)
-            elif K_RETURN in self.pushed:
+            elif K_RETURN in self.pushed or K_SPACE in self.pushed:
                 self.branch += str(self.select)
                 self.text_num = 0
                 self.frame = 0
@@ -215,8 +312,8 @@ class MainScene:
                 50,
                 400 + self.select * 48,
                 "→",
-                700,
-                self.frame / 2,
+                max_width=700,
+                frame=self.frame / 2,
             )
 
             Itext(
@@ -226,8 +323,8 @@ class MainScene:
                 50 + 32,
                 400,
                 ";".join(options),
-                700,
-                self.frame / 2,
+                max_width=700,
+                frame=self.frame / 2,
             )
 
         elif element == "credit":
@@ -252,6 +349,7 @@ class MainScene:
                 "sounds/" + serifs[self.chapter][self.branch][self.text_num + 1]
             ).play()
             self.text_num += 2
+            self.frame = 0
 
         elif element == "bgm":
             pygame.mixer.music.stop()
@@ -260,19 +358,28 @@ class MainScene:
             )
             pygame.mixer.music.play(-1)
             self.text_num += 2
+            self.frame = 0
 
         elif element == "stop_bgm":
             pygame.mixer.music.fadeout(1000)
             self.text_num += 1
+            self.frame = 0
 
         elif element == "sleep":
-            time.sleep(serifs[self.chapter][self.branch][self.text_num + 1])
-            self.text_num += 2
-            self.pushed.clear()
+            if serifs[self.chapter][self.branch][self.text_num + 1] * 60 <= self.frame:
+                self.text_num += 2
+                # self.pushed.clear()
+                self.frame = 0
 
         else:
-            if K_RETURN in self.pushed:
-                text_length = len(serifs[self.chapter][self.branch][self.text_num]) * 2
+            t = serifs[self.chapter][self.branch][self.text_num]
+
+            if self.frame == 1:
+                self.log.append(t)
+                self.log_slicer = None
+
+            if K_RETURN in self.pushed or K_SPACE in self.pushed:
+                text_length = len(t) * 2
 
                 if text_length > self.frame:
                     self.frame = text_length
@@ -284,8 +391,6 @@ class MainScene:
                     self.text_num = 0
                     self.branch += "#"
 
-            t = serifs[self.chapter][self.branch][self.text_num]
-
             if self.frame % 60 < 30:
                 t += "▼"
 
@@ -296,10 +401,111 @@ class MainScene:
                 50,
                 400,
                 t,
-                700,
-                self.frame / 2,
+                max_width=700,
+                frame=self.frame / 2,
             )
 
-        pygame.display.update()  # 画面更新
+    def mode_log(self):
 
-        self.frame += 1
+        text = Iadjust(self.font, ";".join(self.log), 700)
+
+        row = text.split(";")
+
+        if self.log_slicer is None:
+            self.log_slicer = len(row) - 9
+
+        Itext(
+            self.screen,
+            self.font,
+            (255, 255, 255),
+            50,
+            80,
+            ";".join(row[self.log_slicer :]),
+            max_width=700,
+            max_height=400,
+        )
+
+        line = len(row)
+
+        if line > 9:
+            if line - self.log_slicer > 9:
+                Itext(self.screen, self.font, (255, 255, 255), 380, 500, "▼")
+
+                if K_DOWN in self.pushed:
+                    self.log_slicer += 1
+                    self.log_slicer %= line
+            if self.log_slicer > 0:
+                Itext(self.screen, self.font, (255, 255, 255), 380, 30, "▲")
+
+                if K_UP in self.pushed:
+                    self.log_slicer += line - 1
+                    self.log_slicer %= line
+
+    def mode_save(self):
+        self.save_command.run()
+
+        if re.match("^.$", self.save_command.branch):
+            Itext(
+                self.screen,
+                self.font,
+                (255, 255, 255),
+                50,
+                40,
+                self.save_command.options[""][int(self.save_command.branch)],
+            )
+        elif re.match("^.[0-1]$", self.save_command.branch):
+            Itext(self.screen, self.font, (255, 255, 255), 50, 40, "Really?")
+
+        # print(self.save_command.branch, self.save_command.num)
+
+        if re.match("^.00$", self.save_command.branch):
+            # load->yes
+            save_data_number = int(self.save_command.branch[0])
+
+            if len(self.saves) <= save_data_number:
+                self.save_command.cancel()
+                return
+
+            self.load_save_data(save_data_number)
+
+            self.save_command.cancel(3)
+
+        elif re.match("^.10$", self.save_command.branch):
+            # save->yes
+            save_data_number = int(self.save_command.branch[0])
+
+            if len(self.saves) <= save_data_number:
+                self.saves.append({})
+
+            # print(self.saves, save_data_number)
+
+            self.saves[save_data_number]["name"] = self.name
+            self.saves[save_data_number]["chapter"] = self.chapter
+            self.saves[save_data_number]["branch"] = self.branch
+            self.saves[save_data_number]["text_num"] = self.text_num
+            self.saves[save_data_number]["credits"] = self.credits
+
+            with open("save.dat", "w") as f:
+                f.write(json.dumps(self.saves))
+
+            self.save_command.cancel(3)
+
+            self.set_save_command()
+
+        elif re.match("^.[0-1]1$", self.save_command.branch):
+            # yes/no
+            self.save_command.cancel(2)
+
+        elif re.match("^.2$", self.save_command.branch):
+            # cancel
+            # print(0)
+            self.save_command.cancel(2)
+
+    def load_save_data(self, save_data_number):
+        self.name = self.saves[save_data_number]["name"]
+        self.chapter = self.saves[save_data_number]["chapter"]
+        self.branch = self.saves[save_data_number]["branch"]
+        self.text_num = self.saves[save_data_number]["text_num"]
+        self.credits = self.saves[save_data_number]["credits"]
+
+        self.frame = 0

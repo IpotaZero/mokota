@@ -1,12 +1,24 @@
+import json
+import os
 import pygame
 from pygame.locals import *
 import sys
 
 import title_scene
 import main_scene
+import name_scene
 
 
 def main():
+    saves = []
+
+    if os.path.isfile("save.dat"):
+        with open("save.dat") as f:
+            saves = json.loads(f.read())
+    else:
+        with open("save.dat", "w") as f:
+            f.write(json.dumps(saves))
+
     pygame.init()  # Pygameの初期化
     screen = pygame.display.set_mode((800, 600))  # 800*600の画面
 
@@ -16,12 +28,16 @@ def main():
 
     pressed = []
     pushed = []
+    mouse = {"clicked": False, "position": (0, 0)}
 
-    scenes = {"main_scene": main_scene.MainScene(screen, pushed)}
+    scenes = {
+        "main": main_scene.MainScene(screen, pushed, mouse, saves),
+        "name": name_scene.NameScene(screen, pushed),
+    }
 
     frame = 0
 
-    current_scene = title_scene.TitleScene(screen, pushed)
+    current_scene = title_scene.TitleScene(screen, pushed, saves)
 
     while True:
         frame += 1
@@ -35,13 +51,26 @@ def main():
                 pushed.append(event.key)
             elif event.type == KEYUP:
                 pressed.remove(event.key)
+            elif event.type == MOUSEBUTTONDOWN:
+                mouse["clicked"] = True
+                mouse["position"] = event.pos
 
-        current_scene.mainloop()
+        r = current_scene.mainloop()
 
         if current_scene.is_end:
-            current_scene = scenes[current_scene.next_scene_name]
+            if current_scene.scene_name == "title":
+                if r is None:
+                    current_scene = scenes["name"]
+                else:
+                    current_scene.load_save_data(r)
+                    current_scene = scenes["main"]
+
+            elif current_scene.scene_name == "name":
+                current_scene = scenes["main"]
+                current_scene.name = r
 
         pushed.clear()
+        mouse["clicked"] = False
         clock.tick(60)
 
 
