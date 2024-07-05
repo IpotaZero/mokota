@@ -4,7 +4,7 @@ from pygame.locals import *
 
 from Ifunctions import *
 
-moji = "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z ! ? - OK"
+moji = "あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをんがぎぐげござじずぜぞだぢづでどばびぶべぼぱぴぷぺぽぁぃぅぇぉゃゅょっー終"
 
 
 class NameScene:
@@ -23,31 +23,31 @@ class NameScene:
         self.is_end = False
 
         self.num = 0
-        self.name = "MOKOTA"
+        self.name = "もこた"
 
     def mainloop(self) -> None:
         self.screen.fill((0, 0, 0))  # 背景を黒
 
         if K_RIGHT in self.pushed:
             self.num += 1
-            self.num %= 30
+            self.num %= len(moji)
         elif K_LEFT in self.pushed:
             self.num += len(moji) - 1
-            self.num %= 30
+            self.num %= len(moji)
         elif K_DOWN in self.pushed:
             self.num += 15
-            self.num %= 30
+            self.num %= len(moji)
         elif K_UP in self.pushed:
             self.num += len(moji) - 15
-            self.num %= 30
+            self.num %= len(moji)
         elif K_RETURN in self.pushed or K_SPACE in self.pushed:
-            if self.num == 29:
+            if self.num == len(moji) - 1:
                 if len(self.name) > 0:
                     self.is_end = True
                     return self.name
 
             elif len(self.name) < 12:
-                self.name += moji[self.num * 2]
+                self.name += moji[self.num]
 
         elif K_BACKSPACE in self.pushed or K_ESCAPE in self.pushed:
             if len(self.name) > 0:
@@ -81,14 +81,7 @@ class NameScene:
             max_width=740,
         )
 
-        m = (
-            ";" * math.floor(self.num / 15)
-            + "  " * (self.num % 15)
-            + moji[self.num * 2]
-        )
-
-        if self.num == 29:
-            m = ";" * math.floor(self.num / 15) + "  " * (self.num % 15) + "OK"
+        m = ";" * math.floor(self.num / 15) + "  " * (self.num % 15) + moji[self.num]
 
         Itext(
             self.screen,

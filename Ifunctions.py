@@ -129,6 +129,9 @@ class Icommand:
         self.y = y
         self.options = options
 
+        self.reset()
+
+    def reset(self):
         self.branch = ""
         self.num = 0
 

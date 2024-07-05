@@ -249,9 +249,9 @@ class MainScene:
                     self.font,
                     (255, 255, 255),
                     (255, 255, 255),
+                    50,
                     30,
-                    30,
-                    80,
+                    100,
                     40,
                     "LOG",
                 )
@@ -266,9 +266,9 @@ class MainScene:
                     self.font,
                     (255, 255, 255),
                     (255, 255, 255),
-                    690,
+                    670,
                     30,
-                    80,
+                    100,
                     40,
                     "SAVE",
                 )
@@ -283,9 +283,9 @@ class MainScene:
                     self.font,
                     (255, 255, 255),
                     (255, 255, 255),
-                    690,
+                    670,
                     90,
-                    80,
+                    100,
                     40,
                     "TITLE",
                 )
@@ -301,6 +301,7 @@ class MainScene:
 
             if is_pushed_save:
                 self.mode = "save"
+                self.save_command.reset()
 
             self.mode_text()
 
@@ -327,7 +328,7 @@ class MainScene:
 
             elif self.title_command.branch == "1":
                 self.mode = "text"
-                self.title_command.branch = ""
+                self.title_command.reset()
 
         pygame.display.update()  # 画面更新
 
