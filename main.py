@@ -22,7 +22,7 @@ def main():
     pygame.init()  # Pygameの初期化
     screen = pygame.display.set_mode((800, 600))  # 800*600の画面
 
-    pygame.display.set_caption("もこもこマイコン部")
+    pygame.display.set_caption("MicroComputerReserch!")
 
     clock = pygame.time.Clock()
 
@@ -33,11 +33,12 @@ def main():
     scenes = {
         "main": main_scene.MainScene(screen, pushed, mouse, saves),
         "name": name_scene.NameScene(screen, pushed),
+        "title": title_scene.TitleScene(screen, pushed, saves),
     }
 
     frame = 0
 
-    current_scene = title_scene.TitleScene(screen, pushed, saves)
+    current_scene = scenes["title"]
 
     while True:
         frame += 1
@@ -58,16 +59,22 @@ def main():
         r = current_scene.mainloop()
 
         if current_scene.is_end:
+            current_scene.is_end = False
             if current_scene.scene_name == "title":
                 if r is None:
                     current_scene = scenes["name"]
                 else:
-                    current_scene.load_save_data(r)
                     current_scene = scenes["main"]
+                    current_scene.load_save_data(r)
 
             elif current_scene.scene_name == "name":
                 current_scene = scenes["main"]
                 current_scene.name = r
+
+            elif current_scene.scene_name == "main":
+                current_scene = scenes["title"]
+
+            current_scene.start()
 
         pushed.clear()
         mouse["clicked"] = False

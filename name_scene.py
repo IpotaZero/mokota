@@ -16,6 +16,10 @@ class NameScene:
         self.font = pygame.font.Font("DotGothic16-Regular.ttf", 32)
         self.font2 = pygame.font.Font("DotGothic16-Regular.ttf", 48)
 
+        self.start()
+
+    def start(self):
+
         self.is_end = False
 
         self.num = 0

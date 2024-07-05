@@ -17,19 +17,26 @@ class TitleScene:
         self.font2 = pygame.font.Font("DotGothic16-Regular.ttf", 32)
 
         # フォントの設定
-        self.title_text = font.render("もこもこマイコン部", False, (255, 255, 255))
+        self.title_text = font.render("MicroComputerReserch!", False, (255, 255, 255))
 
+        self.start()
+
+    def start(self):
         self.command = Icommand(
-            pushed,
-            screen,
+            self.pushed,
+            self.screen,
             self.font2,
             (255, 255, 255),
             20,
             180,
             RegexDict(
                 {
-                    "": ["はじめから", "つづきから", "やめる"],
-                    "1": [save["name"] for save in saves] + ["CANCEL"],
+                    "": ["Start", "Continue", "Exit"],
+                    "1": [
+                        save["name"] + ": chapter " + str(save["chapter"])
+                        for save in self.saves
+                    ]
+                    + ["CANCEL"],
                 }
             ),
         )
