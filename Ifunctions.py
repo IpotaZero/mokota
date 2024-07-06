@@ -162,6 +162,9 @@ class RegexDict:
         return None
 
 
+suuji = "0123456789abcdefghijklmnopqrstuvwxyz"
+
+
 class Icommand:
     def __init__(
         self,
@@ -200,7 +203,7 @@ class Icommand:
         if K_RETURN in self.pushed or K_SPACE in self.pushed:
             if option is None:
                 return
-            self.branch += str(self.num)
+            self.branch += suuji[self.num]
             self.num = 0
             return
         elif (
@@ -240,7 +243,7 @@ class Icommand:
             )
 
             if selected:
-                self.branch += str(i)
+                self.branch += suuji[i]
                 self.num = 0
                 return
 
@@ -258,5 +261,11 @@ class Icommand:
     def cancel(self, n=1):
         for _ in range(n):
             if self.branch != "":
-                self.num = int(self.branch[-1])
+                self.num = self.get_selected_num()
                 self.branch = self.branch[:-1]
+
+    def get_selected_option(self):
+        return self.options[self.branch[:-1]][self.get_selected_num()]
+
+    def get_selected_num(self, n=1):
+        return suuji.index(self.branch[-n])

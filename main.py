@@ -70,8 +70,9 @@ def main():
                     current_scene = scenes["darkening"]
 
             elif current_scene.scene_name == "name":
-                current_scene = scenes["main"]
-                current_scene.name = result
+                scenes["darkening"].next_scene = "main"
+                current_scene = scenes["darkening"]
+                scenes["main"].name = result
 
             elif current_scene.scene_name == "main":
                 scenes["darkening"].next_scene = "title"

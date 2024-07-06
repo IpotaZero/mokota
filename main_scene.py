@@ -3,179 +3,7 @@ import pygame
 from pygame.locals import *
 
 from Ifunctions import *
-
-serifs = [
-    RegexDict(
-        {
-            "": [
-                "4月...",
-                # "question",
-                # ["a", "b", "c"],
-                # "next_chapter",
-                "俺の名前は{name}",
-                "今年、大阪公立大に入学するしがない猫(?)だ",
-                "そんな俺は今、とてつもなく悩んでいる;そう、どのサークルに入るか、だ",
-                "入学してから1か月、俺はいまだにどのサークルにも入っていないのだ",
-                "どのサークルに入るかが大学生活の行き先を決めるといっても過言ではない",
-                "しかし、俺にはこれといって得意なこともないし;どうすっかなー...",
-                "そんなことを考えながら俺は部活紹介の冊子をめくる",
-                "{name}:;マイコン研究会...?",
-                "俺はコンピュータには全く詳しくないが、ここなら俺みたいなオタクもいるかもしれないな",
-                "そう考えて俺はそのマイコン研究会とやらを覗いてみることにした",
-                "そういえば、幼馴染のもこ子;あいつもこの大学に入ったらしいけど、いったいどこの部活に入るんだろう...?",
-                #
-                "放課後...",
-                "俺は今マイコン部の入り口にいる;ちょうど今日は体験入部の日だったのだ",
-                "ここから俺の輝かしいコンピュータ人生が始まる...かどうかはわからないが、まあ楽しめたらいいかな",
-                "そう思いながら俺はドアノブをひねる",
-                "{name}:;失礼しま...",
-                "???:;ご来場ありがとうございまーす!!",
-                "sound",
-                "party_popper2.mp3",
-                "sleep",
-                1,
-                "{name}:;うわぁっ!?",
-                "いきなりのクラッカーの音で俺は思わず後ろに転んでしまう",
-                "???:;あはは、ごめんね! 大丈夫?",
-                "明るい声とともに差し出された手;その先を見ると...",
-                "{name}:;お前...もしかしてもこ子か!?",
-                "もこ子:;およ? ...もしかして{name}くん?;わー、おひさー! 中学ぶりだよね!",
-                "そこにいたのは、なんともこ子だった!;久々に会ったからか、ずいぶん垢抜けたように見える",
-                "???:;あら、もこ子のお友達?",
-                "もこ子の後ろから顔がのぞく",
-                "もこ子:;あっもこ美ちゃん! この人が私の幼馴染の{name}くんだよ!",
-                "もこ美:;へぇ、あんたが {name} ね あたしは部長のもこ美、よろしくね!;まあ立ち話もなんだし、入りなさいよ",
-                "もこ美と呼ばれた女の子に促され、俺は部室の中に入った",
-                #
-                "部屋は6畳ほどの広さで、壁際にデスクトップパソコンが4台置いてある",
-                "天井近くまである本棚にはCDやプログラミング関連の本、そして...なぜか占いの本が",
-                "ふと一番奥のパソコンを見ると、誰かが座っているのに気づいた",
-                "もこ美:;ほらもこ音! あんたも挨拶しなさいよ!",
-                "もこ音と呼ばれた女の子は椅子に座ったままこちらを向き、俺の顔を見つめる",
-                "もこ音:;...ども",
-                "もこ子:;もこ音ちゃんはねー、音楽とか作ってるんだよー! すごいよねー!",
-                "{name}:;へえ、そうなのか すごいな! 俺も高校の時ちょっとやってたけど難しくて辞めちゃったんだよな",
-                "もこ音:;そう...",
-                "もこ音はあまり興味なさそうにディスプレイに向き直った;人見知りなのかもしれないな",
-                "{name}:;そういえば、もこ子、お前はなんでこのサークルに入ったんだ?",
-                "もこ子:;んー、えーっとね、実は私、高校の頃ゲーム作ってたの!",
-                "{name}:;えっ!? お前がゲームを?",
-                "あまりの驚きに俺は思わず目を丸くする;なぜなら、俺たちが中学の頃、もこ子は不器用の代名詞だったからだ",
-                "もこ子:;えへへー あんまりすごくはないけどね",
-                "もこ美:;もこ子のコードはある意味すごいのよね... なんで動いてるのかしら...",
-                "{name}:;は、はぁ ところであんたはこのサークルでどんなことをしてるんだ?",
-                "もこ美:;あたしはプログラミングより、絵を描くことが多いわね;そういえば、あんたはこの部に入って何がしたいの?",
-                "{name}:;俺は...",
-                "question",
-                ["音楽", "プログラミング", "美術"],
-            ],
-            "0": [
-                "credit",
-                0,
-                "{name}:;音楽、もう一回やってみようかな",
-                "もこ音:;!!",
-                "もこ音がこちらをちらっと見る",
-            ],
-            "1": [
-                "credit",
-                1,
-                "{name}:;プログラミングとか面白そうだな",
-                "もこ子:;やったー! 一緒にやろうよ!",
-            ],
-            "2": [
-                "credit",
-                2,
-                "{name}:;絵とか、描いてみたいな",
-                "もこ美:;へえ、なかなかセンスがあるじゃない;悪くないわね",
-            ],
-            ".#": [
-                "もこ美:;それにしても、よかったわ、今年は新入生が3人も入ってくれて;去年は1人も来なかったのよね",
-                "{name}:;え、いや まだ入部すると決めてはいないんだけど 一応体験入部に来ただけっていうか...",
-                "そう、俺は体験入部に来たのだ 他の部活も見てみたいし...",
-            ],
-            "0##": [
-                "もこ音:;{name}君、入って...くれないの...?",
-                "もこ美が無表情で、しかし訴えかけるような眼でこちらを見つめてくる",
-            ],
-            "1##": [
-                "もこ子:;えー! 入ってよー! 一緒にプログラミングしようよー!",
-                "もこ子が子どもみたいに少し怒った顔でこちらを見つめてくる",
-            ],
-            "2##": [
-                "もこ美:;...ふん まあ、別にいいけど? 入る入らないはあんたの決めることだし",
-                "もこ美は口を固く結んでそっぽを向いてしまった",
-            ],
-            ".###": [
-                "そんな顔をされたら俺は...",
-                "もこ:;～～～分かった分かった! 俺は、マイコン研究会に入部します!",
-                "俺がそういった瞬間、みんなの表情がぱあっと明るくなる",
-                "ああ、ここが俺の居場所なのかもな;俺はなぜだか漠然と、そう思った",
-                "next_chapter",
-            ],
-        }
-    ),
-    # RegexDict(
-    #     {
-    #         "": [
-    #             "7月...",
-    #             "入部してから3か月、俺はすっかりマイコン部に入り浸っていた",
-    #             #
-    #             "そして今、夏休みが始まろうとしている!",
-    #         ],
-    #         "0": ["もこ音さんと"],
-    #     }
-    # ),
-    RegexDict(
-        {
-            "": [
-                "9月...",
-                "bgm",
-                "電車走行中2.mp3",
-                "ガタンゴトン...ガタンゴトン...",
-                "俺は今、電車に乗ってとある田舎町に向かっている",
-                "もこ美の故郷であるその町では、今日、花火大会が行われるらしい",
-                "俺は夕日に照らされた山をぼうっと眺めながら目的の駅に着くのを待っていた...",
-                "stop_bgm",
-                "sound",
-                "電車のブレーキ.mp3",
-                "sleep",
-                3,
-                "sound",
-                "電車の圧搾空気排出.mp3",
-                "sleep",
-                1,
-                #
-                "{name}:;確か...この辺で集合だったよな...",
-                "駅から出てきょろきょろとあたりを見回すと、浴衣の集団が目についた",
-                "go",
-            ],
-            "0": [
-                "もこ助:;お、来たな",
-                "もこ子:;こんばんはー!",
-                "もこ美:;やっと来たのね",
-                "{name}:;お待たせ、もこ音さんは?",
-                "もこ子:;まだ来てないけど...あっ! あれじゃない?",
-                "もこ子が指さした方を見ると、紫色の浴衣に身を包んだもこ音さんがこちらに向かっていた",
-                "もこ音:;す、すいません ちょっと着付けに時間がかかって...",
-                "sleep",
-                1,
-                "俺は思わずその姿に見とれてしまい、声が出せなくなる",
-            ],
-            "1": [
-                "もこ美:;あら、やっと来たのね まあもこ子はまだ来てないんだけど",
-                "{name}:;え、あいつまだ来てないのか?",
-                "まったく、あいつらしいな;そう思った直後、駅の方から声が聞こえてくる",
-                "もこ子:;皆ー! ごめーん! おまたせー!",
-                "もこ子は息を切らせながら俺たちの方へ走ってきた",
-                "{name}:;",
-            ],
-            "2": [
-                "{name}:;お待たせお待たせ あれ? もこ美は?",
-                "もこ音:;まだ来てないですね",
-            ],
-        }
-    ),
-]
+from story import serifs
 
 
 class MainScene:
@@ -237,7 +65,7 @@ class MainScene:
         pygame.mixer.init()  # 初期化
 
     def set_save_command(self):
-        s = [
+        save_data_list = [
             save["name"] + ": chapter " + str(save["chapter"]) for save in self.saves
         ] + ["空のデータ"]
 
@@ -251,14 +79,15 @@ class MainScene:
             80,
             RegexDict(
                 {
-                    "": s,
+                    "": save_data_list,
                     ".": ["ロード", "セーブ", "やめる"],
                     ".[0-1]": ["はい", "いいえ"],
+                    ".2": ["ERROR"],
                 }
             ),
         )
 
-    def mainloop(self) -> None:
+    def mainloop(self):
         self.screen.fill((0, 0, 0))  # 背景を黒
 
         if self.mode == "text" or self.mode == "log":
@@ -315,6 +144,7 @@ class MainScene:
         if self.mode == "text":
             if is_pushed_escape:
                 self.mode = "pause"
+                self.title_command.reset()
 
             if is_pushed_log:
                 self.mode = "log"
@@ -360,7 +190,6 @@ class MainScene:
 
             elif self.title_command.branch == "1":
                 self.mode = "text"
-                self.title_command.reset()
 
         pygame.display.update()  # 画面更新
 
@@ -378,9 +207,7 @@ class MainScene:
             self.story_command.run()
 
             if re.match("^.$", self.story_command.branch):
-                self.log.append(
-                    self.story_command.options[""][int(self.story_command.branch)]
-                )
+                self.log.append(self.story_command.get_selected_option())
                 self.branch += self.story_command.branch
                 self.text_num = 0
                 self.frame = 0
@@ -429,11 +256,31 @@ class MainScene:
                 # self.pushed.clear()
                 self.frame = 0
 
+        elif element == "darken":
+            scr = pygame.Surface((800, 600), flags=pygame.SRCALPHA)
+            scr.fill((0, 0, 0, 255 * self.frame / 60))
+            self.screen.blit(scr, (0, 0))
+
+            if self.frame == 60:
+                self.text_num += 1
+                self.frame = 0
+
+        elif element == "rdarken":
+            scr = pygame.Surface((800, 600), flags=pygame.SRCALPHA)
+            scr.fill((0, 0, 0, 255 * (1 - self.frame / 60)))
+            self.screen.blit(scr, (0, 0))
+
+            if self.frame == 60:
+                self.text_num += 1
+                self.frame = 0
+
         else:
-            t = serifs[self.chapter][self.branch][self.text_num].format(name=self.name)
+            text = serifs[self.chapter][self.branch][self.text_num].format(
+                name=self.name
+            )
 
             if self.frame == 1:
-                self.log.append(t)
+                self.log.append(text)
                 self.log_slicer = None
 
             clicked = Ibutton(
@@ -451,7 +298,7 @@ class MainScene:
             )
 
             if K_RETURN in self.pushed or K_SPACE in self.pushed or clicked:
-                text_length = len(t) * 2
+                text_length = len(text) * 2
 
                 if text_length > self.frame:
                     self.frame = text_length
@@ -464,7 +311,7 @@ class MainScene:
                     self.branch += "#"
 
             if self.frame % 60 < 30:
-                t += "▼"
+                text += "▼"
 
             Itext(
                 self.screen,
@@ -472,7 +319,7 @@ class MainScene:
                 (255, 255, 255),
                 50,
                 340,
-                t,
+                text,
                 max_width=700,
                 frame=self.frame / 2,
             )
@@ -543,15 +390,37 @@ class MainScene:
         if self.save_command.branch == "":
             Itext(self.screen, self.font, (255, 255, 255), 50, 40, "セーブデータを選択")
 
+            for i, save in enumerate(self.saves):
+                current_text = serifs[save["chapter"]][save["branch"]][save["text_num"]]
+
+                if len(current_text) > 6:
+                    current_text = current_text[:6] + "..."
+
+                Itext(
+                    self.screen,
+                    self.font,
+                    (255, 255, 255),
+                    520,
+                    80 + self.font.get_height() * i,
+                    '"' + current_text + '"',
+                )
+
         elif re.match("^.$", self.save_command.branch):
+            save = self.saves[self.save_command.get_selected_num()]
+            current_text = serifs[save["chapter"]][save["branch"]][save["text_num"]]
+
+            if len(current_text) > 8:
+                current_text = current_text[:8] + "..."
+
             Itext(
                 self.screen,
                 self.font,
                 (255, 255, 255),
                 50,
                 40,
-                self.save_command.options[""][int(self.save_command.branch)],
+                self.save_command.get_selected_option() + ' "' + current_text + '"',
             )
+
         elif re.match("^.[0-1]$", self.save_command.branch):
             Itext(self.screen, self.font, (255, 255, 255), 50, 40, "ほんとに?")
 
@@ -559,9 +428,9 @@ class MainScene:
 
         if re.match("^.00$", self.save_command.branch):
             # load->yes
-            save_data_number = int(self.save_command.branch[0])
+            save_data_number = self.save_command.get_selected_num(3)
 
-            if len(self.saves) <= save_data_number:
+            if len(self.saves) == save_data_number:
                 self.save_command.cancel()
                 return
 
@@ -574,9 +443,9 @@ class MainScene:
 
         elif re.match("^.10$", self.save_command.branch):
             # save->yes
-            save_data_number = int(self.save_command.branch[0])
+            save_data_number = self.save_command.get_selected_num(3)
 
-            if len(self.saves) <= save_data_number:
+            if len(self.saves) == save_data_number:
                 self.saves.append({})
 
             # print(self.saves, save_data_number)

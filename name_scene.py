@@ -25,7 +25,7 @@ class NameScene:
         self.num = 0
         self.name = "もこた"
 
-    def mainloop(self) -> None:
+    def mainloop(self):
         self.screen.fill((255, 201, 214))
 
         if K_RIGHT in self.pushed:
