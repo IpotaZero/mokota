@@ -1,3 +1,4 @@
+import math
 import sys
 import pygame
 from pygame.locals import *
@@ -16,11 +17,8 @@ class TitleScene:
         self.pushed = pushed
         self.saves = saves
 
-        font = pygame.font.Font("DotGothic16-Regular.ttf", 48)
+        self.font = pygame.font.Font("DotGothic16-Regular.ttf", 64)
         self.font2 = pygame.font.Font("DotGothic16-Regular.ttf", 32)
-
-        # フォントの設定
-        self.title_text = font.render("MicroComputerReserch!", False, (255, 255, 255))
 
         self.start()
 
@@ -30,31 +28,55 @@ class TitleScene:
             self.pushed,
             self.screen,
             self.font2,
-            (255, 255, 255),
+            (255, 201, 214),
             20,
             180,
             RegexDict(
                 {
-                    "": ["Start", "Continue", "Exit"],
+                    "": [
+                        "はじめから",
+                        "とちゅうから",
+                        "イラスト",
+                        "せってい",
+                        "やめる",
+                    ],
                     "1": [
                         save["name"] + ": chapter " + str(save["chapter"])
                         for save in self.saves
                     ]
-                    + ["CANCEL"],
+                    + ["やめる"],
                 }
             ),
+            outline_width=2,
+            outline_colour=[(255, 255, 255)],
         )
 
         self.is_end = False
 
-    def mainloop(self) -> None:
-        self.screen.fill((0, 0, 0))  # 背景を黒
+        pygame.mixer.init()  # 初期化
 
-        self.screen.blit(self.title_text, (20, 20))
+        pygame.mixer.music.stop()
+        # pygame.mixer.music.load("sounds/試作19 2.mp3")
+        # pygame.mixer.music.play(-1)
+
+    def mainloop(self) -> None:
+        self.screen.fill((255, 201, 224))
+
+        Itext(
+            self.screen,
+            self.font,
+            (255, 201, 214),
+            20,
+            20,
+            "もこもこマイコン部!",
+            outline_width=5,
+            outline_colour=[(255, 255, 255)],
+        )
 
         self.command.run()
 
         if self.command.branch == "0":
+            pygame.mixer.music.fadeout(1000)
             self.is_end = True
 
         elif self.command.branch == "1":
@@ -64,13 +86,17 @@ class TitleScene:
             Itext(
                 self.screen,
                 self.font2,
-                (255, 255, 255),
+                (255, 201, 214),
                 20,
                 130,
-                "Choose Save Data",
+                "セーブデータを選択",
+                outline_width=2,
+                outline_colour=[(255, 255, 255)],
             )
+        elif self.command.branch == "3":
+            pass
 
-        elif self.command.branch == "2":
+        elif self.command.branch == "4":
             pygame.quit()  # 全てのpygameモジュールの初期化を解除
             sys.exit()  # 終了（ないとエラーで終了することになる）
 
@@ -79,6 +105,7 @@ class TitleScene:
                 self.command.cancel(2)
                 return
 
+            pygame.mixer.music.fadeout(1000)
             self.is_end = True
             return int(self.command.branch[1])
 

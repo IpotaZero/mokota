@@ -7,6 +7,7 @@ import sys
 import title_scene
 import main_scene
 import name_scene
+import darkening_scene
 
 
 def main():
@@ -34,14 +35,12 @@ def main():
         "main": main_scene.MainScene(screen, pushed, mouse, saves),
         "name": name_scene.NameScene(screen, pushed, mouse),
         "title": title_scene.TitleScene(screen, pushed, mouse, saves),
+        "darkening": darkening_scene.DarkeningScene(screen),
     }
-
-    frame = 0
 
     current_scene = scenes["title"]
 
     while True:
-        frame += 1
         # イベント処理
         for event in pygame.event.get():  # イベントを取得
             if event.type == QUIT:  # 閉じるボタンが押されたら
@@ -56,23 +55,30 @@ def main():
                 mouse["clicked"] = True
                 mouse["position"] = event.pos
 
-        r = current_scene.mainloop()
+        result = current_scene.mainloop()
 
         if current_scene.is_end:
             current_scene.is_end = False
             if current_scene.scene_name == "title":
-                if r is None:
-                    current_scene = scenes["name"]
+                scenes["main"].save_data_num = result
+
+                if result is None:
+                    scenes["darkening"].next_scene = "name"
+                    current_scene = scenes["darkening"]
                 else:
-                    current_scene = scenes["main"]
-                    current_scene.load_save_data(r)
+                    scenes["darkening"].next_scene = "main"
+                    current_scene = scenes["darkening"]
 
             elif current_scene.scene_name == "name":
                 current_scene = scenes["main"]
-                current_scene.name = r
+                current_scene.name = result
 
             elif current_scene.scene_name == "main":
-                current_scene = scenes["title"]
+                scenes["darkening"].next_scene = "title"
+                current_scene = scenes["darkening"]
+
+            elif current_scene.scene_name == "darkening":
+                current_scene = scenes[current_scene.next_scene]
 
             current_scene.start()
 

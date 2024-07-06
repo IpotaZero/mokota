@@ -4,7 +4,7 @@ from pygame.locals import *
 
 from Ifunctions import *
 
-moji = "あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをんがぎぐげござじずぜぞだぢづでどばびぶべぼぱぴぷぺぽぁぃぅぇぉゃゅょっー消終"
+moji = "あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもらりるれろやゆよわをがぎぐげござじずぜぞだぢづでどばびぶべぼぱぴぷぺぽぁぃぅぇぉゃゅょっーん消終"
 
 
 class NameScene:
@@ -26,7 +26,7 @@ class NameScene:
         self.name = "もこた"
 
     def mainloop(self) -> None:
-        self.screen.fill((0, 0, 0))  # 背景を黒
+        self.screen.fill((255, 201, 214))
 
         if K_RIGHT in self.pushed:
             self.num += 1
@@ -49,7 +49,7 @@ class NameScene:
                 if len(self.name) > 0:
                     self.name = self.name[:-1]
 
-            elif len(self.name) < 12:
+            elif len(self.name) < 7:
                 self.name += moji[self.num]
 
         elif K_BACKSPACE in self.pushed or K_ESCAPE in self.pushed:
@@ -62,7 +62,7 @@ class NameScene:
             (255, 255, 255),
             40,
             30,
-            "Enter Your Name:",
+            "名前を入力:",
         )
 
         Itext(
@@ -110,7 +110,7 @@ class NameScene:
                     if len(self.name) > 0:
                         self.name = self.name[:-1]
 
-                elif len(self.name) < 12:
+                elif len(self.name) < 7:
                     self.name += moji[self.num]
 
         m = ";" * math.floor(self.num / 15) + "  " * (self.num % 15) + moji[self.num]
@@ -118,7 +118,7 @@ class NameScene:
         Itext(
             self.screen,
             self.font,
-            (255, 255, 0),
+            (255, 240, 0),
             40,
             100,
             m,

@@ -1,3 +1,4 @@
+import math
 import pygame
 import re
 from pygame.locals import *
@@ -38,6 +39,8 @@ def Itext(
     frame: int = 10000,
     max_width: int = 10000,
     max_height: int = 10000,
+    outline_width: int = 0,
+    outline_colour: list[tuple[int, int, int]] = [(0, 0, 0)],
 ):
     blitx = 0
     blity = 0
@@ -63,6 +66,27 @@ def Itext(
         if blity >= max_height:
             break
 
+        if outline_width > 0:
+            for j, ocolour in enumerate(reversed(outline_colour)):
+                jtext2 = font.render(char, False, ocolour)
+
+                for i in range(8):
+                    screen.blit(
+                        jtext2,
+                        (
+                            x
+                            + blitx
+                            + math.cos(2 * math.pi * i / 8)
+                            * outline_width
+                            * (len(outline_colour) - j),
+                            y
+                            + blity
+                            + math.sin(2 * math.pi * i / 8)
+                            * outline_width
+                            * (len(outline_colour) - j),
+                        ),
+                    )
+
         # 貼り付ける文字列、貼り付ける場所
         screen.blit(jtext, (x + blitx, y + blity))
 
@@ -82,6 +106,8 @@ def Ibutton(
     text: str,
     line_width=2,
     text_alighn="center",
+    outline_width: int = 0,
+    outline_colour: tuple[int, int, int] = (0, 0, 0),
 ):
     button = pygame.Rect(x, y, width, height)  # creates a rect object
     if line_width > 0:
@@ -92,11 +118,28 @@ def Ibutton(
     text_height = jtext.get_rect().h / 2
 
     if text_alighn == "center":
-        screen.blit(
-            jtext, (x + width / 2 - text_width, y + height / 2 - text_height - 1)
+        Itext(
+            screen,
+            font,
+            text_colour,
+            x + width / 2 - text_width,
+            y + height / 2 - text_height - 1,
+            text,
+            outline_width=outline_width,
+            outline_colour=outline_colour,
         )
+
     elif text_alighn == "left":
-        screen.blit(jtext, (x, y + height / 2 - text_height - 1))
+        Itext(
+            screen,
+            font,
+            text_colour,
+            x + width / 2 - text_width,
+            y + height / 2 - text_height - 1,
+            text,
+            outline_width=outline_width,
+            outline_colour=outline_colour,
+        )
 
     if (
         mouse["clicked"]
@@ -130,6 +173,8 @@ class Icommand:
         x: int,
         y: int,
         options: RegexDict,
+        outline_width: int = 0,
+        outline_colour: tuple[int, int, int] = (0, 0, 0),
     ) -> None:
         self.mouse = mouse
         self.pushed = pushed
@@ -139,6 +184,9 @@ class Icommand:
         self.x = x
         self.y = y
         self.options = options
+
+        self.outline_width = outline_width
+        self.outline_colour = outline_colour
 
         self.reset()
 
@@ -187,6 +235,8 @@ class Icommand:
                 text,
                 line_width=0,
                 text_alighn="left",
+                outline_width=self.outline_width,
+                outline_colour=self.outline_colour,
             )
 
             if selected:
@@ -201,6 +251,8 @@ class Icommand:
             self.x,
             self.y + self.font.get_height() * self.num,
             "→",
+            outline_width=self.outline_width,
+            outline_colour=self.outline_colour,
         )
 
     def cancel(self, n=1):

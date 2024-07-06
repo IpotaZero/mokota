@@ -15,7 +15,7 @@ serifs = [
                 "俺の名前は{name}",
                 "今年、大阪公立大に入学するしがない猫(?)だ",
                 "そんな俺は今、とてつもなく悩んでいる;そう、どのサークルに入るか、だ",
-                "入学してから2週間、俺はいまだにどのサークルにも入っていないのだ",
+                "入学してから1か月、俺はいまだにどのサークルにも入っていないのだ",
                 "どのサークルに入るかが大学生活の行き先を決めるといっても過言ではない",
                 "しかし、俺にはこれといって得意なこともないし;どうすっかなー...",
                 "そんなことを考えながら俺は部活紹介の冊子をめくる",
@@ -30,12 +30,16 @@ serifs = [
                 "そう思いながら俺はドアノブをひねる",
                 "{name}:;失礼しま...",
                 "???:;ご来場ありがとうございまーす!!",
+                "sound",
+                "party_popper2.mp3",
+                "sleep",
+                1,
                 "{name}:;うわぁっ!?",
                 "いきなりのクラッカーの音で俺は思わず後ろに転んでしまう",
                 "???:;あはは、ごめんね! 大丈夫?",
                 "明るい声とともに差し出された手;その先を見ると...",
                 "{name}:;お前...もしかしてもこ子か!?",
-                "もこ子:;およ? ...もしかして{name}くん? わー、おひさー! 中学ぶりだよね!",
+                "もこ子:;およ? ...もしかして{name}くん?;わー、おひさー! 中学ぶりだよね!",
                 "そこにいたのは、なんともこ子だった!;久々に会ったからか、ずいぶん垢抜けたように見える",
                 "???:;あら、もこ子のお友達?",
                 "もこ子の後ろから顔がのぞく",
@@ -56,7 +60,7 @@ serifs = [
                 "{name}:;そういえば、もこ子、お前はなんでこのサークルに入ったんだ?",
                 "もこ子:;んー、えーっとね、実は私、高校の頃ゲーム作ってたの!",
                 "{name}:;えっ!? お前がゲームを?",
-                "あまりの驚きに俺は思わず目を丸くする;なぜなら、俺たちが中学の頃もこ子は不器用の代名詞だったからだ",
+                "あまりの驚きに俺は思わず目を丸くする;なぜなら、俺たちが中学の頃、もこ子は不器用の代名詞だったからだ",
                 "もこ子:;えへへー あんまりすごくはないけどね",
                 "もこ美:;もこ子のコードはある意味すごいのよね... なんで動いてるのかしら...",
                 "{name}:;は、はぁ ところであんたはこのサークルでどんなことをしてるんだ?",
@@ -190,6 +194,8 @@ class MainScene:
 
         self.font = pygame.font.Font("DotGothic16-Regular.ttf", 32)
 
+        self.save_data_num = None
+
         self.start()
 
     def start(self):
@@ -198,12 +204,9 @@ class MainScene:
 
         self.mode = "text"
 
-        self.chapter = 0
-        self.text_num = 0
-        self.branch = ""
         self.frame = 0
 
-        self.credits = [0, 0, 0]
+        self.load_save_data(self.save_data_num)
 
         self.story_command = Icommand(
             self.mouse,
@@ -212,7 +215,7 @@ class MainScene:
             self.font,
             (255, 255, 255),
             50,
-            400,
+            340,
             RegexDict({}),
         )
 
@@ -225,8 +228,8 @@ class MainScene:
             self.font,
             (255, 255, 255),
             50,
-            400,
-            RegexDict({"": ["BACK TO TITLE", "RESUME"], "0": ["YES", "NO"]}),
+            340 + self.font.get_height(),
+            RegexDict({"": ["タイトルに戻る", "再開する"], "0": ["はい", "いいえ"]}),
         )
 
         self.is_end = False
@@ -236,7 +239,7 @@ class MainScene:
     def set_save_command(self):
         s = [
             save["name"] + ": chapter " + str(save["chapter"]) for save in self.saves
-        ] + ["nodata"]
+        ] + ["空のデータ"]
 
         self.save_command = Icommand(
             self.mouse,
@@ -247,7 +250,11 @@ class MainScene:
             50,
             80,
             RegexDict(
-                {"": s, ".": ["LOAD", "SAVE", "CANCEL"], ".[0-1]": ["YES", "NO"]}
+                {
+                    "": s,
+                    ".": ["ロード", "セーブ", "やめる"],
+                    ".[0-1]": ["はい", "いいえ"],
+                }
             ),
         )
 
@@ -263,7 +270,7 @@ class MainScene:
                     (255, 255, 255),
                     (255, 255, 255),
                     30,
-                    30,
+                    530,
                     100,
                     40,
                     "LOG",
@@ -280,7 +287,7 @@ class MainScene:
                     (255, 255, 255),
                     (255, 255, 255),
                     670,
-                    30,
+                    530,
                     100,
                     40,
                     "SAVE",
@@ -297,7 +304,7 @@ class MainScene:
                     (255, 255, 255),
                     (255, 255, 255),
                     670,
-                    90,
+                    30,
                     100,
                     40,
                     "TITLE",
@@ -336,7 +343,16 @@ class MainScene:
 
             self.title_command.run()
 
-            if self.title_command.branch == "00":
+            if self.title_command.branch == "0":
+                Itext(
+                    self.screen,
+                    self.font,
+                    (255, 255, 255),
+                    50,
+                    340,
+                    "ほんとに?",
+                )
+            elif self.title_command.branch == "00":
                 self.is_end = True
 
             elif self.title_command.branch == "01":
@@ -362,6 +378,9 @@ class MainScene:
             self.story_command.run()
 
             if re.match("^.$", self.story_command.branch):
+                self.log.append(
+                    self.story_command.options[""][int(self.story_command.branch)]
+                )
                 self.branch += self.story_command.branch
                 self.text_num = 0
                 self.frame = 0
@@ -424,9 +443,9 @@ class MainScene:
                 (255, 255, 255),
                 (255, 255, 255),
                 50,
-                400,
+                340,
                 700,
-                150,
+                180,
                 "",
                 line_width=0,
             )
@@ -452,27 +471,26 @@ class MainScene:
                 self.font,
                 (255, 255, 255),
                 50,
-                400,
+                340,
                 t,
                 max_width=700,
                 frame=self.frame / 2,
             )
 
     def mode_log(self):
-
         text = Iadjust(self.font, ";".join(self.log), 700)
 
         row = text.split(";")
 
         if self.log_slicer is None:
-            self.log_slicer = len(row) - 9
+            self.log_slicer = max([len(row) - 9, 0])
 
         Itext(
             self.screen,
             self.font,
             (255, 255, 255),
             50,
-            80,
+            65,
             ";".join(row[self.log_slicer :]),
             max_width=700,
             max_height=400,
@@ -482,15 +500,40 @@ class MainScene:
 
         if line > 9:
             if line - self.log_slicer > 9:
-                Itext(self.screen, self.font, (255, 255, 255), 380, 500, "▼")
+                is_pushed_down = Ibutton(
+                    self.mouse,
+                    self.screen,
+                    self.font,
+                    (255, 255, 255),
+                    (255, 255, 255),
+                    130,
+                    500,
+                    500,
+                    32,
+                    "▼",
+                    line_width=2,
+                )
+                # Itext(self.screen, self.font, (255, 255, 255), 380, 500, "▼")
 
-                if K_DOWN in self.pushed:
+                if K_DOWN in self.pushed or is_pushed_down:
                     self.log_slicer += 1
                     self.log_slicer %= line
             if self.log_slicer > 0:
-                Itext(self.screen, self.font, (255, 255, 255), 380, 30, "▲")
+                is_pushed_up = Ibutton(
+                    self.mouse,
+                    self.screen,
+                    self.font,
+                    (255, 255, 255),
+                    (255, 255, 255),
+                    130,
+                    30,
+                    500,
+                    32,
+                    "▲",
+                    line_width=2,
+                )
 
-                if K_UP in self.pushed:
+                if K_UP in self.pushed or is_pushed_up:
                     self.log_slicer += line - 1
                     self.log_slicer %= line
 
@@ -498,7 +541,7 @@ class MainScene:
         self.save_command.run()
 
         if self.save_command.branch == "":
-            Itext(self.screen, self.font, (255, 255, 255), 50, 40, "Choose Save Data")
+            Itext(self.screen, self.font, (255, 255, 255), 50, 40, "セーブデータを選択")
 
         elif re.match("^.$", self.save_command.branch):
             Itext(
@@ -510,7 +553,7 @@ class MainScene:
                 self.save_command.options[""][int(self.save_command.branch)],
             )
         elif re.match("^.[0-1]$", self.save_command.branch):
-            Itext(self.screen, self.font, (255, 255, 255), 50, 40, "Really?")
+            Itext(self.screen, self.font, (255, 255, 255), 50, 40, "ほんとに?")
 
         # print(self.save_command.branch, self.save_command.num)
 
@@ -525,6 +568,9 @@ class MainScene:
             self.load_save_data(save_data_number)
 
             self.save_command.cancel(3)
+
+            self.log = []
+            self.mode = "text"
 
         elif re.match("^.10$", self.save_command.branch):
             # save->yes
@@ -558,10 +604,14 @@ class MainScene:
             self.save_command.cancel(2)
 
     def load_save_data(self, save_data_number):
-        self.name = self.saves[save_data_number]["name"]
-        self.chapter = self.saves[save_data_number]["chapter"]
-        self.branch = self.saves[save_data_number]["branch"]
-        self.text_num = self.saves[save_data_number]["text_num"]
-        self.credits = self.saves[save_data_number]["credits"]
+        self.chapter = 0
+        self.text_num = 0
+        self.branch = ""
+        self.credits = [0, 0, 0]
 
-        self.frame = 0
+        if save_data_number is not None:
+            self.name = self.saves[save_data_number]["name"]
+            self.chapter = self.saves[save_data_number]["chapter"]
+            self.branch = self.saves[save_data_number]["branch"]
+            self.text_num = self.saves[save_data_number]["text_num"]
+            self.credits = self.saves[save_data_number]["credits"]
