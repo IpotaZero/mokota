@@ -72,9 +72,9 @@ class TitleScene:
             self.screen,
             self.font,
             (255, 201, 214),
+            150,
             20,
-            20,
-            "もこもこマイコン部!",
+            "初恋コードライン",
             outline_width=5,
             outline_colour=[(255, 255, 255)],
         )
@@ -99,6 +99,9 @@ class TitleScene:
 
             for i, save in enumerate(self.saves):
                 current_text = serifs[save["chapter"]][save["branch"]][save["text_num"]]
+                if type(current_text) != str:
+                    current_text = "ERROR"
+                # print(type(current_text))
 
                 if len(current_text) > 6:
                     current_text = current_text[:6] + "..."

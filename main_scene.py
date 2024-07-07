@@ -62,6 +62,9 @@ class MainScene:
 
         self.is_end = False
 
+        self.images = []
+        self.letter_colour = (255, 255, 255)
+
         pygame.mixer.init()  # 初期化
 
     def set_save_command(self):
@@ -89,6 +92,8 @@ class MainScene:
 
     def mainloop(self):
         self.screen.fill((0, 0, 0))  # 背景を黒
+        for image in self.images:
+            self.screen.blit(image, (0, 0))
 
         if self.mode == "text" or self.mode == "log":
             is_pushed_log = (
@@ -274,10 +279,25 @@ class MainScene:
                 self.text_num += 1
                 self.frame = 0
 
-        else:
-            text = serifs[self.chapter][self.branch][self.text_num].format(
-                name=self.name
+        elif element == "image":
+            img = pygame.image.load(
+                "images/" + serifs[self.chapter][self.branch][self.text_num + 1]
             )
+            self.images.append(pygame.transform.scale(img, (800, 600)))
+            self.text_num += 2
+
+        elif element == "delete_image":
+            r = serifs[self.chapter][self.branch][self.text_num + 1]
+            del self.images[r]
+            self.text_num += 2
+
+        else:
+            text = serifs[self.chapter][self.branch][self.text_num]
+
+            if type(text) != str:
+                text = "ERROR"
+
+            text = text.format(name=self.name)
 
             if self.frame == 1:
                 self.log.append(text)
@@ -346,6 +366,8 @@ class MainScene:
         line = len(row)
 
         if line > 9:
+            scroll = Iscroll(self.mouse, 50, 70, 700, 460)
+
             if line - self.log_slicer > 9:
                 is_pushed_down = Ibutton(
                     self.mouse,
@@ -362,7 +384,11 @@ class MainScene:
                 )
                 # Itext(self.screen, self.font, (255, 255, 255), 380, 500, "▼")
 
-                if K_DOWN in self.pushed or is_pushed_down:
+                if (
+                    K_DOWN in self.pushed
+                    or is_pushed_down
+                    or (scroll[0] and scroll[1] == "down")
+                ):
                     self.log_slicer += 1
                     self.log_slicer %= line
             if self.log_slicer > 0:
@@ -380,7 +406,11 @@ class MainScene:
                     line_width=2,
                 )
 
-                if K_UP in self.pushed or is_pushed_up:
+                if (
+                    K_UP in self.pushed
+                    or is_pushed_up
+                    or (scroll[0] and scroll[1] == "up")
+                ):
                     self.log_slicer += line - 1
                     self.log_slicer %= line
 
@@ -392,6 +422,8 @@ class MainScene:
 
             for i, save in enumerate(self.saves):
                 current_text = serifs[save["chapter"]][save["branch"]][save["text_num"]]
+                if type(current_text) != str:
+                    current_text = "ERROR"
 
                 if len(current_text) > 6:
                     current_text = current_text[:6] + "..."
@@ -408,6 +440,8 @@ class MainScene:
         elif re.match("^.$", self.save_command.branch):
             save = self.saves[self.save_command.get_selected_num()]
             current_text = serifs[save["chapter"]][save["branch"]][save["text_num"]]
+            if type(current_text) != str:
+                current_text = "ERROR"
 
             if len(current_text) > 8:
                 current_text = current_text[:8] + "..."
@@ -477,6 +511,9 @@ class MainScene:
         self.text_num = 0
         self.branch = ""
         self.credits = [0, 0, 0]
+
+        self.frame = 0
+        self.images = []
 
         if save_data_number is not None:
             self.name = self.saves[save_data_number]["name"]

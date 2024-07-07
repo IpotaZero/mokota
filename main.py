@@ -29,7 +29,13 @@ def main():
 
     pressed = []
     pushed = []
-    mouse = {"clicked": False, "position": (0, 0)}
+    mouse = {
+        "clicked": False,
+        "right_clicked": False,
+        "up": False,
+        "down": False,
+        "position": (0, 0),
+    }
 
     scenes = {
         "main": main_scene.MainScene(screen, pushed, mouse, saves),
@@ -52,8 +58,18 @@ def main():
             elif event.type == KEYUP:
                 pressed.remove(event.key)
             elif event.type == MOUSEBUTTONDOWN:
-                mouse["clicked"] = True
+                if event.button == 1:
+                    mouse["clicked"] = True
+                elif event.button == 3:
+                    mouse["right_clicked"] = True
+                elif event.button == 4:
+                    mouse["up"] = True
+                elif event.button == 5:
+                    mouse["down"] = True
+
                 mouse["position"] = event.pos
+
+                # print(event.pos)
 
         result = current_scene.mainloop()
 
@@ -85,6 +101,9 @@ def main():
 
         pushed.clear()
         mouse["clicked"] = False
+        mouse["right_clicked"] = False
+        mouse["up"] = False
+        mouse["down"] = False
         clock.tick(60)
 
 

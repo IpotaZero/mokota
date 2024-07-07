@@ -151,6 +151,22 @@ def Ibutton(
     return False
 
 
+def Iscroll(mouse: dict, x: int, y: int, width: int, height: int) -> tuple[bool, str]:
+    if not (mouse["up"] or mouse["down"]):
+        return (False, "none")
+
+    if (
+        x <= mouse["position"][0] <= x + width
+        and y <= mouse["position"][1] <= y + height
+    ):
+        if mouse["up"]:
+            return (True, "up")
+        else:
+            return (True, "down")
+
+    return (False, "none")
+
+
 class RegexDict:
     def __init__(self, regex_dict: dict):
         self.regex_dict = regex_dict
