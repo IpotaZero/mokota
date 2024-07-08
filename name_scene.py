@@ -26,6 +26,7 @@ class NameScene:
         self.name = "もこた"
 
     def mainloop(self):
+        row_letter_num = 20
         self.screen.fill((255, 201, 224))
 
         if K_RIGHT in self.pushed:
@@ -35,10 +36,10 @@ class NameScene:
             self.num += len(moji) - 1
             self.num %= len(moji)
         elif K_DOWN in self.pushed:
-            self.num += 15
+            self.num += row_letter_num
             self.num %= len(moji)
         elif K_UP in self.pushed:
-            self.num += len(moji) - 15
+            self.num += len(moji) - row_letter_num
             self.num %= len(moji)
         elif K_RETURN in self.pushed or K_SPACE in self.pushed:
             if self.num == len(moji) - 1:
@@ -85,20 +86,34 @@ class NameScene:
         # )
 
         for i, char in enumerate(moji):
-            size = 48
+            size = 56
+
+            x = 40 + (i % row_letter_num) * size
+            y = 112 + math.floor(i / row_letter_num) * self.font.get_height()
+
             selected = Ibutton(
                 self.mouse,
                 self.screen,
                 self.font,
                 (255, 255, 255),
                 (255, 255, 255),
-                40 + (i % 15) * size,
-                112 + math.floor(i / 15) * self.font.get_height(),
+                x,
+                y,
                 size,
                 size,
                 char,
                 line_width=0,
             )
+
+            if i == self.num:
+                Itext(
+                    self.screen,
+                    self.font,
+                    (255, 240, 0),
+                    x + 4,
+                    y - 8,
+                    char,
+                )
 
             if selected:
                 self.num = i
@@ -113,15 +128,19 @@ class NameScene:
                 elif len(self.name) < 7:
                     self.name += moji[self.num]
 
-        m = ";" * math.floor(self.num / 15) + "  " * (self.num % 15) + moji[self.num]
+        # m = (
+        #     ";" * math.floor(self.num / row_letter_num)
+        #     + "  " * (self.num % row_letter_num)
+        #     + moji[self.num]
+        # )
 
-        Itext(
-            self.screen,
-            self.font,
-            (255, 240, 0),
-            40,
-            100,
-            m,
-        )
+        # Itext(
+        #     self.screen,
+        #     self.font,
+        #     (255, 240, 0),
+        #     40,
+        #     100,
+        #     m,
+        # )
 
         pygame.display.update()  # 画面更新

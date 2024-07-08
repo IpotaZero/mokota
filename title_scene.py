@@ -29,7 +29,7 @@ class TitleScene:
             self.pushed,
             self.screen,
             self.font2,
-            (255, 201, 214),
+            (255, 255, 255),
             20,
             180,
             RegexDict(
@@ -53,8 +53,8 @@ class TitleScene:
                     "4": ["はい", "いいえ"],
                 }
             ),
-            outline_width=2,
-            outline_colour=[(255, 255, 255)],
+            # outline_width=2,
+            # outline_colour=[(255, 255, 255)],
         )
 
         self.is_end = False
@@ -72,8 +72,8 @@ class TitleScene:
             self.screen,
             self.font,
             (255, 201, 214),
-            150,
-            20,
+            350,
+            50,
             "初恋コードライン",
             outline_width=5,
             outline_colour=[(255, 255, 255)],
@@ -89,12 +89,12 @@ class TitleScene:
             Itext(
                 self.screen,
                 self.font2,
-                (255, 201, 214),
+                (255, 255, 255),
                 20,
                 130,
                 "セーブデータを選択",
-                outline_width=2,
-                outline_colour=[(255, 255, 255)],
+                # outline_width=2,
+                # outline_colour=[(255, 255, 255)],
             )
 
             for i, save in enumerate(self.saves):
@@ -103,18 +103,22 @@ class TitleScene:
                     current_text = "ERROR"
                 # print(type(current_text))
 
-                if len(current_text) > 6:
-                    current_text = current_text[:6] + "..."
+                max_letter_num = 18
+
+                if len(current_text) > max_letter_num:
+                    current_text = (
+                        current_text[:max_letter_num].replace(";", "") + "..."
+                    )
 
                 Itext(
                     self.screen,
                     self.font2,
-                    (255, 201, 214),
+                    (255, 255, 255),
                     500,
                     180 + self.font2.get_height() * i,
                     '"' + current_text + '"',
-                    outline_width=2,
-                    outline_colour=[(255, 255, 255)],
+                    # outline_width=2,
+                    # outline_colour=[(255, 255, 255)],
                 )
 
         elif re.match("^1.$", self.command.branch):
@@ -126,12 +130,12 @@ class TitleScene:
             Itext(
                 self.screen,
                 self.font2,
-                (255, 201, 214),
+                (255, 255, 255),
                 20,
                 130,
                 "どうする?",
-                outline_width=2,
-                outline_colour=[(255, 255, 255)],
+                # outline_width=2,
+                # outline_colour=[(255, 255, 255)],
             )
 
         elif re.match("^1.0$", self.command.branch):
@@ -145,12 +149,12 @@ class TitleScene:
             Itext(
                 self.screen,
                 self.font2,
-                (255, 201, 214),
+                (255, 255, 255),
                 20,
                 130,
                 "ほんとに?",
-                outline_width=2,
-                outline_colour=[(255, 255, 255)],
+                # outline_width=2,
+                # outline_colour=[(255, 255, 255)],
             )
 
         elif re.match("^1.10$", self.command.branch):
@@ -179,12 +183,12 @@ class TitleScene:
             Itext(
                 self.screen,
                 self.font2,
-                (255, 201, 214),
+                (255, 255, 255),
                 20,
                 130,
                 "どのイラストを見る?",
-                outline_width=2,
-                outline_colour=[(255, 255, 255)],
+                # outline_width=2,
+                # outline_colour=[(255, 255, 255)],
             )
 
         elif re.match("^2.$", self.command.branch):
@@ -199,12 +203,12 @@ class TitleScene:
             Itext(
                 self.screen,
                 self.font2,
-                (255, 201, 214),
+                (255, 255, 255),
                 20,
                 130,
                 "設定",
-                outline_width=2,
-                outline_colour=[(255, 255, 255)],
+                # outline_width=2,
+                # outline_colour=[(255, 255, 255)],
             )
 
         elif re.match("^3.$", self.command.branch):
@@ -215,12 +219,12 @@ class TitleScene:
             Itext(
                 self.screen,
                 self.font2,
-                (255, 201, 214),
+                (255, 255, 255),
                 20,
                 130,
                 "ほんとに?",
-                outline_width=2,
-                outline_colour=[(255, 255, 255)],
+                # outline_width=2,
+                # outline_colour=[(255, 255, 255)],
             )
         elif self.command.branch == "40":
             pygame.quit()  # 全てのpygameモジュールの初期化を解除

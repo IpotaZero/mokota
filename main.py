@@ -21,7 +21,7 @@ def main():
             f.write(json.dumps(saves))
 
     pygame.init()  # Pygameの初期化
-    screen = pygame.display.set_mode((800, 600))  # 800*600の画面
+    screen = pygame.display.set_mode((1200, 800))  # 800*600の画面
 
     pygame.display.set_caption("MicroComputerReserch!")
 
@@ -75,6 +75,7 @@ def main():
 
         if current_scene.is_end:
             current_scene.is_end = False
+
             if current_scene.scene_name == "title":
                 scenes["main"].save_data_num = result
 

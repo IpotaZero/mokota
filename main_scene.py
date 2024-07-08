@@ -27,6 +27,9 @@ class MainScene:
         self.start()
 
     def start(self):
+        self.skip = False
+        self.auto = False
+
         self.log = []
         self.log_slicer = 0
 
@@ -43,7 +46,7 @@ class MainScene:
             self.font,
             (255, 255, 255),
             50,
-            340,
+            540,
             RegexDict({}),
         )
 
@@ -56,13 +59,13 @@ class MainScene:
             self.font,
             (255, 255, 255),
             50,
-            340 + self.font.get_height(),
+            540 + self.font.get_height(),
             RegexDict({"": ["タイトルに戻る", "再開する"], "0": ["はい", "いいえ"]}),
         )
 
         self.is_end = False
 
-        self.images = []
+        self.images: list[tuple] = []
         self.letter_colour = (255, 255, 255)
 
         pygame.mixer.init()  # 初期化
@@ -92,8 +95,8 @@ class MainScene:
 
     def mainloop(self):
         self.screen.fill((0, 0, 0))  # 背景を黒
-        for image in self.images:
-            self.screen.blit(image, (0, 0))
+        for image, pos in self.images:
+            self.screen.blit(image, pos)
 
         if self.mode == "text" or self.mode == "log":
             is_pushed_log = (
@@ -104,7 +107,7 @@ class MainScene:
                     (255, 255, 255),
                     (255, 255, 255),
                     30,
-                    530,
+                    740,
                     100,
                     40,
                     "LOG",
@@ -120,8 +123,8 @@ class MainScene:
                     self.font,
                     (255, 255, 255),
                     (255, 255, 255),
-                    670,
-                    530,
+                    1070,
+                    740,
                     100,
                     40,
                     "SAVE",
@@ -137,7 +140,7 @@ class MainScene:
                     self.font,
                     (255, 255, 255),
                     (255, 255, 255),
-                    670,
+                    1070,
                     30,
                     100,
                     40,
@@ -147,18 +150,97 @@ class MainScene:
             )
 
         if self.mode == "text":
-            if is_pushed_escape:
+            if self.skip:
+                is_pushed_skip = (
+                    Ibutton(
+                        self.mouse,
+                        self.screen,
+                        self.font,
+                        (255, 255, 255),
+                        (255, 255, 255),
+                        160,
+                        740,
+                        100,
+                        40,
+                        "SKIP",
+                        line_width=100,
+                        outline_colour=[(0, 0, 0)],
+                        outline_width=2,
+                    )
+                    or K_k in self.pushed
+                )
+            else:
+                is_pushed_skip = (
+                    Ibutton(
+                        self.mouse,
+                        self.screen,
+                        self.font,
+                        (255, 255, 255),
+                        (255, 255, 255),
+                        160,
+                        740,
+                        100,
+                        40,
+                        "SKIP",
+                    )
+                    or K_k in self.pushed
+                )
+
+            if self.auto:
+                is_pushed_auto = (
+                    Ibutton(
+                        self.mouse,
+                        self.screen,
+                        self.font,
+                        (255, 255, 255),
+                        (255, 255, 255),
+                        290,
+                        740,
+                        100,
+                        40,
+                        "AUTO",
+                        line_width=100,
+                        outline_colour=[(0, 0, 0)],
+                        outline_width=2,
+                    )
+                    or K_a in self.pushed
+                )
+            else:
+                is_pushed_auto = (
+                    Ibutton(
+                        self.mouse,
+                        self.screen,
+                        self.font,
+                        (255, 255, 255),
+                        (255, 255, 255),
+                        290,
+                        740,
+                        100,
+                        40,
+                        "AUTO",
+                    )
+                    or K_a in self.pushed
+                )
+
+            if is_pushed_skip:
+                self.skip = not self.skip
+
+            elif is_pushed_auto:
+                self.auto = not self.auto
+
+            elif is_pushed_escape:
                 self.mode = "pause"
                 self.title_command.reset()
 
-            if is_pushed_log:
+            elif is_pushed_log:
                 self.mode = "log"
 
-            if is_pushed_save:
+            elif is_pushed_save:
                 self.mode = "save"
                 self.save_command.reset()
 
             self.mode_text()
+            self.frame += 1
 
         elif self.mode == "log":
             if is_pushed_log:
@@ -184,7 +266,7 @@ class MainScene:
                     self.font,
                     (255, 255, 255),
                     50,
-                    340,
+                    540,
                     "ほんとに?",
                 )
             elif self.title_command.branch == "00":
@@ -198,8 +280,6 @@ class MainScene:
 
         pygame.display.update()  # 画面更新
 
-        self.frame += 1
-
     def mode_text(self):
         element = serifs[self.chapter][self.branch][self.text_num]
 
@@ -212,7 +292,7 @@ class MainScene:
             self.story_command.run()
 
             if re.match("^.$", self.story_command.branch):
-                self.log.append(self.story_command.get_selected_option())
+                self.log.append(self.story_command.get_selected_option() + ";")
                 self.branch += self.story_command.branch
                 self.text_num = 0
                 self.frame = 0
@@ -262,7 +342,7 @@ class MainScene:
                 self.frame = 0
 
         elif element == "darken":
-            scr = pygame.Surface((800, 600), flags=pygame.SRCALPHA)
+            scr = pygame.Surface((1200, 800), flags=pygame.SRCALPHA)
             scr.fill((0, 0, 0, 255 * self.frame / 60))
             self.screen.blit(scr, (0, 0))
 
@@ -271,7 +351,7 @@ class MainScene:
                 self.frame = 0
 
         elif element == "rdarken":
-            scr = pygame.Surface((800, 600), flags=pygame.SRCALPHA)
+            scr = pygame.Surface((1200, 800), flags=pygame.SRCALPHA)
             scr.fill((0, 0, 0, 255 * (1 - self.frame / 60)))
             self.screen.blit(scr, (0, 0))
 
@@ -283,8 +363,11 @@ class MainScene:
             img = pygame.image.load(
                 "images/" + serifs[self.chapter][self.branch][self.text_num + 1]
             )
-            self.images.append(pygame.transform.scale(img, (800, 600)))
-            self.text_num += 2
+            scale = serifs[self.chapter][self.branch][self.text_num + 2]
+            pos = serifs[self.chapter][self.branch][self.text_num + 3]
+
+            self.images.append((pygame.transform.scale(img, scale), pos))
+            self.text_num += 3
 
         elif element == "delete_image":
             r = serifs[self.chapter][self.branch][self.text_num + 1]
@@ -300,7 +383,7 @@ class MainScene:
             text = text.format(name=self.name)
 
             if self.frame == 1:
-                self.log.append(text)
+                self.log.append(text + ";")
                 self.log_slicer = None
 
             clicked = Ibutton(
@@ -310,16 +393,22 @@ class MainScene:
                 (255, 255, 255),
                 (255, 255, 255),
                 50,
-                340,
-                700,
-                180,
+                540,
+                1100,
+                190,
                 "",
                 line_width=0,
             )
 
-            if K_RETURN in self.pushed or K_SPACE in self.pushed or clicked:
-                text_length = len(text) * 2
+            text_length = len(text) * 2
 
+            if (
+                K_RETURN in self.pushed
+                or K_SPACE in self.pushed
+                or clicked
+                or self.skip
+                or (self.auto and text_length + 30 <= self.frame)
+            ):
                 if text_length > self.frame:
                     self.frame = text_length
                 else:
@@ -338,19 +427,21 @@ class MainScene:
                 self.font,
                 (255, 255, 255),
                 50,
-                340,
+                540,
                 text,
-                max_width=700,
+                max_width=1100,
                 frame=self.frame / 2,
             )
 
     def mode_log(self):
-        text = Iadjust(self.font, ";".join(self.log), 700)
+        text = Iadjust(self.font, ";".join(self.log), 1100)
 
         row = text.split(";")
 
+        max_row_num = 14
+
         if self.log_slicer is None:
-            self.log_slicer = max([len(row) - 9, 0])
+            self.log_slicer = max([len(row) - max_row_num, 0])
 
         Itext(
             self.screen,
@@ -359,25 +450,25 @@ class MainScene:
             50,
             65,
             ";".join(row[self.log_slicer :]),
-            max_width=700,
-            max_height=400,
+            max_width=1100,
+            max_height=650,
         )
 
         line = len(row)
 
-        if line > 9:
-            scroll = Iscroll(self.mouse, 50, 70, 700, 460)
+        if line > max_row_num:
+            scroll = Iscroll(self.mouse, 50, 70, 1100, 660)
 
-            if line - self.log_slicer > 9:
+            if line - self.log_slicer > max_row_num:
                 is_pushed_down = Ibutton(
                     self.mouse,
                     self.screen,
                     self.font,
                     (255, 255, 255),
                     (255, 255, 255),
-                    130,
-                    500,
-                    500,
+                    150,
+                    738,
+                    900,
                     32,
                     "▼",
                     line_width=2,
@@ -391,6 +482,7 @@ class MainScene:
                 ):
                     self.log_slicer += 1
                     self.log_slicer %= line
+
             if self.log_slicer > 0:
                 is_pushed_up = Ibutton(
                     self.mouse,
@@ -398,9 +490,9 @@ class MainScene:
                     self.font,
                     (255, 255, 255),
                     (255, 255, 255),
-                    130,
+                    150,
                     30,
-                    500,
+                    900,
                     32,
                     "▲",
                     line_width=2,
@@ -425,8 +517,12 @@ class MainScene:
                 if type(current_text) != str:
                     current_text = "ERROR"
 
-                if len(current_text) > 6:
-                    current_text = current_text[:6] + "..."
+                max_letter_num = 18
+
+                if len(current_text) > max_letter_num:
+                    current_text = (
+                        current_text[:max_letter_num].replace(";", "") + "..."
+                    )
 
                 Itext(
                     self.screen,
@@ -443,8 +539,10 @@ class MainScene:
             if type(current_text) != str:
                 current_text = "ERROR"
 
-            if len(current_text) > 8:
-                current_text = current_text[:8] + "..."
+            max_letter_num = 20
+
+            if len(current_text) > max_letter_num:
+                current_text = current_text[:max_letter_num].replace(";", "") + "..."
 
             Itext(
                 self.screen,
