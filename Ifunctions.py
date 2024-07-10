@@ -3,6 +3,22 @@ import pygame
 import re
 from pygame.locals import *
 
+keyboard = {
+    "pressed": [],
+    "pushed": [],
+    "long_pressed": [],
+}
+
+mouse = {
+    "clicked": False,
+    "double_clicked": False,
+    "right_clicked": False,
+    "up": False,
+    "down": False,
+    "position": (0, 0),
+    "last_click_time": 0,
+}
+
 
 def Iadjust(font: pygame.font.Font, text: str, max_width: int):
     blitx = 0
@@ -94,7 +110,6 @@ def Itext(
 
 
 def Ibutton(
-    mouse: dict,
     screen: pygame.Surface,
     font: pygame.font.Font,
     colour: tuple[int, int, int],
@@ -151,7 +166,7 @@ def Ibutton(
     return False
 
 
-def Iscroll(mouse: dict, x: int, y: int, width: int, height: int) -> tuple[bool, str]:
+def Iscroll(x: int, y: int, width: int, height: int) -> tuple[bool, str]:
     if not (mouse["up"] or mouse["down"]):
         return (False, "none")
 
@@ -184,8 +199,6 @@ suuji = "0123456789abcdefghijklmnopqrstuvwxyz"
 class Icommand:
     def __init__(
         self,
-        mouse: dict,
-        pushed: list[int],
         screen: pygame.Surface,
         font: pygame.font.Font,
         colour: tuple[int, int, int],
@@ -195,8 +208,6 @@ class Icommand:
         outline_width: int = 0,
         outline_colour: tuple[int, int, int] = (0, 0, 0),
     ) -> None:
-        self.mouse = mouse
-        self.pushed = pushed
         self.screen = screen
         self.font = font
         self.colour = colour
@@ -216,33 +227,30 @@ class Icommand:
     def run(self):
         option = self.options[self.branch]
 
-        if K_RETURN in self.pushed or K_SPACE in self.pushed:
-            if option is None:
-                return
+        if option is None:
+            return
+
+        if K_RETURN in keyboard["pushed"] or K_SPACE in keyboard["pushed"]:
             self.branch += suuji[self.num]
             self.num = 0
             return
         elif (
-            K_ESCAPE in self.pushed or K_BACKSPACE in self.pushed
+            K_ESCAPE in keyboard["pushed"] or K_BACKSPACE in keyboard["pushed"]
         ) and self.branch != "":
             self.cancel()
             return
 
-        if option is None:
-            return
-
         if len(option) > 0:
-            if K_UP in self.pushed:
+            if K_UP in keyboard["long_pressed"]:
                 self.num += len(option) - 1
                 self.num %= len(option)
-            elif K_DOWN in self.pushed:
+            elif K_DOWN in keyboard["long_pressed"]:
                 self.num += 1
                 self.num %= len(option)
 
         for i, text in enumerate(option):
             width = self.font.render(text, False, (255, 255, 255)).get_rect().w
             selected = Ibutton(
-                self.mouse,
                 self.screen,
                 self.font,
                 self.colour,
@@ -276,12 +284,16 @@ class Icommand:
 
     def cancel(self, n=1):
         for _ in range(n):
-            if self.branch != "":
-                self.num = self.get_selected_num()
-                self.branch = self.branch[:-1]
+            if self.branch == "":
+                break
+            self.num = self[-1]
+            self.branch = self.branch[:-1]
 
     def get_selected_option(self):
-        return self.options[self.branch[:-1]][self.get_selected_num()]
+        return self.options[self.branch[:-1]][self[-1]]
 
-    def get_selected_num(self, n=1):
-        return suuji.index(self.branch[-n])
+    def __getitem__(self, index):
+        return suuji.index(self.branch[index])
+
+    def is_match(self, key):
+        return re.match("^" + key + "$", self.branch)

@@ -3,20 +3,16 @@ import pygame
 from pygame.locals import *
 
 from Ifunctions import *
-from story import serifs
+from story import Save, serifs
 
 
 class MainScene:
-    def __init__(
-        self, screen: pygame.Surface, pushed: list[int], mouse: dict, saves: list[dict]
-    ) -> None:
+    def __init__(self, screen: pygame.Surface, saves: list[Save]) -> None:
         self.scene_name = "main"
 
         self.name = "ERROR"
 
         self.screen = screen
-        self.pushed = pushed
-        self.mouse = mouse
 
         self.saves = saves
 
@@ -40,8 +36,6 @@ class MainScene:
         self.load_save_data(self.save_data_num)
 
         self.story_command = Icommand(
-            self.mouse,
-            self.pushed,
             self.screen,
             self.font,
             (255, 255, 255),
@@ -53,8 +47,6 @@ class MainScene:
         self.set_save_command()
 
         self.title_command = Icommand(
-            self.mouse,
-            self.pushed,
             self.screen,
             self.font,
             (255, 255, 255),
@@ -76,8 +68,6 @@ class MainScene:
         ] + ["空のデータ"]
 
         self.save_command = Icommand(
-            self.mouse,
-            self.pushed,
             self.screen,
             self.font,
             (255, 255, 255),
@@ -101,7 +91,6 @@ class MainScene:
         if self.mode == "text" or self.mode == "log":
             is_pushed_log = (
                 Ibutton(
-                    self.mouse,
                     self.screen,
                     self.font,
                     (255, 255, 255),
@@ -112,13 +101,12 @@ class MainScene:
                     40,
                     "LOG",
                 )
-                or K_l in self.pushed
+                or K_l in keyboard["pushed"]
             )
 
         if self.mode == "text" or self.mode == "save":
             is_pushed_save = (
                 Ibutton(
-                    self.mouse,
                     self.screen,
                     self.font,
                     (255, 255, 255),
@@ -129,13 +117,12 @@ class MainScene:
                     40,
                     "SAVE",
                 )
-                or K_s in self.pushed
+                or K_s in keyboard["pushed"]
             )
 
         if self.mode == "text" or self.mode == "pause":
             is_pushed_escape = (
                 Ibutton(
-                    self.mouse,
                     self.screen,
                     self.font,
                     (255, 255, 255),
@@ -146,14 +133,13 @@ class MainScene:
                     40,
                     "TITLE",
                 )
-                or K_ESCAPE in self.pushed
+                or K_ESCAPE in keyboard["pushed"]
             )
 
         if self.mode == "text":
             if self.skip:
                 is_pushed_skip = (
                     Ibutton(
-                        self.mouse,
                         self.screen,
                         self.font,
                         (255, 255, 255),
@@ -167,12 +153,11 @@ class MainScene:
                         outline_colour=[(0, 0, 0)],
                         outline_width=2,
                     )
-                    or K_k in self.pushed
+                    or K_k in keyboard["pushed"]
                 )
             else:
                 is_pushed_skip = (
                     Ibutton(
-                        self.mouse,
                         self.screen,
                         self.font,
                         (255, 255, 255),
@@ -183,13 +168,12 @@ class MainScene:
                         40,
                         "SKIP",
                     )
-                    or K_k in self.pushed
+                    or K_k in keyboard["pushed"]
                 )
 
             if self.auto:
                 is_pushed_auto = (
                     Ibutton(
-                        self.mouse,
                         self.screen,
                         self.font,
                         (255, 255, 255),
@@ -203,12 +187,11 @@ class MainScene:
                         outline_colour=[(0, 0, 0)],
                         outline_width=2,
                     )
-                    or K_a in self.pushed
+                    or K_a in keyboard["pushed"]
                 )
             else:
                 is_pushed_auto = (
                     Ibutton(
-                        self.mouse,
                         self.screen,
                         self.font,
                         (255, 255, 255),
@@ -219,7 +202,7 @@ class MainScene:
                         40,
                         "AUTO",
                     )
-                    or K_a in self.pushed
+                    or K_a in keyboard["pushed"]
                 )
 
             if is_pushed_skip:
@@ -257,26 +240,7 @@ class MainScene:
         elif self.mode == "pause":
             if is_pushed_escape:
                 self.mode = "text"
-
-            self.title_command.run()
-
-            if self.title_command.branch == "0":
-                Itext(
-                    self.screen,
-                    self.font,
-                    (255, 255, 255),
-                    50,
-                    540,
-                    "ほんとに?",
-                )
-            elif self.title_command.branch == "00":
-                self.is_end = True
-
-            elif self.title_command.branch == "01":
-                self.title_command.cancel(2)
-
-            elif self.title_command.branch == "1":
-                self.mode = "text"
+            self.mode_pause()
 
         pygame.display.update()  # 画面更新
 
@@ -291,11 +255,12 @@ class MainScene:
 
             self.story_command.run()
 
-            if re.match("^.$", self.story_command.branch):
+            if self.story_command.is_match("."):
                 self.log.append(self.story_command.get_selected_option() + ";")
                 self.branch += self.story_command.branch
                 self.text_num = 0
                 self.frame = 0
+                self.story_command.reset()
 
         elif element == "credit":
             num = serifs[self.chapter][self.branch][self.text_num + 1]
@@ -387,7 +352,6 @@ class MainScene:
                 self.log_slicer = None
 
             clicked = Ibutton(
-                self.mouse,
                 self.screen,
                 self.font,
                 (255, 255, 255),
@@ -403,11 +367,18 @@ class MainScene:
             text_length = len(text) * 2
 
             if (
-                K_RETURN in self.pushed
-                or K_SPACE in self.pushed
+                K_RETURN in keyboard["pushed"]
+                or K_SPACE in keyboard["pushed"]
                 or clicked
                 or self.skip
-                or (self.auto and text_length + 30 <= self.frame)
+                or (
+                    text_length + 30 <= self.frame
+                    and (
+                        self.auto
+                        or K_RETURN in keyboard["long_pressed"]
+                        or K_SPACE in keyboard["long_pressed"]
+                    )
+                )
             ):
                 if text_length > self.frame:
                     self.frame = text_length
@@ -457,11 +428,10 @@ class MainScene:
         line = len(row)
 
         if line > max_row_num:
-            scroll = Iscroll(self.mouse, 50, 70, 1100, 660)
+            scroll = Iscroll(50, 70, 1100, 660)
 
             if line - self.log_slicer > max_row_num:
                 is_pushed_down = Ibutton(
-                    self.mouse,
                     self.screen,
                     self.font,
                     (255, 255, 255),
@@ -476,7 +446,7 @@ class MainScene:
                 # Itext(self.screen, self.font, (255, 255, 255), 380, 500, "▼")
 
                 if (
-                    K_DOWN in self.pushed
+                    K_DOWN in keyboard["long_pressed"]
                     or is_pushed_down
                     or (scroll[0] and scroll[1] == "down")
                 ):
@@ -485,7 +455,6 @@ class MainScene:
 
             if self.log_slicer > 0:
                 is_pushed_up = Ibutton(
-                    self.mouse,
                     self.screen,
                     self.font,
                     (255, 255, 255),
@@ -499,7 +468,7 @@ class MainScene:
                 )
 
                 if (
-                    K_UP in self.pushed
+                    K_UP in keyboard["long_pressed"]
                     or is_pushed_up
                     or (scroll[0] and scroll[1] == "up")
                 ):
@@ -509,20 +478,11 @@ class MainScene:
     def mode_save(self):
         self.save_command.run()
 
-        if self.save_command.branch == "":
+        if self.save_command.is_match(""):
             Itext(self.screen, self.font, (255, 255, 255), 50, 40, "セーブデータを選択")
 
             for i, save in enumerate(self.saves):
-                current_text = serifs[save["chapter"]][save["branch"]][save["text_num"]]
-                if type(current_text) != str:
-                    current_text = "ERROR"
-
-                max_letter_num = 18
-
-                if len(current_text) > max_letter_num:
-                    current_text = (
-                        current_text[:max_letter_num].replace(";", "") + "..."
-                    )
+                current_text = '"' + save.current_text(18) + '"'
 
                 Itext(
                     self.screen,
@@ -530,19 +490,17 @@ class MainScene:
                     (255, 255, 255),
                     520,
                     80 + self.font.get_height() * i,
-                    '"' + current_text + '"',
+                    current_text,
                 )
 
-        elif re.match("^.$", self.save_command.branch):
-            save = self.saves[self.save_command.get_selected_num()]
-            current_text = serifs[save["chapter"]][save["branch"]][save["text_num"]]
-            if type(current_text) != str:
-                current_text = "ERROR"
+        elif self.save_command.is_match("."):
+            selected_save_data_num = self.save_command[0]
 
-            max_letter_num = 20
+            current_text = ""
 
-            if len(current_text) > max_letter_num:
-                current_text = current_text[:max_letter_num].replace(";", "") + "..."
+            if selected_save_data_num < len(self.saves):
+                save = self.saves[selected_save_data_num]
+                current_text = '"' + save.current_text(20) + '"'
 
             Itext(
                 self.screen,
@@ -550,17 +508,17 @@ class MainScene:
                 (255, 255, 255),
                 50,
                 40,
-                self.save_command.get_selected_option() + ' "' + current_text + '"',
+                self.save_command.get_selected_option() + current_text,
             )
 
-        elif re.match("^.[0-1]$", self.save_command.branch):
+        elif self.save_command.is_match(".[0-1]"):
             Itext(self.screen, self.font, (255, 255, 255), 50, 40, "ほんとに?")
 
         # print(self.save_command.branch, self.save_command.num)
 
-        if re.match("^.00$", self.save_command.branch):
+        if self.save_command.is_match(".00"):
             # load->yes
-            save_data_number = self.save_command.get_selected_num(3)
+            save_data_number = self.save_command[0]
 
             if len(self.saves) == save_data_number:
                 self.save_command.cancel()
@@ -573,12 +531,12 @@ class MainScene:
             self.log = []
             self.mode = "text"
 
-        elif re.match("^.10$", self.save_command.branch):
+        elif self.save_command.is_match(".10"):
             # save->yes
-            save_data_number = self.save_command.get_selected_num(3)
+            save_data_number = self.save_command[0]
 
             if len(self.saves) == save_data_number:
-                self.saves.append({})
+                self.saves.append(Save({}))
 
             # print(self.saves, save_data_number)
 
@@ -589,17 +547,17 @@ class MainScene:
             self.saves[save_data_number]["credits"] = self.credits
 
             with open("save.dat", "w") as f:
-                f.write(json.dumps(self.saves))
+                f.write(json.dumps([save.save_data for save in self.saves]))
 
             self.save_command.cancel(3)
 
             self.set_save_command()
 
-        elif re.match("^.[0-1]1$", self.save_command.branch):
+        elif self.save_command.is_match(".[0-1]1"):
             # yes/no
             self.save_command.cancel(2)
 
-        elif re.match("^.2$", self.save_command.branch):
+        elif self.save_command.is_match(".2"):
             # cancel
             # print(0)
             self.save_command.cancel(2)
@@ -612,6 +570,7 @@ class MainScene:
 
         self.frame = 0
         self.images = []
+        pygame.mixer.music.fadeout(1000)
 
         if save_data_number is not None:
             self.name = self.saves[save_data_number]["name"]
@@ -619,3 +578,24 @@ class MainScene:
             self.branch = self.saves[save_data_number]["branch"]
             self.text_num = self.saves[save_data_number]["text_num"]
             self.credits = self.saves[save_data_number]["credits"]
+
+    def mode_pause(self):
+        self.title_command.run()
+
+        if self.title_command.is_match("0"):
+            Itext(
+                self.screen,
+                self.font,
+                (255, 255, 255),
+                50,
+                540,
+                "ほんとに?",
+            )
+        elif self.title_command.is_match("00"):
+            self.is_end = True
+
+        elif self.title_command.is_match("01"):
+            self.title_command.cancel(2)
+
+        elif self.title_command.is_match("1"):
+            self.mode = "text"

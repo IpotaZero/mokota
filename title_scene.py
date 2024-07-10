@@ -2,20 +2,15 @@ import json
 import sys
 import pygame
 from pygame.locals import *
-import re
 
 from Ifunctions import *
-from story import serifs
+from story import Save
 
 
 class TitleScene:
-    def __init__(
-        self, screen: pygame.Surface, pushed: list[int], mouse: dict, saves: list
-    ) -> None:
+    def __init__(self, screen: pygame.Surface, saves: list[Save]) -> None:
         self.scene_name = "title"
         self.screen = screen
-        self.mouse = mouse
-        self.pushed = pushed
         self.saves = saves
 
         self.font = pygame.font.Font("DotGothic16-Regular.ttf", 64)
@@ -25,8 +20,6 @@ class TitleScene:
 
     def start(self):
         self.command = Icommand(
-            self.mouse,
-            self.pushed,
             self.screen,
             self.font2,
             (255, 255, 255),
@@ -81,11 +74,11 @@ class TitleScene:
 
         self.command.run()
 
-        if self.command.branch == "0":
+        if self.command.is_match("0"):
             pygame.mixer.music.fadeout(1000)
             self.is_end = True
 
-        elif self.command.branch == "1":
+        elif self.command.is_match("1"):
             Itext(
                 self.screen,
                 self.font2,
@@ -98,32 +91,20 @@ class TitleScene:
             )
 
             for i, save in enumerate(self.saves):
-                current_text = serifs[save["chapter"]][save["branch"]][save["text_num"]]
-                if type(current_text) != str:
-                    current_text = "ERROR"
-                # print(type(current_text))
-
-                max_letter_num = 18
-
-                if len(current_text) > max_letter_num:
-                    current_text = (
-                        current_text[:max_letter_num].replace(";", "") + "..."
-                    )
-
                 Itext(
                     self.screen,
                     self.font2,
                     (255, 255, 255),
                     500,
                     180 + self.font2.get_height() * i,
-                    '"' + current_text + '"',
+                    '"' + save.current_text(18) + '"',
                     # outline_width=2,
                     # outline_colour=[(255, 255, 255)],
                 )
 
-        elif re.match("^1.$", self.command.branch):
+        elif self.command.is_match("1."):
             # load->cancel
-            if self.command.get_selected_num() == len(self.saves):
+            if self.command[1] == len(self.saves):
                 self.command.cancel(2)
                 return
 
@@ -138,13 +119,13 @@ class TitleScene:
                 # outline_colour=[(255, 255, 255)],
             )
 
-        elif re.match("^1.0$", self.command.branch):
+        elif self.command.is_match("1.0"):
             # load->load
             pygame.mixer.music.fadeout(1000)
             self.is_end = True
-            return self.command.get_selected_num(2)
+            return self.command[1]
 
-        elif re.match("^1.1$", self.command.branch):
+        elif self.command.is_match("1.1"):
             # load->delete
             Itext(
                 self.screen,
@@ -157,12 +138,12 @@ class TitleScene:
                 # outline_colour=[(255, 255, 255)],
             )
 
-        elif re.match("^1.10$", self.command.branch):
+        elif self.command.is_match("1.10"):
             # load->delete->yes
-            self.saves.pop(self.command.get_selected_num(3))
+            self.saves.pop(self.command[1])
 
             with open("save.dat", "w") as f:
-                f.write(json.dumps(self.saves))
+                f.write(json.dumps([save.save_data for save in self.saves]))
 
             self.command.cancel(3)
 
@@ -171,15 +152,15 @@ class TitleScene:
                 for save in self.saves
             ] + ["やめる"]
 
-        elif re.match("^1.11$", self.command.branch):
+        elif self.command.is_match("1.11"):
             # load->delete->no
             self.command.cancel(2)
 
-        elif re.match("^1.2$", self.command.branch):
+        elif self.command.is_match("1.2"):
             # load->cancel
             self.command.cancel(2)
 
-        elif self.command.branch == "2":
+        elif self.command.is_match("2"):
             Itext(
                 self.screen,
                 self.font2,
@@ -191,15 +172,16 @@ class TitleScene:
                 # outline_colour=[(255, 255, 255)],
             )
 
-        elif re.match("^2.$", self.command.branch):
-            if self.command.get_selected_num() == 0:
+        elif self.command.is_match("2."):
+            if self.command[1] == 0:
                 self.command.cancel(2)
+                return
 
             elif self.command.get_selected_option() == "???":
                 self.command.cancel()
                 return
 
-        elif self.command.branch == "3":
+        elif self.command.is_match("3"):
             Itext(
                 self.screen,
                 self.font2,
@@ -211,11 +193,11 @@ class TitleScene:
                 # outline_colour=[(255, 255, 255)],
             )
 
-        elif re.match("^3.$", self.command.branch):
-            if self.command.get_selected_num() == 0:
+        elif self.command.is_match("3."):
+            if self.command[1] == 0:
                 self.command.cancel(2)
 
-        elif self.command.branch == "4":
+        elif self.command.is_match("4"):
             Itext(
                 self.screen,
                 self.font2,
@@ -226,11 +208,11 @@ class TitleScene:
                 # outline_width=2,
                 # outline_colour=[(255, 255, 255)],
             )
-        elif self.command.branch == "40":
+        elif self.command.is_match("40"):
             pygame.quit()  # 全てのpygameモジュールの初期化を解除
             sys.exit()  # 終了（ないとエラーで終了することになる）
 
-        elif self.command.branch == "41":
+        elif self.command.is_match("41"):
             self.command.cancel(2)
 
         pygame.display.update()  # 画面更新

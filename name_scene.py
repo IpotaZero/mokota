@@ -4,15 +4,13 @@ from pygame.locals import *
 
 from Ifunctions import *
 
-moji = "あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもらりるれろやゆよわをがぎぐげござじずぜぞだぢづでどばびぶべぼぱぴぷぺぽぁぃぅぇぉゃゅょっーん消終"
+moji = "あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもらりるれろやゆよわをがぎぐげござじずぜぞだぢづでどばびぶべぼぱぴぷぺぽぁぃぅぇぉゃゅょっんアイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモラリルレロヤユヨワヲガギグゲゴザジズゼゾダヂヅデドバビブベボパピプペポァィゥェォャュョッンー消終"
 
 
 class NameScene:
-    def __init__(self, screen: pygame.Surface, pushed: list[int], mouse: dict) -> None:
+    def __init__(self, screen: pygame.Surface) -> None:
         self.scene_name = "name"
         self.screen = screen
-        self.mouse = mouse
-        self.pushed = pushed
 
         self.font = pygame.font.Font("DotGothic16-Regular.ttf", 48)
 
@@ -29,19 +27,19 @@ class NameScene:
         row_letter_num = 20
         self.screen.fill((255, 201, 224))
 
-        if K_RIGHT in self.pushed:
+        if K_RIGHT in keyboard["long_pressed"]:
             self.num += 1
             self.num %= len(moji)
-        elif K_LEFT in self.pushed:
+        elif K_LEFT in keyboard["long_pressed"]:
             self.num += len(moji) - 1
             self.num %= len(moji)
-        elif K_DOWN in self.pushed:
+        elif K_DOWN in keyboard["long_pressed"]:
             self.num += row_letter_num
             self.num %= len(moji)
-        elif K_UP in self.pushed:
+        elif K_UP in keyboard["long_pressed"]:
             self.num += len(moji) - row_letter_num
             self.num %= len(moji)
-        elif K_RETURN in self.pushed or K_SPACE in self.pushed:
+        elif K_RETURN in keyboard["pushed"] or K_SPACE in keyboard["pushed"]:
             if self.num == len(moji) - 1:
                 if len(self.name) > 0:
                     self.is_end = True
@@ -53,7 +51,7 @@ class NameScene:
             elif len(self.name) < 7:
                 self.name += moji[self.num]
 
-        elif K_BACKSPACE in self.pushed or K_ESCAPE in self.pushed:
+        elif K_BACKSPACE in keyboard["pushed"] or K_ESCAPE in keyboard["pushed"]:
             if len(self.name) > 0:
                 self.name = self.name[:-1]
 
@@ -92,7 +90,6 @@ class NameScene:
             y = 112 + math.floor(i / row_letter_num) * self.font.get_height()
 
             selected = Ibutton(
-                self.mouse,
                 self.screen,
                 self.font,
                 (255, 255, 255),
