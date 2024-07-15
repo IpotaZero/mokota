@@ -61,6 +61,8 @@ serifs = [
                 # "question",
                 # ["a", "b", "c"],
                 # "next_chapter",
+                "image_background",
+                "omu.jpg",
                 "俺の名前は{name}",
                 "今年、大阪公立大に入学するしがない猫(?)だ",
                 "そんな俺は今、とてつもなく悩んでいる;そう、どのサークルに入るか、だ",
