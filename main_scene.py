@@ -10,6 +10,7 @@ class MainScene:
     def __init__(self, screen: pygame.Surface, saves: list[Save]) -> None:
         self.scene_name = "main"
 
+        # このまま出てきたらえらー
         self.name = "ERROR"
 
         self.screen = screen
@@ -23,6 +24,8 @@ class MainScene:
         self.start()
 
     def start(self):
+        self.popups = []
+
         self.skip = False
         self.auto = False
 
@@ -222,6 +225,12 @@ class MainScene:
                 self.mode = "save"
                 self.save_command.reset()
 
+            for popup in self.popups:
+                Itext(self.screen, self.font, (255, 255, 255), 30, 30, popup["text"])
+                popup["life"] -= 1
+                if popup["life"] == 0:
+                    self.popups.remove(popup)
+
             self.mode_text()
             self.frame += 1
 
@@ -245,13 +254,32 @@ class MainScene:
         pygame.display.update()  # 画面更新
 
     def mode_text(self):
-        element = serifs[self.chapter][self.branch][self.text_num]
+        # print(self.branch)
+        branchs = serifs[self.chapter].get_all(self.branch)
+        # print(self.text_num, self.branch)
+
+        element_list = []
+        for branch in branchs:
+            element_list += branch
+
+        if len(element_list) <= self.text_num:
+            self.branch += "#"
+            self.text_num = 0
+            element_list = []
+            for branch in branchs:
+                element_list += branch
+
+            return
+
+        element = element_list[self.text_num]
+
+        # print(element_list)
 
         if element == "question":
             if self.frame == 1:
-                self.story_command.options.regex_dict[""] = serifs[self.chapter][
-                    self.branch
-                ][self.text_num + 1]
+                self.story_command.options.regex_dict[""] = element_list[
+                    self.text_num + 1
+                ]
 
             self.story_command.run()
 
@@ -263,10 +291,12 @@ class MainScene:
                 self.story_command.reset()
 
         elif element == "credit":
-            num = serifs[self.chapter][self.branch][self.text_num + 1]
-            self.credits[num] += 1
+            num = element_list[self.text_num + 1]
+            self.credits[num] += 5
             self.text_num += 2
             self.frame = 0
+
+            self.popups.append({"text": "LEVEL UP!", "life": 120})
 
         elif element == "next_chapter":
             self.chapter += 1
@@ -280,17 +310,13 @@ class MainScene:
             self.frame = 0
 
         elif element == "sound":
-            pygame.mixer.Sound(
-                "sounds/" + serifs[self.chapter][self.branch][self.text_num + 1]
-            ).play()
+            pygame.mixer.Sound("sounds/" + element_list[self.text_num + 1]).play()
             self.text_num += 2
             self.frame = 0
 
         elif element == "bgm":
             pygame.mixer.music.stop()
-            pygame.mixer.music.load(
-                "sounds/" + serifs[self.chapter][self.branch][self.text_num + 1]
-            )
+            pygame.mixer.music.load("sounds/" + element_list[self.text_num + 1])
             pygame.mixer.music.play(-1)
             self.text_num += 2
             self.frame = 0
@@ -301,7 +327,7 @@ class MainScene:
             self.frame = 0
 
         elif element == "sleep":
-            if serifs[self.chapter][self.branch][self.text_num + 1] * 60 <= self.frame:
+            if element_list[self.text_num + 1] * 60 <= self.frame:
                 self.text_num += 2
                 # self.pushed.clear()
                 self.frame = 0
@@ -324,23 +350,29 @@ class MainScene:
                 self.text_num += 1
                 self.frame = 0
 
-        elif element == "image":
-            img = pygame.image.load(
-                "images/" + serifs[self.chapter][self.branch][self.text_num + 1]
-            )
-            scale = serifs[self.chapter][self.branch][self.text_num + 2]
-            pos = serifs[self.chapter][self.branch][self.text_num + 3]
+        elif element == "image_background":
+            path = "images/" + element_list[self.text_num + 1]
+            img = pygame.image.load(path)
 
-            self.images.append((pygame.transform.scale(img, scale), pos))
-            self.text_num += 3
+            self.images.append(pygame.transform.scale(img, (1200, 800)), (0, 0))
+
+        # elif element == "image":
+        #     img = pygame.image.load(
+        #         "images/" + element_list[self.text_num + 1]
+        #     )
+        #     scale = serifs[self.chapter][self.branch][self.text_num + 2]
+        #     pos = serifs[self.chapter][self.branch][self.text_num + 3]
+
+        #     self.images.append((pygame.transform.scale(img, scale), pos))
+        #     self.text_num += 3
 
         elif element == "delete_image":
-            r = serifs[self.chapter][self.branch][self.text_num + 1]
+            r = element_list[self.text_num + 1]
             del self.images[r]
             self.text_num += 2
 
         else:
-            text = serifs[self.chapter][self.branch][self.text_num]
+            text = element_list[self.text_num]
 
             if type(text) != str:
                 text = "ERROR"
@@ -386,9 +418,8 @@ class MainScene:
                     self.text_num += 1
                     self.frame = 0
 
-                if self.text_num == len(serifs[self.chapter][self.branch]):
-                    self.text_num = 0
-                    self.branch += "#"
+                # if self.text_num == len(element_list):
+                #     self.text_num = 0
 
             if self.frame % 60 < 30:
                 text += "▼"
@@ -580,6 +611,21 @@ class MainScene:
             self.credits = self.saves[save_data_number]["credits"]
 
     def mode_pause(self):
+
+        Itext(
+            self.screen,
+            self.font,
+            (255, 255, 255),
+            50,
+            30,
+            ";".join(
+                [
+                    ["もこ音", "もこ子", "もこ美"][i] + ": " + str(self.credits[i])
+                    for i in range(3)
+                ]
+            ),
+        )
+
         self.title_command.run()
 
         if self.title_command.is_match("0"):

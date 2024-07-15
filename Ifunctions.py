@@ -192,6 +192,13 @@ class RegexDict:
                 return value
         return None
 
+    def get_all(self, target_string):
+        l = []
+        for pattern, value in self.regex_dict.items():
+            if re.match("^" + pattern + "$", target_string):
+                l.append(value)
+        return l
+
 
 suuji = "0123456789abcdefghijklmnopqrstuvwxyz"
 
