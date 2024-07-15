@@ -351,7 +351,7 @@ class MainScene:
         elif element == "image_background":
             path = "images/background/" + element_list[self.text_num + 1]
             img = pygame.image.load(path)
-            self.backgroundImage = (pygame.transform.scale(img, (1200, 800)), (0, 0))
+            self.backgroundImage = (pygame.transform.scale(img, (1920 / 1.5, 1080 /1.5)), (0, 0))
             self.text_num += 2
 
         # elif element == "image":
