@@ -17,13 +17,24 @@ class Save:
         self.save_data = save
 
     def current_text(self, max_letter_num: int):
-        current_text = serifs[self["chapter"]][self["branch"]][self["text_num"]]
+        branch_list = serifs[self["chapter"]].get_all(self["branch"])
+
+        while True:
+            element_list = []
+            for branch in branch_list:
+                element_list += branch
+
+            if len(element_list) > self["text_num"]:
+                break
+
+            self["branch"] += "#"
+            self["text_num"] = 0
+
+        current_text = element_list[self["text_num"]]
 
         num = 1
         while current_text in ["question", "darken", "rdarken", "sleep"]:
-            current_text = serifs[self["chapter"]][self["branch"]][
-                self["text_num"] - num
-            ]
+            current_text = element_list[self["text_num"] - num]
             num += 1
 
         if type(current_text) != str:

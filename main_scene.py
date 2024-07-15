@@ -254,21 +254,15 @@ class MainScene:
         pygame.display.update()  # 画面更新
 
     def mode_text(self):
-        # print(self.branch)
-        branchs = serifs[self.chapter].get_all(self.branch)
-        # print(self.text_num, self.branch)
+        branch_list = serifs[self.chapter].get_all(self.branch)
 
         element_list = []
-        for branch in branchs:
+        for branch in branch_list:
             element_list += branch
 
         if len(element_list) <= self.text_num:
             self.branch += "#"
             self.text_num = 0
-            element_list = []
-            for branch in branchs:
-                element_list += branch
-
             return
 
         element = element_list[self.text_num]
