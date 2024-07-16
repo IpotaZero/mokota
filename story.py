@@ -19,16 +19,13 @@ class Save:
     def current_text(self, max_letter_num: int):
         branch_list = serifs[self["chapter"]].get_all(self["branch"])
 
-        while True:
-            element_list = []
-            for branch in branch_list:
-                element_list += branch
+        element_list = []
+        for branch in branch_list:
+            element_list += branch
 
-            if len(element_list) > self["text_num"]:
-                break
-
-            self["branch"] += "#"
-            self["text_num"] = 0
+        # もし今いるブランチの長さを越えているならデータ破損
+        if len(element_list) <= self["text_num"]:
+            return "Error"
 
         current_text = element_list[self["text_num"]]
 

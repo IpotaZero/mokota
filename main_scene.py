@@ -254,6 +254,20 @@ class MainScene:
         pygame.display.update()  # 画面更新
 
     def mode_text(self):
+        # branchの長さが20を超えるストーリーは止めた方がいいんじゃないかな
+        if len(self.branch) > 20:
+            Itext(
+                self.screen,
+                self.font,
+                (255, 255, 255),
+                50,
+                540,
+                "branchが存在しません;もしくは単にbranchの長さが20を超えてる;chapterを分けた方がいいんじゃないかな",
+                max_width=1100,
+                frame=self.frame / 2,
+            )
+            return
+
         branch_list = serifs[self.chapter].get_all(self.branch)
 
         element_list = []

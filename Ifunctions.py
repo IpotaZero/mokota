@@ -186,13 +186,13 @@ class RegexDict:
     def __init__(self, regex_dict: dict):
         self.regex_dict = regex_dict
 
-    def __getitem__(self, target_string):
+    def __getitem__(self, target_string: str):
         for pattern, value in self.regex_dict.items():
             if re.match("^" + pattern + "$", target_string):
                 return value
         return None
 
-    def get_all(self, target_string):
+    def get_all(self, target_string: str):
         l = []
         for pattern, value in self.regex_dict.items():
             if re.match("^" + pattern + "$", target_string):
