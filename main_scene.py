@@ -61,6 +61,7 @@ class MainScene:
         self.is_end = False
 
         self.images: list[tuple] = []
+        self.backgroundImage = None
         self.letter_colour = (255, 255, 255)
 
         pygame.mixer.init()  # 初期化
@@ -88,8 +89,11 @@ class MainScene:
 
     def mainloop(self):
         self.screen.fill((0, 0, 0))  # 背景を黒
+        if(self.backgroundImage != None):
+            self.screen.blit(self.backgroundImage[0], self.backgroundImage[1])
         for image, pos in self.images:
             self.screen.blit(image, pos)
+
 
         if self.mode == "text" or self.mode == "log":
             is_pushed_log = (
@@ -359,10 +363,10 @@ class MainScene:
                 self.frame = 0
 
         elif element == "image_background":
-            path = "images/" + element_list[self.text_num + 1]
+            path = "images/background/" + element_list[self.text_num + 1]
             img = pygame.image.load(path)
-
-            self.images.append(pygame.transform.scale(img, (1200, 800)), (0, 0))
+            self.backgroundImage = (pygame.transform.scale(img, (1920 / 1.5, 1080 /1.5)), (0, 0))
+            self.text_num += 2
 
         # elif element == "image":
         #     img = pygame.image.load(
@@ -609,6 +613,7 @@ class MainScene:
 
         self.frame = 0
         self.images = []
+        self.backgroundImage = None
         pygame.mixer.music.fadeout(1000)
 
         if save_data_number is not None:

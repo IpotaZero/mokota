@@ -39,6 +39,10 @@ class NameScene:
         elif K_UP in keyboard["long_pressed"]:
             self.num += len(moji) - row_letter_num
             self.num %= len(moji)
+        elif K_TAB in keyboard["pushed"]:
+            if len(self.name) > 0:
+                self.is_end = True
+                return self.name
         elif K_RETURN in keyboard["pushed"] or K_SPACE in keyboard["pushed"]:
             if self.num == len(moji) - 1:
                 if len(self.name) > 0:
