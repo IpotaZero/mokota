@@ -61,7 +61,7 @@ class MainScene:
         self.is_end = False
 
         self.images: list[tuple] = []
-        self.backgroundImage = None
+        self.background_image = None
         self.letter_colour = (255, 255, 255)
 
         pygame.mixer.init()  # 初期化
@@ -82,18 +82,21 @@ class MainScene:
                     "": save_data_list,
                     ".": ["ロード", "セーブ", "やめる"],
                     ".[0-1]": ["はい", "いいえ"],
-                    ".2": ["ERROR"],
+                    # ".2": ["ERROR"],
                 }
             ),
         )
 
     def mainloop(self):
         self.screen.fill((0, 0, 0))  # 背景を黒
-        if(self.backgroundImage != None):
-            self.screen.blit(self.backgroundImage[0], self.backgroundImage[1])
+        if self.background_image != None:
+            self.screen.blit(self.background_image[0], self.background_image[1])
         for image, pos in self.images:
             self.screen.blit(image, pos)
 
+        scr = pygame.Surface((1140, 250), flags=pygame.SRCALPHA)
+        scr.fill((0, 0, 0, 255 / 2))
+        self.screen.blit(scr, (30, 530))
 
         if self.mode == "text" or self.mode == "log":
             is_pushed_log = (
@@ -285,13 +288,76 @@ class MainScene:
 
         element = element_list[self.text_num]
 
-        # print(element_list)
+        if type(element) == str:
+            self.solve_text(element)
+        elif type(element) == tuple:
+            self.solve_command(element)
+
+    def solve_text(self, text: str):
+        formated_text = text.format(name=self.name)
+
+        if self.frame == 1:
+            self.log.append(formated_text + ";")
+            self.log_slicer = None
+
+        clicked = Ibutton(
+            self.screen,
+            self.font,
+            (255, 255, 255),
+            (255, 255, 255),
+            50,
+            540,
+            1100,
+            190,
+            "",
+            line_width=0,
+        )
+
+        text_length = len(formated_text) * 2
+
+        if (
+            K_RETURN in keyboard["pushed"]
+            or K_SPACE in keyboard["pushed"]
+            or clicked
+            or self.skip
+            or (
+                text_length + 30 <= self.frame
+                and (
+                    self.auto
+                    or K_RETURN in keyboard["long_pressed"]
+                    or K_SPACE in keyboard["long_pressed"]
+                )
+            )
+        ):
+            if text_length > self.frame:
+                self.frame = text_length
+            else:
+                self.text_num += 1
+                self.frame = 0
+
+            # if self.text_num == len(element_list):
+            #     self.text_num = 0
+
+        if self.frame % 60 < 30:
+            formated_text += "▼"
+
+        Itext(
+            self.screen,
+            self.font,
+            (255, 255, 255),
+            50,
+            540,
+            formated_text,
+            max_width=1100,
+            frame=self.frame / 2,
+        )
+
+    def solve_command(self, command):
+        element = command[0]
 
         if element == "question":
             if self.frame == 1:
-                self.story_command.options.regex_dict[""] = element_list[
-                    self.text_num + 1
-                ]
+                self.story_command.options.regex_dict[""] = command[1]
 
             self.story_command.run()
 
@@ -303,7 +369,7 @@ class MainScene:
                 self.story_command.reset()
 
         elif element == "credit":
-            num = element_list[self.text_num + 1]
+            num = command[1]
             self.credits[num] += 5
             self.text_num += 2
             self.frame = 0
@@ -322,13 +388,13 @@ class MainScene:
             self.frame = 0
 
         elif element == "sound":
-            pygame.mixer.Sound("sounds/" + element_list[self.text_num + 1]).play()
+            pygame.mixer.Sound("sounds/" + command[1]).play()
             self.text_num += 2
             self.frame = 0
 
         elif element == "bgm":
             pygame.mixer.music.stop()
-            pygame.mixer.music.load("sounds/" + element_list[self.text_num + 1])
+            pygame.mixer.music.load("sounds/" + command[1])
             pygame.mixer.music.play(-1)
             self.text_num += 2
             self.frame = 0
@@ -339,7 +405,7 @@ class MainScene:
             self.frame = 0
 
         elif element == "sleep":
-            if element_list[self.text_num + 1] * 60 <= self.frame:
+            if command[1] * 60 <= self.frame:
                 self.text_num += 2
                 # self.pushed.clear()
                 self.frame = 0
@@ -363,9 +429,9 @@ class MainScene:
                 self.frame = 0
 
         elif element == "image_background":
-            path = "images/background/" + element_list[self.text_num + 1]
+            path = "images/background/" + command[1]
             img = pygame.image.load(path)
-            self.backgroundImage = (pygame.transform.scale(img, (1920 / 1.5, 1080 /1.5)), (0, 0))
+            self.background_image = (pygame.transform.scale(img, (1200, 800)), (0, 0))
             self.text_num += 2
 
         # elif element == "image":
@@ -379,73 +445,9 @@ class MainScene:
         #     self.text_num += 3
 
         elif element == "delete_image":
-            r = element_list[self.text_num + 1]
+            r = command[1]
             del self.images[r]
             self.text_num += 2
-
-        else:
-            text = element_list[self.text_num]
-
-            if type(text) != str:
-                text = "ERROR"
-
-            text = text.format(name=self.name)
-
-            if self.frame == 1:
-                self.log.append(text + ";")
-                self.log_slicer = None
-
-            clicked = Ibutton(
-                self.screen,
-                self.font,
-                (255, 255, 255),
-                (255, 255, 255),
-                50,
-                540,
-                1100,
-                190,
-                "",
-                line_width=0,
-            )
-
-            text_length = len(text) * 2
-
-            if (
-                K_RETURN in keyboard["pushed"]
-                or K_SPACE in keyboard["pushed"]
-                or clicked
-                or self.skip
-                or (
-                    text_length + 30 <= self.frame
-                    and (
-                        self.auto
-                        or K_RETURN in keyboard["long_pressed"]
-                        or K_SPACE in keyboard["long_pressed"]
-                    )
-                )
-            ):
-                if text_length > self.frame:
-                    self.frame = text_length
-                else:
-                    self.text_num += 1
-                    self.frame = 0
-
-                # if self.text_num == len(element_list):
-                #     self.text_num = 0
-
-            if self.frame % 60 < 30:
-                text += "▼"
-
-            Itext(
-                self.screen,
-                self.font,
-                (255, 255, 255),
-                50,
-                540,
-                text,
-                max_width=1100,
-                frame=self.frame / 2,
-            )
 
     def mode_log(self):
         text = Iadjust(self.font, ";".join(self.log), 1100)
@@ -613,7 +615,7 @@ class MainScene:
 
         self.frame = 0
         self.images = []
-        self.backgroundImage = None
+        self.background_image = None
         pygame.mixer.music.fadeout(1000)
 
         if save_data_number is not None:
