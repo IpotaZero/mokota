@@ -290,7 +290,7 @@ class MainScene:
 
         if type(element) == str:
             self.solve_text(element)
-        elif type(element) == tuple:
+        elif type(element) == list:
             self.solve_command(element)
 
     def solve_text(self, text: str):

@@ -5,6 +5,7 @@ from pygame.locals import *
 import sys
 import time
 
+import edit_scene
 import title_scene
 import main_scene
 import name_scene
@@ -30,7 +31,7 @@ def main():
             f.write(json.dumps(saves))
 
     pygame.init()  # Pygameの初期化
-    screen = pygame.display.set_mode((1200, 800))  # 800*600の画面
+    screen = pygame.display.set_mode((1200, 800))
 
     pygame.display.set_caption("MicroComputerReserch!")
 
@@ -43,6 +44,7 @@ def main():
         "name": name_scene.NameScene(screen),
         "title": title_scene.TitleScene(screen, saves),
         "darkening": darkening_scene.DarkeningScene(screen),
+        "edit": edit_scene.EditScene(screen),
     }
 
     current_scene = scenes["title"]
@@ -77,6 +79,7 @@ def main():
                     mouse["last_click_time"] = time.time()
 
                     mouse["clicked"] = True
+                    mouse["long_clicked"] = True
                 elif event.button == 3:
                     mouse["right_clicked"] = True
                 elif event.button == 4:
@@ -85,6 +88,9 @@ def main():
                     mouse["down"] = True
 
                 mouse["position"] = event.pos
+            elif event.type == MOUSEBUTTONUP:
+                if event.button == 1:
+                    mouse["long_clicked"] = False
 
         keyboard["long_pressed"].clear()
 
@@ -108,14 +114,18 @@ def main():
             current_scene.is_end = False
 
             if current_scene.scene_name == "title":
-                scenes["main"].save_data_num = result
+                if result == "edit":
+                    current_scene = scenes["edit"]
 
-                if result is None:
-                    scenes["darkening"].next_scene = "name"
-                    current_scene = scenes["darkening"]
                 else:
-                    scenes["darkening"].next_scene = "main"
-                    current_scene = scenes["darkening"]
+                    scenes["main"].save_data_num = result
+
+                    if result is None:
+                        scenes["darkening"].next_scene = "name"
+                        current_scene = scenes["darkening"]
+                    else:
+                        scenes["darkening"].next_scene = "main"
+                        current_scene = scenes["darkening"]
 
             elif current_scene.scene_name == "name":
                 scenes["darkening"].next_scene = "main"

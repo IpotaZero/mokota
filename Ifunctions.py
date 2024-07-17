@@ -11,6 +11,7 @@ keyboard = {
 
 mouse = {
     "clicked": False,
+    "long_clicked": False,
     "double_clicked": False,
     "right_clicked": False,
     "up": False,
@@ -120,7 +121,7 @@ def Ibutton(
     height: int,
     text: str,
     line_width=2,
-    text_alighn="center",
+    text_align="center",
     outline_width: int = 0,
     outline_colour: tuple[int, int, int] = (0, 0, 0),
 ):
@@ -132,7 +133,7 @@ def Ibutton(
     text_width = jtext.get_rect().w / 2
     text_height = jtext.get_rect().h / 2
 
-    if text_alighn == "center":
+    if text_align == "center":
         Itext(
             screen,
             font,
@@ -144,13 +145,13 @@ def Ibutton(
             outline_colour=outline_colour,
         )
 
-    elif text_alighn == "left":
+    elif text_align == "left":
         Itext(
             screen,
             font,
             text_colour,
-            x + width / 2 - text_width,
-            y + height / 2 - text_height - 1,
+            x,
+            y,
             text,
             outline_width=outline_width,
             outline_colour=outline_colour,
@@ -268,7 +269,7 @@ class Icommand:
                 self.font.get_height(),
                 text,
                 line_width=0,
-                text_alighn="left",
+                text_align="left",
                 outline_width=self.outline_width,
                 outline_colour=self.outline_colour,
             )

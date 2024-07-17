@@ -42,7 +42,7 @@ class TitleScene:
                     "1.": ["ロード", "削除", "やめる"],
                     "1.1": ["はい", "いいえ"],
                     "2": ["やめる", "???", "???", "???"],
-                    "3": ["やめる"],
+                    "3": ["やめる", "編集(デバッグ)"],
                     "4": ["はい", "いいえ"],
                 }
             ),
@@ -196,6 +196,9 @@ class TitleScene:
         elif self.command.is_match("3."):
             if self.command[1] == 0:
                 self.command.cancel(2)
+            elif self.command[1] == 1:
+                self.is_end = True
+                return "edit"
 
         elif self.command.is_match("4"):
             Itext(

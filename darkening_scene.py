@@ -12,8 +12,6 @@ class DarkeningScene:
 
         self.start()
 
-        self.next_scene = ""
-
     def start(self):
         self.is_end = False
         self.frame = 0
