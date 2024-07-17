@@ -372,15 +372,15 @@ class MainScene:
                 self.frame = 0
                 self.story_command.reset()
 
-        elif element == "go":
-            self.branch += str(self.credits.index(max(self.credits)))
-            self.text_num = 0
-            self.frame = 0
+        # elif element == "go":
+        #     self.branch += str(self.credits.index(max(self.credits)))
+        #     self.text_num = 0
+        #     self.frame = 0
 
         elif element == "credit":
             num = command[1]
             self.credits[num] += 5
-            self.text_num += 2
+            self.text_num += 1
             self.frame = 0
 
             self.popups.append({"text": "LEVEL UP!", "life": 120})
@@ -400,7 +400,7 @@ class MainScene:
             pygame.mixer.music.stop()
             pygame.mixer.music.load("sounds/" + command[1])
             pygame.mixer.music.play(-1)
-            self.text_num += 2
+            self.text_num += 1
             self.frame = 0
 
         elif element == "stop_bgm":
@@ -443,7 +443,7 @@ class MainScene:
                     "pos": (0, 0),
                     "on": True,
                 }
-            self.text_num += 2
+            self.text_num += 1
 
         elif element == "image_one":
             path = "images/" + command[1]
