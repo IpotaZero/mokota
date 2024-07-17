@@ -60,8 +60,7 @@ class MainScene:
 
         self.is_end = False
 
-        self.images: list[tuple] = []
-        self.background_image = None
+        self.images: dict = {}
         self.letter_colour = (255, 255, 255)
 
         pygame.mixer.init()  # 初期化
@@ -89,10 +88,9 @@ class MainScene:
 
     def mainloop(self):
         self.screen.fill((0, 0, 0))  # 背景を黒
-        if self.background_image != None:
-            self.screen.blit(self.background_image[0], self.background_image[1])
-        for image, pos in self.images:
-            self.screen.blit(image, pos)
+        for image in self.images.values():
+            if image["on"] != None or image["on"] == True:
+                self.screen.blit(image["size"], image["pos"])
 
         scr = pygame.Surface((1140, 250), flags=pygame.SRCALPHA)
         scr.fill((0, 0, 0, 255 / 2))
@@ -434,12 +432,27 @@ class MainScene:
                 self.text_num += 1
                 self.frame = 0
 
-        elif element == "image_background":
+        elif element == "image_back":
             path = "images/background/" + command[1]
             img = pygame.image.load(path).convert()
-            self.background_image = (pygame.transform.scale(img, (1200, 800)), (0, 0))
+            if len(command) >= 3:
+                self.images["background"] = command[2]
+            else:
+                self.images["background"] = {
+                    "size": pygame.transform.scale(img, (1200, 800)),
+                    "pos": (0, 0),
+                    "on": True,
+                }
+            self.text_num += 2
+
+        elif element == "image_one":
+            path = "images/" + command[1]
+            img = pygame.image.load(path)
+            self.images[command[1]] = command[2]
             self.text_num += 1
 
+        elif element == "image_onoff":
+            self.images[command[1]]["on"] = command[2]
         # elif element == "image":
         #     img = pygame.image.load(
         #         "images/" + element_list[self.text_num + 1]
