@@ -275,18 +275,7 @@ class MainScene:
             )
             return
 
-        branch_list = serifs[self.chapter].get_all(self.branch)
-
-        element_list = []
-        for branch in branch_list:
-            element_list += branch
-
-        if len(element_list) <= self.text_num:
-            self.branch += "#"
-            self.text_num = 0
-            return
-
-        element = element_list[self.text_num]
+        element = serifs[self.chapter][self.branch][self.text_num]
 
         if type(element) == str:
             self.solve_text(element)
@@ -355,7 +344,23 @@ class MainScene:
     def solve_command(self, command):
         element = command[0]
 
-        if element == "question":
+        if element == "goto":
+            self.text_num = 0
+            self.frame = 0
+
+            if type(command[1]) == str:
+                self.branch = command[1]
+
+            else:
+                self.branch = command[1](
+                    {
+                        "footprints": self.footprints,
+                        "max_credit": self.credits.index(max(self.credits)),
+                    }
+                )
+            return
+
+        elif element == "question":
             if self.frame == 1:
                 self.story_command.options.regex_dict[""] = command[1]
 
@@ -363,10 +368,16 @@ class MainScene:
 
             if self.story_command.is_match("."):
                 self.log.append(self.story_command.get_selected_option() + ";")
-                self.branch += self.story_command.branch
+                self.footprints[self.branch] = self.story_command[0]
+                self.branch = command[2][self.story_command[0]]
                 self.text_num = 0
                 self.frame = 0
                 self.story_command.reset()
+
+        elif element == "go":
+            self.branch += str(self.credits.index(max(self.credits)))
+            self.text_num = 0
+            self.frame = 0
 
         elif element == "credit":
             num = command[1]
@@ -382,14 +393,9 @@ class MainScene:
             self.text_num = 0
             self.frame = 0
 
-        elif element == "go":
-            self.branch += str(self.credits.index(max(self.credits)))
-            self.text_num = 0
-            self.frame = 0
-
         elif element == "sound":
             pygame.mixer.Sound("sounds/" + command[1]).play()
-            self.text_num += 2
+            self.text_num += 1
             self.frame = 0
 
         elif element == "bgm":
@@ -406,7 +412,7 @@ class MainScene:
 
         elif element == "sleep":
             if command[1] * 60 <= self.frame:
-                self.text_num += 2
+                self.text_num += 1
                 # self.pushed.clear()
                 self.frame = 0
 
@@ -430,9 +436,9 @@ class MainScene:
 
         elif element == "image_background":
             path = "images/background/" + command[1]
-            img = pygame.image.load(path)
+            img = pygame.image.load(path).convert()
             self.background_image = (pygame.transform.scale(img, (1200, 800)), (0, 0))
-            self.text_num += 2
+            self.text_num += 1
 
         # elif element == "image":
         #     img = pygame.image.load(
@@ -447,7 +453,18 @@ class MainScene:
         elif element == "delete_image":
             r = command[1]
             del self.images[r]
-            self.text_num += 2
+            self.text_num += 1
+
+        else:
+            Itext(
+                self.screen,
+                self.font,
+                (255, 255, 255),
+                50,
+                540,
+                f"知らないコマンド: {element}",
+                max_width=1100,
+            )
 
     def mode_log(self):
         text = Iadjust(self.font, ";".join(self.log), 1100)
@@ -590,6 +607,7 @@ class MainScene:
             self.saves[save_data_number]["branch"] = self.branch
             self.saves[save_data_number]["text_num"] = self.text_num
             self.saves[save_data_number]["credits"] = self.credits
+            self.saves[save_data_number]["footprints"] = self.footprints
 
             with open("save.dat", "w") as f:
                 f.write(json.dumps([save.save_data for save in self.saves]))
@@ -612,6 +630,7 @@ class MainScene:
         self.text_num = 0
         self.branch = ""
         self.credits = [0, 0, 0]
+        self.footprints = {}
 
         self.frame = 0
         self.images = []
@@ -624,6 +643,7 @@ class MainScene:
             self.branch = self.saves[save_data_number]["branch"]
             self.text_num = self.saves[save_data_number]["text_num"]
             self.credits = self.saves[save_data_number]["credits"]
+            self.footprints = self.saves[save_data_number]["footprints"]
 
     def mode_pause(self):
 
