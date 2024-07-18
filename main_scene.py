@@ -259,21 +259,35 @@ class MainScene:
         pygame.display.update()  # 画面更新
 
     def mode_text(self):
-        # branchの長さが20を超えるストーリーは止めた方がいいんじゃないかな
-        if len(self.branch) > 20:
+        chapter = serifs[self.chapter]
+        if self.branch not in chapter:
             Itext(
                 self.screen,
                 self.font,
                 (255, 255, 255),
                 50,
                 540,
-                "branchが存在しません;もしくは単にbranchの長さが20を超えてる;chapterを分けた方がいいんじゃないかな",
+                "知らないbranch: " + self.branch,
                 max_width=1100,
                 frame=self.frame / 2,
             )
             return
 
-        element = serifs[self.chapter][self.branch][self.text_num]
+        branch = chapter[self.branch]
+        if len(branch) <= self.text_num:
+            Itext(
+                self.screen,
+                self.font,
+                (255, 255, 255),
+                50,
+                540,
+                "elementが存在しないtext_num",
+                max_width=1100,
+                frame=self.frame / 2,
+            )
+            return
+
+        element = branch[self.text_num]
 
         if type(element) == str:
             self.solve_text(element)
@@ -339,23 +353,25 @@ class MainScene:
             frame=self.frame / 2,
         )
 
+    def get_next_branch(self, element: str) -> str:
+        if type(element) == str:
+            return element
+        else:
+            return element(
+                {
+                    "footprints": self.footprints,
+                    "max_credit": self.credits.index(max(self.credits)),
+                }
+            )
+
     def solve_command(self, command):
         element = command[0]
 
         if element == "goto":
+            self.branch = self.get_next_branch(command[1])
+
             self.text_num = 0
             self.frame = 0
-
-            if type(command[1]) == str:
-                self.branch = command[1]
-
-            else:
-                self.branch = command[1](
-                    {
-                        "footprints": self.footprints,
-                        "max_credit": self.credits.index(max(self.credits)),
-                    }
-                )
             return
 
         elif element == "question":
@@ -365,9 +381,14 @@ class MainScene:
             self.story_command.run()
 
             if self.story_command.is_match("."):
+                # ログに追加
                 self.log.append(self.story_command.get_selected_option() + ";")
+                # 分岐履歴
                 self.footprints[self.branch] = self.story_command[0]
-                self.branch = command[2][self.story_command[0]]
+                # 次のbranch
+                self.branch = self.get_next_branch(command[2][self.story_command[0]])
+
+                # リセット
                 self.text_num = 0
                 self.frame = 0
                 self.story_command.reset()
@@ -387,7 +408,7 @@ class MainScene:
 
         elif element == "next_chapter":
             self.chapter += 1
-            self.branch = ""
+            self.branch = "first"
             self.text_num = 0
             self.frame = 0
 
@@ -447,7 +468,7 @@ class MainScene:
 
         elif element == "image_one":
             path = "images/" + command[1]
-            img = pygame.image.load(path)
+            img = pygame.image.load(path).convert()
             self.images[command[1]] = command[2]
             self.text_num += 1
 
@@ -478,6 +499,9 @@ class MainScene:
                 f"知らないコマンド: {element}",
                 max_width=1100,
             )
+
+            if K_RETURN in keyboard["pushed"]:
+                self.text_num += 1
 
     def mode_log(self):
         text = Iadjust(self.font, ";".join(self.log), 1100)
@@ -641,7 +665,7 @@ class MainScene:
     def load_save_data(self, save_data_number):
         self.chapter = 0
         self.text_num = 0
-        self.branch = ""
+        self.branch = "first"
         self.credits = [0, 0, 0]
         self.footprints = {}
 

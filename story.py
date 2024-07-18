@@ -6,7 +6,7 @@ class Save:
         # if "chapter" not in save:
         #     save["chapter"] = 0
         # if "branch" not in save:
-        #     save["branch"] = ""
+        #     save["branch"] = "first"
         # if "text_num" not in save:
         #     save["text_num"] = 0
         # if "name" not in save:
@@ -48,7 +48,7 @@ class Save:
 
 serifs = [
     {
-        "": [
+        "first": [
             "4月...",
             # "question",
             # ["a", "b", "c"],
@@ -144,9 +144,11 @@ serifs = [
             "そう、俺は体験入部に来たのだ 他の部活も見てみたいし...",
             [
                 "goto",
-                lambda o: ["uttae_mokone", "uttae_mokoko", "uttae_mokomi"][
-                    o["footprints"][""]
-                ],
+                lambda o: [
+                    "uttae_mokone",
+                    "uttae_mokoko",
+                    "uttae_mokomi",
+                ][o["footprints"]["first"]],
             ],
         ],
         "uttae_mokone": [
@@ -175,7 +177,7 @@ serifs = [
     },
     # RegexDict(
     #     {
-    #         "": [
+    #         "first": [
     #             "7月...",
     #             "入部してから3か月、俺はすっかりマイコン部に入り浸っていた",
     #             #
@@ -185,7 +187,7 @@ serifs = [
     #     }
     # ),
     {
-        "": [
+        "first": [
             ["rdarken"],
             ["bgm", "電車走行中2.mp3"],
             "8月...",
@@ -193,21 +195,23 @@ serifs = [
             "俺は今、電車に乗ってとある田舎町に向かっている",
             "もこ美の故郷であるその町では、今日、花火大会が行われるらしい",
             "俺は夕日に照らされた山をぼうっと眺めながら目的の駅に着くのを待っていた...",
-            ["dareken"],
+            ["darken"],
             # ここで背景を黒く
             ["stop_bgm"],
             ["sound", "電車のブレーキ.mp3"],
             ["sleep", 3],
             ["sound", "電車の圧搾空気排出.mp3"],
-            ["rdareken"],
+            ["rdarken"],
             #
             "{name}:;確か...この辺で集合だったよな...",
             "駅から出てきょろきょろとあたりを見回すと、浴衣の集団が目についた",
             [
                 "goto",
-                lambda o: ["gouryuu_mokone", "gouryuu_mokoko", "gouryuu_mokomi"][
-                    o["max_credit"]
-                ],
+                lambda o: [
+                    "gouryuu_mokone",
+                    "gouryuu_mokoko",
+                    "gouryuu_mokomi",
+                ][o["max_credit"]],
             ],
         ],
         "gouryuu_mokone": [
@@ -279,15 +283,20 @@ serifs = [
             "俺はもこ子の両手で押さえた頭を優しくなでてやる",
             "茶色の髪が指に絡みつき、もこ子の瞳が俺を上目遣いで見つめる",
             "夏の夜、ぬるい気候の中、2人の時間がゆっくりと過ぎてゆく",
+            ["goto", "hanabi_mokoko"],
         ],
         "takoyaki": [
             "{name}:;じゃあ、たこ焼きでも食べるか!",
             "俺はもこ子の手を引いてたこ焼き屋を探しに行く",
-            ["dareken"],
-            ["rdareken"],
+            ["darken"],
+            ["rdarken"],
             "{name}:;はふっ、熱っ! 出来立て過ぎる!",
             "やっぱりお祭りといえばこの熱々のたこ焼きだよな",
+            "もこ子:;はあ～、あ、あひゅい...",
+            #
+            ["goto", "hanabi_mokoko"],
         ],
+        "hanabi_mokoko": [],
         "asobu_mokone": [
             "{name}:;俺はちょっと雑貨を買いに行きたいな 後から行くから先行っててくれ!",
             "もこ音:;あ、私も見に行きたいです",
@@ -300,8 +309,8 @@ serifs = [
             "{name}:;俺はもうちょっと遊びたいな どうする?",
             "もこ美:;...あたしも遊び足りないかも",
             "もこ助:;じゃあ、俺たちは先行ってるぜ!",
-            ["dareken"],
-            ["rdareken"],
+            ["darken"],
+            ["rdarken"],
             "俺ともこ美は2人で屋台の立ち並ぶ道を歩く;色とりどりの提灯が輝き、祭囃子が心地よいリズムを刻んでいる",
             #
             "{name}:;...といっても、何して遊ぶかな もこ美は何かやりたいことある?",
@@ -309,8 +318,8 @@ serifs = [
             "{name}:;え、じゃあなんでついてきたんだ?",
             "もこ美:;ま、まあ、あんたが寂しいかな、って思ったからよ! 感謝しなさいよね!",
             "{name}:;はいはい、ありがとな",
-            ["dareken"],
-            ["rdareken"],
+            ["darken"],
+            ["rdarken"],
             #
             "2人で何か面白い屋台はないかと探していると、俺はなんとも懐かしいものを見つけた",
             "{name}:;おっ、千本引きだ! 小さいころやったなー",
@@ -355,26 +364,26 @@ serifs = [
             ["goto", "hanabi_mokomi"],
         ],
         "hanabi_mokomi": [
-            ["dareken"],
-            ["rdareken"],
+            ["darken"],
+            ["rdarken"],
             "そうしてもこ美と遊んでいると、いよいよ花火大会本番が始まった",
             "もこ美:;あっ、始まっちゃったわね;皆のところへ戻った方がいいかしら?",
             "{name}:;まあいいんじゃないか? ここからでも十分見えるしな",
             "俺ともこ美は肩を並べて空を見上げた",
-            ["dareken"],
-            ["rdareken"],
-            "",
+            ["darken"],
+            ["rdarken"],
+            "first",
         ],
     },
     # もこ音の好感度が高い状態で禁忌肢を2回選んだ時
     # 禁忌肢: もこ音が好きなものに興味を持つ
     {
-        "": [
+        "first": [
             "ピロン♪",
             "机の上でスマホが震える",
             "{name}:;ん、もこ音さんからメールだ なんだろう?",
-            ["dareken"],
-            ["rdareken"],
+            ["darken"],
+            ["rdarken"],
             "{name}さんへ",
             "今まで隠してきたことを話そうと思います",
             "こんな形でしか伝えられなくてごめんなさい",
