@@ -21,5 +21,6 @@ class Scene:
     def scaled_blit(self, buffer):
         scale_screen, offset, scale = utill.scale()
         screen = pygame.display.get_surface()
+        print(scale_screen)
         scaled_buffer = pygame.transform.scale(buffer, scale_screen)
         screen.blit(scaled_buffer, offset)

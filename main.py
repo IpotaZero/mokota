@@ -42,15 +42,15 @@ def main():
 
     key_pressed_time = {}
 
-    def new_screen():
-        return pygame.display.set_mode(parameter.ScreenSize, pygame.RESIZABLE)
+    def new_screen(screen):
+        return pygame.Surface(screen.get_size())
 
     scenes = {
-        "main": main_scene.MainScene(new_screen(), saves),
-        "name": name_scene.NameScene(new_screen()),
-        "title": title_scene.TitleScene(new_screen(), saves),
-        "darkening": darkening_scene.DarkeningScene(new_screen()),
-        "edit": edit_scene.EditScene(new_screen()),
+        "main": main_scene.MainScene(new_screen(screen), saves),
+        "name": name_scene.NameScene(new_screen(screen)),
+        "title": title_scene.TitleScene(new_screen(screen), saves),
+        "darkening": darkening_scene.DarkeningScene(new_screen(screen)),
+        "edit": edit_scene.EditScene(new_screen(screen)),
     }
 
     current_scene = scenes["title"]
