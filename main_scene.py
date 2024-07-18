@@ -6,11 +6,14 @@ import pygame
 from pygame.locals import *
 
 from Ifunctions import *
+from main import ScreenSize
+from scene import Scene
 from story import Save, serifs
 
 
-class MainScene:
+class MainScene(Scene):
     def __init__(self, screen: pygame.Surface, saves: list[Save]) -> None:
+        super().__init__()
         self.scene_name = "main"
 
         # このまま出てきたらえらー
@@ -27,8 +30,10 @@ class MainScene:
         self.start()
 
     def start(self):
-        self.layer_background = pygame.Surface((1200, 800))
-        self.layer_buttons = pygame.Surface((1200, 800), pygame.SRCALPHA)
+        self.layer_background = pygame.Surface(self.screen.get_size())
+        self.layer_buttons = pygame.Surface(self.screen.get_size(), pygame.SRCALPHA)
+
+        self.addlayer(self.layer_background, self.layer_buttons)
 
         self.popups = []
 
@@ -92,12 +97,12 @@ class MainScene:
             ),
         )
 
+
     def mainloop(self):
         self.layer_background.fill((0, 0, 0))  # 背景を黒
         for image in self.images.values():
             if image["is_shown"]:
                 self.layer_background.blit(pygame.transform.scale(image["img"], image["size"]), image["pos"])
-
         self.layer_buttons.fill((0, 0, 0, 0))  # 透明?
 
         if self.mode == "text" or self.mode == "log":
@@ -279,10 +284,7 @@ class MainScene:
         if self.frame == 0:
             return
 
-        self.screen.blit(self.layer_background, (0, 0))
-        self.screen.blit(self.layer_buttons, (0, 0))
-
-        pygame.display.update()  # 画面更新
+        super().bilt()
 
     def mode_text(self):
         chapter = serifs[self.chapter]
