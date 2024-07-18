@@ -283,8 +283,6 @@ class MainScene(Scene):
         if self.frame == 0:
             return
 
-        super().bilt()
-
     def mode_text(self):
         chapter = serifs[self.chapter]
         if self.branch not in chapter:

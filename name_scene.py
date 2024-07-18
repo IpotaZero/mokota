@@ -3,14 +3,16 @@ import pygame
 from pygame.locals import *
 
 from Ifunctions import *
+from scene import Scene
 
 moji = "あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもらりるれろやゆよわをがぎぐげござじずぜぞだぢづでどばびぶべぼぱぴぷぺぽぁぃぅぇぉゃゅょっんアイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモラリルレロヤユヨワヲガギグゲゴザジズゼゾダヂヅデドバビブベボパピプペポァィゥェォャュョッンー消終"
 
 
-class NameScene:
+class NameScene(Scene):
     def __init__(self, screen: pygame.Surface) -> None:
         self.scene_name = "name"
         self.screen = screen
+        super().__init__(screen)
 
         self.font = pygame.font.Font("DotGothic16-Regular.ttf", 48)
 

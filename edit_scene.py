@@ -2,14 +2,16 @@ import pygame
 from pygame.locals import *
 
 from Ifunctions import *
+from scene import Scene
 from story import serifs
 
 
-class EditScene:
+class EditScene(Scene):
     def __init__(self, screen: pygame.Surface) -> None:
         self.scene_name = "edit"
 
         self.screen = screen
+        super().__init__(screen)
         self.font = pygame.font.Font("DotGothic16-Regular.ttf", 32)
 
         self.start()

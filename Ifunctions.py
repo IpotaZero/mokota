@@ -171,12 +171,12 @@ def Ibutton(
             outline_width=outline_width,
             outline_colour=outline_colour,
         )
-    scale, offset = utill.scale()
+    _x, _y, _width, _height = utill.scale_rect(x,y, width, height)
 
     if (
         mouse["clicked"]
-        and x <= mouse["position"][0] <= x + offset[0] + width * scale[0]
-        and y <= mouse["position"][1] <= y + offset[1] + height * scale[1]
+        and _x <= mouse["position"][0] <= _x + _width
+        and _y <= mouse["position"][1] <= _y + _height
     ):
         return True
 

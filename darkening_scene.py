@@ -2,13 +2,15 @@ import pygame
 from pygame.locals import *
 
 from Ifunctions import *
+from scene import Scene
 
 
-class DarkeningScene:
+class DarkeningScene(Scene):
     def __init__(self, screen: pygame.Surface) -> None:
         self.scene_name = "darkening"
 
         self.screen = screen
+        super().__init__(screen)
 
         self.start()
 
@@ -21,8 +23,6 @@ class DarkeningScene:
         scr.fill((0, 0, 0, 255 * self.frame / 120))
 
         self.screen.blit(scr, (0, 0))
-
-        pygame.display.update()  # 画面更新
 
         self.frame += 1
 

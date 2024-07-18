@@ -42,12 +42,15 @@ def main():
 
     key_pressed_time = {}
 
+    def new_screen():
+        return pygame.display.set_mode(parameter.ScreenSize, pygame.RESIZABLE)
+
     scenes = {
-        "main": main_scene.MainScene(screen, saves),
-        "name": name_scene.NameScene(screen),
-        "title": title_scene.TitleScene(screen, saves),
-        "darkening": darkening_scene.DarkeningScene(screen),
-        "edit": edit_scene.EditScene(screen),
+        "main": main_scene.MainScene(new_screen(), saves),
+        "name": name_scene.NameScene(new_screen()),
+        "title": title_scene.TitleScene(new_screen(), saves),
+        "darkening": darkening_scene.DarkeningScene(new_screen()),
+        "edit": edit_scene.EditScene(new_screen()),
     }
 
     current_scene = scenes["title"]
@@ -112,6 +115,7 @@ def main():
         keyboard["long_pressed"] += keyboard["pushed"]
 
         result = current_scene.mainloop()
+        current_scene.blit()
 
         if current_scene.is_end:
             current_scene.is_end = False

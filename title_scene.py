@@ -1,16 +1,19 @@
 import json
+from re import S
 import sys
 import pygame
 from pygame.locals import *
 
 from Ifunctions import *
+from scene import Scene
 from story import Save
 
 
-class TitleScene:
+class TitleScene(Scene):
     def __init__(self, screen: pygame.Surface, saves: list[Save]) -> None:
         self.scene_name = "title"
         self.screen = screen
+        super().__init__(screen)
         self.saves = saves
 
         self.font = pygame.font.Font("DotGothic16-Regular.ttf", 64)
@@ -217,5 +220,3 @@ class TitleScene:
 
         elif self.command.is_match("41"):
             self.command.cancel(2)
-
-        pygame.display.update()  # 画面更新
