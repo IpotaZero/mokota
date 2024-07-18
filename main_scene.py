@@ -96,9 +96,11 @@ class MainScene:
         self.layer_background.fill((0, 0, 0))  # 背景を黒
         for image in self.images.values():
             if image["is_shown"]:
-                self.layer_background.blit(pygame.transform.scale(image["img"], image["size"]), image["pos"])
+                self.layer_background.blit(
+                    pygame.transform.scale(image["img"], image["size"]), image["pos"]
+                )
 
-        self.layer_buttons.fill((0, 0, 0, 0))  # 透明?
+        self.layer_buttons.fill((0, 0, 0, 0))  # 透明
 
         if self.mode == "text" or self.mode == "log":
             is_pushed_log = (
@@ -467,14 +469,14 @@ class MainScene:
     def solve_1frame_command(self, command):
         command_type = command[0]
 
-        #次のブランチに進む
+        # 次のブランチに進む
         if command_type == "goto":
             self.branch = self.get_next_branch(command)
 
             self.text_num = 0
             self.frame = 0
 
-        #好感度を上げる
+        # 好感度を上げる
         elif command_type == "credit":
             num = command[1]
             self.credits[num] += 5
@@ -483,20 +485,20 @@ class MainScene:
 
             self.popups.append({"text": "LEVEL UP!", "life": 120})
 
-        #次のチャプターに進む
+        # 次のチャプターに進む
         elif command_type == "next_chapter":
             self.chapter += 1
             self.branch = "first"
             self.text_num = 0
             self.frame = 0
 
-        #効果音を流す
+        # 効果音を流す
         elif command_type == "sound":
             pygame.mixer.Sound("sounds/" + command[1]).play()
             self.text_num += 1
             self.frame = 0
 
-        #BGMを流す
+        # BGMを流す
         elif command_type == "bgm":
             pygame.mixer.music.stop()
             pygame.mixer.music.load("sounds/" + command[1])
@@ -504,60 +506,62 @@ class MainScene:
             self.text_num += 1
             self.frame = 0
 
-        #BGMを止める
+        # BGMを止める
         elif command_type == "stop_bgm":
             pygame.mixer.music.fadeout(1000)
             self.text_num += 1
             self.frame = 0
 
+        # 背景を変更する
         elif command_type == "image_back":
             path = "images/background/" + command[1]
             img = pygame.image.load(path).convert()
 
+            # デフォルト値
             img_data = {
-                    "img": img,
-                    "size": (1200, 800),
-                    "pos": (0, 0),
-                    "is_shown": True,
-                }
+                "img": img,
+                "size": (1200, 800),
+                "pos": (0, 0),
+                "is_shown": True,
+            }
 
-
-            if(len(command) >= 3):
-                commands:dict = command[2]
-                for key in img_data.keys():
-                    if(key in commands):
-                        img_data[key] = commands[key]
+            # オーダーメイド
+            if len(command) >= 3:
+                commands: dict = command[2]
+                for key in commands:
+                    img_data[key] = commands[key]
 
             self.images["back"] = img_data
 
             self.text_num += 1
             self.frame = 0
 
-        #画像を変える path,name,dict
+        # 画像を変える[path, name, dict]
         elif command_type == "image":
             path = "images/" + command[1]
             img = pygame.image.load(path).convert()
 
+            # デフォルト値
             img_data = {
-                    "img": img,
-                    "size": (1200, 800),
-                    "pos": (0, 0),
-                    "is_shown": True,
-                }
+                "img": img,
+                "size": (1200, 800),
+                "pos": (0, 0),
+                "is_shown": True,
+            }
 
-
-            if(len(command) >= 4):
-                commands:dict = command[3]
+            # オーダーメイド
+            if len(command) >= 4:
+                commands: dict = command[3]
                 for key in img_data.keys():
-                    if(key in commands):
+                    if key in commands:
                         img_data[key] = commands[key]
 
             self.images[command[2]] = img_data
 
             self.text_num += 1
             self.frame = 0
-            
-        #画像を非表示、表示
+
+        # 画像を非表示、表示
         elif command_type == "image_onoff":
             image_name = command[1]
 
@@ -566,18 +570,9 @@ class MainScene:
             self.text_num += 1
             self.frame = 0
 
-        #画像を削除
+        # 画像を削除
         elif command_type == "image_delete":
             self.images.pop(command[1])
-        # elif element == "image":
-        #     img = pygame.image.load(
-        #         "images/" + element_list[self.text_num + 1]
-        #     )
-        #     scale = serifs[self.chapter][self.branch][self.text_num + 2]
-        #     pos = serifs[self.chapter][self.branch][self.text_num + 3]
-
-        #     self.images.append((pygame.transform.scale(img, scale), pos))
-        #     self.text_num += 3
 
         elif command_type == "delete_image":
             r = command[1]
@@ -593,12 +588,21 @@ class MainScene:
             size = (1536 / 2.5, 2048 / 2.5)
 
             self.images[name] = {
-                "img": pygame.image.load("images/Charactor/" + name + ".png").convert_alpha(),
+                "img": pygame.image.load(
+                    "images/character/" + name + ".png"
+                ).convert_alpha(),
                 "size": size,
-                "pos": ((place-1) * 400 + self.layer_background.get_size()[0] / 2 - size[0] / 2, 200),
-                "is_shown": ison
+                "pos": (
+                    (place - 1) * 400
+                    + self.layer_background.get_size()[0] / 2
+                    - size[0] / 2,
+                    200,
+                ),
+                "is_shown": ison,
             }
+
             self.text_num += 1
+            self.frame = 0
 
         else:
             return True
