@@ -1,7 +1,4 @@
 import json
-from re import I
-from turtle import screensize
-from numpy import size
 import pygame
 from pygame.locals import *
 
@@ -472,16 +469,13 @@ class MainScene:
         # 次のブランチに進む
         if command_type == "goto":
             self.branch = self.get_next_branch(command)
-
-            self.text_num = 0
-            self.frame = 0
+            print(self.branch)
+            self.text_num = -1
 
         # 好感度を上げる
         elif command_type == "credit":
             num = command[1]
             self.credits[num] += 5
-            self.text_num += 1
-            self.frame = 0
 
             self.popups.append({"text": "LEVEL UP!", "life": 120})
 
@@ -489,28 +483,24 @@ class MainScene:
         elif command_type == "next_chapter":
             self.chapter += 1
             self.branch = "first"
-            self.text_num = 0
-            self.frame = 0
+            self.text_num = -1
+
+            self.images.clear()
+            pygame.mixer.music.fadeout(1000)
 
         # 効果音を流す
         elif command_type == "sound":
             pygame.mixer.Sound("sounds/" + command[1]).play()
-            self.text_num += 1
-            self.frame = 0
 
         # BGMを流す
         elif command_type == "bgm":
             pygame.mixer.music.stop()
             pygame.mixer.music.load("sounds/" + command[1])
             pygame.mixer.music.play(-1)
-            self.text_num += 1
-            self.frame = 0
 
         # BGMを止める
         elif command_type == "stop_bgm":
             pygame.mixer.music.fadeout(1000)
-            self.text_num += 1
-            self.frame = 0
 
         # 背景を変更する
         elif command_type == "image_back":
@@ -532,9 +522,6 @@ class MainScene:
                     img_data[key] = commands[key]
 
             self.images["back"] = img_data
-
-            self.text_num += 1
-            self.frame = 0
 
         # 画像を変える[path, name, dict]
         elif command_type == "image":
@@ -558,17 +545,11 @@ class MainScene:
 
             self.images[command[2]] = img_data
 
-            self.text_num += 1
-            self.frame = 0
-
         # 画像を非表示、表示
         elif command_type == "image_onoff":
             image_name = command[1]
 
             self.images[image_name]["is_shown"] = command[2]
-
-            self.text_num += 1
-            self.frame = 0
 
         # 画像を削除
         elif command_type == "image_delete":
@@ -577,13 +558,11 @@ class MainScene:
         elif command_type == "delete_image":
             r = command[1]
             del self.images[r]
-            self.text_num += 1
-            self.frame = 0
 
         elif command_type == "character":
             name: str = command[1]
-            place: int = command[2]
-            ison: bool = command[3] if len(command) > 3 else True
+            place: int = command[2]  # 左、真ん中、右
+            is_shown: bool = command[3] if len(command) > 3 else True
 
             size = (1536 / 2.5, 2048 / 2.5)
 
@@ -598,14 +577,14 @@ class MainScene:
                     - size[0] / 2,
                     200,
                 ),
-                "is_shown": ison,
+                "is_shown": is_shown,
             }
-
-            self.text_num += 1
-            self.frame = 0
 
         else:
             return True
+
+        self.text_num += 1
+        self.frame = 0
 
         return False
 

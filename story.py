@@ -1,6 +1,3 @@
-from Ifunctions import RegexDict
-
-
 class Save:
     def __init__(self, save) -> None:
         # if "chapter" not in save:
@@ -53,7 +50,8 @@ serifs = [
             # "question",
             # ["a", "b", "c"],
             # "next_chapter",
-            ["image_back", "omu_anime.png", dict(size=(1920/1.5, 1080/1.5))],
+            ["image_back", "omu_anime.png", dict(size=(1920 / 1.5, 1080 / 1.5))],
+            ["rdarken"],
             "俺の名前は{name}",
             "今年、大阪公立大に入学する、しがない猫(?)だ",
             "そんな俺は今、とてつもなく悩んでいる;そう、どのサークルに入るか、だ",
@@ -61,12 +59,13 @@ serifs = [
             "どのサークルに入るかが大学生活の行き先を決めるといっても過言ではない",
             "しかし、俺にはこれといって得意なこともないし;どうすっかなー...",
             "そんなことを考えていると、あるチラシが目に留まった",
-            ["image_back", "mcr_poster.png", dict(size=(1920/1.5, 1080/1.5))],
+            ["image_back", "mcr_poster.png", dict(size=(1920 / 1.5, 1080 / 1.5))],
             ["rdarken"],
             "{name}:;マイコン研究会...?",
             "俺はコンピュータには全く詳しくないが、ここなら俺みたいなオタクもいるかもしれないな",
             "そう考えて俺はそのマイコン研究会とやらを覗いてみることにした",
             ["darken"],
+            ["image_onoff", "back", False],
             "そういえば、幼馴染のもこ子;あいつもこの大学に入ったらしいけど、いったいどこの部活に入るんだろう...?",
             ["image_back", "clubroom_front.jpg"],
             ["rdarken"],
@@ -77,13 +76,13 @@ serifs = [
             "{name}:;失礼しま...",
             "???:;ご来場ありがとうございまーす!!",
             ["sound", "party_popper2.mp3"],
-            ["character", "mokoko", 1],
             ["sleep", 1],
             "{name}:;うわぁっ!?",
             "いきなりのクラッカーの音で俺は思わず後ろに転んでしまう",
             "???:;あはは、ごめんね! 大丈夫?",
             "明るい声とともに差し出された手;その先を見ると...",
             "{name}:;お前...もしかしてもこ子か!?",
+            ["character", "mokoko", 1],
             "もこ子:;およ? ...もしかして{name}くん?;わー、おひさー! 中学ぶりだよね!",
             "そこにいたのは、なんと、もこ子だった!;久々に会ったからか、ずいぶん垢抜けたように見える",
             "???:;あら、もこ子のお友達?",
@@ -94,7 +93,7 @@ serifs = [
             "もこ美:;へぇ、あんたが {name} ね あたしはもこ美、よろしくね!;まあ立ち話もなんだし、入りなさいよ",
             "俺はもこ美と呼ばれた女の子に促され部室の中に入った",
             ["darken"],
-            ["image_back", "部室背景_anime.png", dict(size=(1920/1.5, 1080/1.5))],
+            ["image_back", "部室背景_anime.png", dict(size=(1920 / 1.5, 1080 / 1.5))],
             ["character", "mokoko", 1, False],
             ["character", "mokomi", 1, False],
             ["rdarken"],
@@ -210,7 +209,7 @@ serifs = [
     # ),
     {
         "first": [
-            ["image_back", "test.png"],
+            # ["image_back", "test.png"],
             ["rdarken"],
             ["bgm", "電車走行中2.mp3"],
             "8月...",
@@ -218,7 +217,7 @@ serifs = [
             "もこ美の故郷であるその町では、今日、花火大会が行われるらしい",
             "俺は夕日に照らされた山をぼうっと眺めながら目的の駅に着くのを待っていた...",
             ["darken"],
-            ["image_onoff", "background", False],
+            # ["image_onoff", "back", False],
             ["stop_bgm"],
             ["sound", "電車のブレーキ.mp3"],
             ["sleep", 3],
@@ -317,7 +316,7 @@ serifs = [
             #
             ["goto", "hanabi_mokoko"],
         ],
-        "hanabi_mokoko": [],
+        # "hanabi_mokoko": [],
         "asobu_mokone": [
             "{name}:;俺はちょっと雑貨を買いに行きたいな 後から行くから先行っててくれ!",
             "もこ音:;あ、私も見に行きたいです",

@@ -29,53 +29,79 @@ class EditScene:
             RegexDict({"": ["編集する", "子を追加する", "削除する"]}),
         )
 
-        self.nodes = {}
+        self.nodes_list = []
 
         self.mode = "observation"
         self.edit_target = ""
 
         layer = 0
 
-        for branch in serifs[self.chapter]:
-            nexts = []
+        for chapter_num, chapter in enumerate(serifs):
+            self.nodes_list.append({})
+            for branch_name in chapter:
+                nexts = []
 
-            element = serifs[self.chapter][branch][-1]
+                print(chapter[branch_name])
 
-            if element[0] == "goto":
-                if type(element[1]) == str:
-                    nexts.append(element[1])
-                elif type(element[1]) == list:
-                    nexts += element[1]
-            elif element[0] == "question":
-                nexts += element[2]
-            else:
-                continue
+                element = chapter[branch_name][-1]
 
-            # print(nexts)
-
-            if branch == "first":
-                self.nodes["first"] = {"pos": (0, 0), "nexts": nexts}
-                layer += 1
-            else:
-                self.nodes[branch]["nexts"] = nexts
-
-            flag = False
-
-            for i, next_branch in enumerate(nexts):
-                if next_branch not in self.nodes:
-                    self.nodes[next_branch] = {"pos": (400 * i, 100 * layer)}
+                if element[0] == "goto":
+                    if type(element[1]) == str:
+                        nexts.append(element[1])
+                    elif type(element[1]) == list:
+                        nexts += element[1]
+                elif element[0] == "question":
+                    nexts += element[2]
                 else:
-                    flag = True
+                    continue
 
-            if flag:
-                continue
+                # print(nexts)
 
-            layer += 1
+                if branch_name == "first":
+                    self.nodes_list[chapter_num]["first"] = {
+                        "pos": (0, 0),
+                        "nexts": nexts,
+                    }
+                    layer += 1
+                else:
+                    self.nodes_list[chapter_num][branch_name]["nexts"] = nexts
+
+                flag = False
+
+                for i, next_branch in enumerate(nexts):
+                    if next_branch not in self.nodes_list[chapter_num]:
+                        self.nodes_list[chapter_num][next_branch] = {
+                            "pos": (400 * i, 100 * layer)
+                        }
+
+                    else:
+                        flag = True
+
+                if flag:
+                    continue
+
+                layer += 1
 
         # print(self.nodes)
 
     def mainloop(self) -> None:
         self.screen.fill((255, 201, 224))
+
+        is_clicked_next_chapter = Ibutton(
+            self.screen,
+            self.font,
+            (255, 255, 255),
+            (255, 255, 255),
+            30,
+            30,
+            200,
+            40,
+            "NEXT CHAPTER",
+        )
+
+        if is_clicked_next_chapter:
+            self.chapter += 1
+            self.chapter %= len(self.nodes_list)
 
         if self.mode == "observation":
             speed = 20
@@ -92,7 +118,7 @@ class EditScene:
             elif K_RETURN in keyboard["pushed"]:
                 self.is_end = True
 
-            for branch, value in self.nodes.items():
+            for branch, value in self.nodes_list[self.chapter].items():
                 if "nexts" in value:
                     for next_branch in value["nexts"]:
                         pygame.draw.line(
@@ -103,10 +129,12 @@ class EditScene:
                                 value["pos"][1] + self.camera[1] + 25,
                             ),
                             (
-                                self.nodes[next_branch]["pos"][0]
+                                self.nodes_list[self.chapter][next_branch]["pos"][0]
                                 + self.camera[0]
                                 + 200,
-                                self.nodes[next_branch]["pos"][1] + self.camera[1] + 25,
+                                self.nodes_list[self.chapter][next_branch]["pos"][1]
+                                + self.camera[1]
+                                + 25,
                             ),
                         )
 
