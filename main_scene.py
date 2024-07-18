@@ -749,6 +749,11 @@ class MainScene:
         if save_data_number is not None:
             save = self.saves[save_data_number]
             self.name = save["name"]
+            self.chapter = save["chapter"]
+            self.branch = save["branch"]
+            self.text_num = save["text_num"]
+            self.credits = save["credits"]
+            self.footprints = save["footprints"]
 
             chapter = save["chapter"]
             branch = "first"
