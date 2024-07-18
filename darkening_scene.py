@@ -17,7 +17,10 @@ class DarkeningScene:
         self.frame = 0
 
     def mainloop(self) -> None:
-        scr = pygame.Surface((1200, 800), flags=pygame.SRCALPHA)
+        scr = pygame.Surface(
+            (1200 * screen_option["ratio"], 800 * screen_option["ratio"]),
+            flags=pygame.SRCALPHA,
+        )
         scr.fill((0, 0, 0, 255 * self.frame / 120))
 
         self.screen.blit(scr, (0, 0))
