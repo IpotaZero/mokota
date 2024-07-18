@@ -6,7 +6,6 @@ import pygame
 from pygame.locals import *
 
 from Ifunctions import *
-from main import ScreenSize
 from scene import Scene
 from story import Save, serifs
 

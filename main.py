@@ -7,6 +7,7 @@ import sys
 import time
 
 import edit_scene
+import parameter
 import title_scene
 import main_scene
 import name_scene
@@ -15,7 +16,7 @@ from story import Save
 
 from Ifunctions import keyboard, mouse
 
-ScreenSize = (1200, 800)
+
 
 def main():
     saves: list[Save] = []
@@ -33,7 +34,7 @@ def main():
             f.write(json.dumps(saves))
 
     pygame.init()  # Pygameの初期化
-    screen = pygame.display.set_mode(ScreenSize, pygame.RESIZABLE)
+    screen = pygame.display.set_mode(parameter.ScreenSize, pygame.RESIZABLE)
 
     pygame.display.set_caption("MicroComputerReserch!")
 

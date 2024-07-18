@@ -3,6 +3,8 @@ import pygame
 import re
 from pygame.locals import *
 
+import utill
+
 keyboard = {
     "pressed": [],
     "pushed": [],
@@ -169,11 +171,12 @@ def Ibutton(
             outline_width=outline_width,
             outline_colour=outline_colour,
         )
+    scale, offset = utill.scale()
 
     if (
         mouse["clicked"]
-        and x <= mouse["position"][0] <= x + width
-        and y <= mouse["position"][1] <= y + height
+        and x <= mouse["position"][0] <= x + offset[0] + width * scale[0]
+        and y <= mouse["position"][1] <= y + offset[1] + height * scale[1]
     ):
         return True
 
