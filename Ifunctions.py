@@ -46,6 +46,19 @@ def Iadjust(font: pygame.font.Font, text: str, max_width: int):
     return adjusted
 
 
+def Irect(
+    screen: pygame.Surface,
+    colour: tuple[int, int, int] | tuple[int, int, int, int],
+    x: int,
+    y: int,
+    width: int,
+    height: int,
+):
+    scr = pygame.Surface((width, height), flags=pygame.SRCALPHA)
+    scr.fill(colour)
+    screen.blit(scr, (x, y))
+
+
 def Itext(
     screen: pygame.Surface,
     font: pygame.font.Font,

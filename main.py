@@ -139,6 +139,9 @@ def main():
             elif current_scene.scene_name == "darkening":
                 current_scene = scenes[current_scene.next_scene]
 
+            elif current_scene.scene_name == "edit":
+                current_scene = scenes["title"]
+
             current_scene.start()
 
         keyboard["pushed"].clear()

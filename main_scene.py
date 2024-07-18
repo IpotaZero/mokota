@@ -24,6 +24,9 @@ class MainScene:
         self.start()
 
     def start(self):
+        self.layer_background = pygame.Surface((1200, 800))
+        self.layer_buttons = pygame.Surface((1200, 800), pygame.SRCALPHA)
+
         self.popups = []
 
         self.skip = False
@@ -36,10 +39,8 @@ class MainScene:
 
         self.frame = 0
 
-        self.load_save_data(self.save_data_num)
-
         self.story_command = Icommand(
-            self.screen,
+            self.layer_buttons,
             self.font,
             (255, 255, 255),
             50,
@@ -50,7 +51,7 @@ class MainScene:
         self.set_save_command()
 
         self.title_command = Icommand(
-            self.screen,
+            self.layer_buttons,
             self.font,
             (255, 255, 255),
             50,
@@ -65,13 +66,15 @@ class MainScene:
 
         pygame.mixer.init()  # 初期化
 
+        self.load_save_data(self.save_data_num)
+
     def set_save_command(self):
         save_data_list = [
             save["name"] + ": chapter " + str(save["chapter"]) for save in self.saves
         ] + ["空のデータ"]
 
         self.save_command = Icommand(
-            self.screen,
+            self.layer_buttons,
             self.font,
             (255, 255, 255),
             50,
@@ -87,19 +90,17 @@ class MainScene:
         )
 
     def mainloop(self):
-        self.screen.fill((0, 0, 0))  # 背景を黒
+        self.layer_background.fill((0, 0, 0))  # 背景を黒
         for image in self.images.values():
-            if(image["on"] != None or image["on"] == True):
-                self.screen.blit(image["size"], image["pos"])
+            if image["is_shown"]:
+                self.layer_background.blit(image["size"], image["pos"])
 
-        scr = pygame.Surface((1140, 250), flags=pygame.SRCALPHA)
-        scr.fill((0, 0, 0, 255 / 2))
-        self.screen.blit(scr, (30, 530))
+        self.layer_buttons.fill((0, 0, 0, 0))  # 透明?
 
         if self.mode == "text" or self.mode == "log":
             is_pushed_log = (
                 Ibutton(
-                    self.screen,
+                    self.layer_buttons,
                     self.font,
                     (255, 255, 255),
                     (255, 255, 255),
@@ -115,7 +116,7 @@ class MainScene:
         if self.mode == "text" or self.mode == "save":
             is_pushed_save = (
                 Ibutton(
-                    self.screen,
+                    self.layer_buttons,
                     self.font,
                     (255, 255, 255),
                     (255, 255, 255),
@@ -131,7 +132,7 @@ class MainScene:
         if self.mode == "text" or self.mode == "pause":
             is_pushed_escape = (
                 Ibutton(
-                    self.screen,
+                    self.layer_buttons,
                     self.font,
                     (255, 255, 255),
                     (255, 255, 255),
@@ -139,7 +140,7 @@ class MainScene:
                     30,
                     100,
                     40,
-                    "TITLE",
+                    "PAUSE",
                 )
                 or K_ESCAPE in keyboard["pushed"]
             )
@@ -148,7 +149,7 @@ class MainScene:
             if self.skip:
                 is_pushed_skip = (
                     Ibutton(
-                        self.screen,
+                        self.layer_buttons,
                         self.font,
                         (255, 255, 255),
                         (255, 255, 255),
@@ -166,7 +167,7 @@ class MainScene:
             else:
                 is_pushed_skip = (
                     Ibutton(
-                        self.screen,
+                        self.layer_buttons,
                         self.font,
                         (255, 255, 255),
                         (255, 255, 255),
@@ -182,7 +183,7 @@ class MainScene:
             if self.auto:
                 is_pushed_auto = (
                     Ibutton(
-                        self.screen,
+                        self.layer_buttons,
                         self.font,
                         (255, 255, 255),
                         (255, 255, 255),
@@ -200,7 +201,7 @@ class MainScene:
             else:
                 is_pushed_auto = (
                     Ibutton(
-                        self.screen,
+                        self.layer_buttons,
                         self.font,
                         (255, 255, 255),
                         (255, 255, 255),
@@ -231,17 +232,28 @@ class MainScene:
                 self.save_command.reset()
 
             for popup in self.popups:
-                Itext(self.screen, self.font, (255, 255, 255), 30, 30, popup["text"])
+                Itext(
+                    self.layer_buttons,
+                    self.font,
+                    (255, 255, 255),
+                    30,
+                    30,
+                    popup["text"],
+                )
                 popup["life"] -= 1
                 if popup["life"] == 0:
                     self.popups.remove(popup)
 
-            self.mode_text()
+            Irect(self.layer_background, (0, 0, 0, 255 // 2), 30, 530, 1140, 250)
+
             self.frame += 1
+            self.mode_text()
 
         elif self.mode == "log":
             if is_pushed_log:
                 self.mode = "text"
+
+            Irect(self.layer_background, (0, 0, 0, 255 // 2), 30, 30, 1140, 750)
 
             self.mode_log()
 
@@ -249,42 +261,56 @@ class MainScene:
             if is_pushed_save:
                 self.mode = "text"
 
+            Irect(self.layer_background, (0, 0, 0, 255 // 2), 30, 30, 1140, 750)
+
             self.mode_save()
 
         elif self.mode == "pause":
             if is_pushed_escape:
                 self.mode = "text"
+
+            Irect(self.layer_background, (0, 0, 0, 255 // 2), 30, 30, 1140, 750)
+
             self.mode_pause()
+
+        if self.frame == 0:
+            return
+
+        self.screen.blit(self.layer_background, (0, 0))
+        self.screen.blit(self.layer_buttons, (0, 0))
 
         pygame.display.update()  # 画面更新
 
     def mode_text(self):
-        # branchの長さが20を超えるストーリーは止めた方がいいんじゃないかな
-        if len(self.branch) > 20:
+        chapter = serifs[self.chapter]
+        if self.branch not in chapter:
             Itext(
-                self.screen,
+                self.layer_buttons,
                 self.font,
                 (255, 255, 255),
                 50,
                 540,
-                "branchが存在しません;もしくは単にbranchの長さが20を超えてる;chapterを分けた方がいいんじゃないかな",
+                "知らないbranch: " + self.branch,
                 max_width=1100,
                 frame=self.frame / 2,
             )
             return
 
-        branch_list = serifs[self.chapter].get_all(self.branch)
-
-        element_list = []
-        for branch in branch_list:
-            element_list += branch
-
-        if len(element_list) <= self.text_num:
-            self.branch += "#"
-            self.text_num = 0
+        branch = chapter[self.branch]
+        if len(branch) <= self.text_num:
+            Itext(
+                self.layer_buttons,
+                self.font,
+                (255, 255, 255),
+                50,
+                540,
+                "elementが存在しないtext_num",
+                max_width=1100,
+                frame=self.frame / 2,
+            )
             return
 
-        element = element_list[self.text_num]
+        element = branch[self.text_num]
 
         if type(element) == str:
             self.solve_text(element)
@@ -299,7 +325,7 @@ class MainScene:
             self.log_slicer = None
 
         clicked = Ibutton(
-            self.screen,
+            self.layer_buttons,
             self.font,
             (255, 255, 255),
             (255, 255, 255),
@@ -332,6 +358,7 @@ class MainScene:
             else:
                 self.text_num += 1
                 self.frame = 0
+                return
 
             # if self.text_num == len(element_list):
             #     self.text_num = 0
@@ -340,7 +367,7 @@ class MainScene:
             formated_text += "▼"
 
         Itext(
-            self.screen,
+            self.layer_buttons,
             self.font,
             (255, 255, 255),
             50,
@@ -350,99 +377,166 @@ class MainScene:
             frame=self.frame / 2,
         )
 
-    def solve_command(self, command):
-        element = command[0]
+    def get_next_branch(self, command: str) -> str:
+        element = command[1]
+        if type(element) == str:
+            return element
+        elif type(element) == list:
+            index = command[2](
+                {
+                    "footprints": self.footprints,
+                    "max_credit": self.credits.index(max(self.credits)),
+                }
+            )
+            self.footprints[self.branch] = index
 
-        if element == "question":
+            return element[index]
+
+    def solve_command(self, command):
+        if self.solve_1frame_command(command):
+            self.solve_long_frame_command(command)
+
+    def solve_long_frame_command(self, command):
+        command_type = command[0]
+
+        if command_type == "question":
             if self.frame == 1:
                 self.story_command.options.regex_dict[""] = command[1]
 
             self.story_command.run()
 
             if self.story_command.is_match("."):
+                # ログに追加
                 self.log.append(self.story_command.get_selected_option() + ";")
-                self.branch += self.story_command.branch
+                # 分岐履歴
+                self.footprints[self.branch] = self.story_command[0]
+                # 次のbranch
+                self.branch = command[2][self.story_command[0]]
+
+                # リセット
                 self.text_num = 0
                 self.frame = 0
                 self.story_command.reset()
 
-        elif element == "credit":
+        elif command_type == "darken":
+            Irect(
+                self.layer_background,
+                (0, 0, 0, 255 * self.frame // 60),
+                0,
+                0,
+                1200,
+                800,
+            )
+
+            if self.frame == 60:
+                self.text_num += 1
+                self.frame = 0
+
+        elif command_type == "rdarken":
+            scr = pygame.Surface((1200, 800), flags=pygame.SRCALPHA)
+            scr.fill((0, 0, 0, 255 * (1 - self.frame / 60)))
+            self.layer_background.blit(scr, (0, 0))
+
+            if self.frame == 60:
+                self.text_num += 1
+                self.frame = 0
+
+        elif command_type == "sleep":
+            if command[1] * 60 <= self.frame:
+                self.text_num += 1
+                # self.pushed.clear()
+                self.frame = 0
+        else:
+            Itext(
+                self.layer_buttons,
+                self.font,
+                (255, 255, 255),
+                50,
+                540,
+                f"知らないコマンド: {command_type}",
+                max_width=1100,
+            )
+
+            if K_RETURN in keyboard["pushed"]:
+                self.text_num += 1
+                self.frame = 0
+
+    def solve_1frame_command(self, command):
+        command_type = command[0]
+
+        if command_type == "goto":
+            self.branch = self.get_next_branch(command)
+
+            self.text_num = 0
+            self.frame = 0
+
+        elif command_type == "credit":
             num = command[1]
             self.credits[num] += 5
-            self.text_num += 2
+            self.text_num += 1
             self.frame = 0
 
             self.popups.append({"text": "LEVEL UP!", "life": 120})
 
-        elif element == "next_chapter":
+        elif command_type == "next_chapter":
             self.chapter += 1
-            self.branch = ""
+            self.branch = "first"
             self.text_num = 0
             self.frame = 0
 
-        elif element == "go":
-            self.branch += str(self.credits.index(max(self.credits)))
-            self.text_num = 0
-            self.frame = 0
-
-        elif element == "sound":
+        elif command_type == "sound":
             pygame.mixer.Sound("sounds/" + command[1]).play()
-            self.text_num += 2
+            self.text_num += 1
             self.frame = 0
 
-        elif element == "bgm":
+        elif command_type == "bgm":
             pygame.mixer.music.stop()
             pygame.mixer.music.load("sounds/" + command[1])
             pygame.mixer.music.play(-1)
-            self.text_num += 2
+            self.text_num += 1
             self.frame = 0
 
-        elif element == "stop_bgm":
+        elif command_type == "stop_bgm":
             pygame.mixer.music.fadeout(1000)
             self.text_num += 1
             self.frame = 0
 
-        elif element == "sleep":
-            if command[1] * 60 <= self.frame:
-                self.text_num += 2
-                # self.pushed.clear()
-                self.frame = 0
-
-        elif element == "darken":
-            scr = pygame.Surface((1200, 800), flags=pygame.SRCALPHA)
-            scr.fill((0, 0, 0, 255 * self.frame / 60))
-            self.screen.blit(scr, (0, 0))
-
-            if self.frame == 60:
-                self.text_num += 1
-                self.frame = 0
-
-        elif element == "rdarken":
-            scr = pygame.Surface((1200, 800), flags=pygame.SRCALPHA)
-            scr.fill((0, 0, 0, 255 * (1 - self.frame / 60)))
-            self.screen.blit(scr, (0, 0))
-
-            if self.frame == 60:
-                self.text_num += 1
-                self.frame = 0
-
-        elif element == "image_back":
+        elif command_type == "image_back":
             path = "images/background/" + command[1]
-            img = pygame.image.load(path)
-            if(len(command) >= 3):
+            img = pygame.image.load(path).convert()
+
+            if len(command) >= 3:
                 self.images["background"] = command[2]
+
             else:
-                self.images["background"] = {"size" : pygame.transform.scale(img, (1200, 800)), "pos" :(0, 0), "on":True}
-            self.text_num += 2
-            
-        elif element == "image_one":
+                self.images["background"] = {
+                    "size": pygame.transform.scale(img, (1200, 800)),
+                    "pos": (0, 0),
+                    "is_shown": True,
+                }
+
+            self.text_num += 1
+            self.frame = 0
+
+        elif command_type == "image_one":
             path = "images/" + command[1]
-            img = pygame.image.load(path)
-            self.images[command[1]] = command[2]
-            self.text_num += 2
-        
-        elif element == "image_onoff":
-            self.images[command[1]]["on"] = command[2]
+            img = pygame.image.load(path).convert()
+
+            image_name = command[1]
+
+            self.images[image_name] = command[2]
+
+            self.text_num += 1
+            self.frame = 0
+
+        elif command_type == "image_onoff":
+            image_name = command[1]
+
+            self.images[image_name]["is_shown"] = command[2]
+
+            self.text_num += 1
+            self.frame = 0
+
         # elif element == "image":
         #     img = pygame.image.load(
         #         "images/" + element_list[self.text_num + 1]
@@ -453,10 +547,16 @@ class MainScene:
         #     self.images.append((pygame.transform.scale(img, scale), pos))
         #     self.text_num += 3
 
-        elif element == "delete_image":
+        elif command_type == "delete_image":
             r = command[1]
             del self.images[r]
-            self.text_num += 2
+            self.text_num += 1
+            self.frame = 0
+
+        else:
+            return True
+
+        return False
 
     def mode_log(self):
         text = Iadjust(self.font, ";".join(self.log), 1100)
@@ -469,7 +569,7 @@ class MainScene:
             self.log_slicer = max([len(row) - max_row_num, 0])
 
         Itext(
-            self.screen,
+            self.layer_buttons,
             self.font,
             (255, 255, 255),
             50,
@@ -486,14 +586,14 @@ class MainScene:
 
             if line - self.log_slicer > max_row_num:
                 is_pushed_down = Ibutton(
-                    self.screen,
+                    self.layer_buttons,
                     self.font,
                     (255, 255, 255),
                     (255, 255, 255),
                     150,
-                    738,
+                    750,
                     900,
-                    32,
+                    30,
                     "▼",
                     line_width=2,
                 )
@@ -509,14 +609,14 @@ class MainScene:
 
             if self.log_slicer > 0:
                 is_pushed_up = Ibutton(
-                    self.screen,
+                    self.layer_buttons,
                     self.font,
                     (255, 255, 255),
                     (255, 255, 255),
                     150,
                     30,
                     900,
-                    32,
+                    30,
                     "▲",
                     line_width=2,
                 )
@@ -533,13 +633,20 @@ class MainScene:
         self.save_command.run()
 
         if self.save_command.is_match(""):
-            Itext(self.screen, self.font, (255, 255, 255), 50, 40, "セーブデータを選択")
+            Itext(
+                self.layer_buttons,
+                self.font,
+                (255, 255, 255),
+                50,
+                40,
+                "セーブデータを選択",
+            )
 
             for i, save in enumerate(self.saves):
                 current_text = '"' + save.current_text(18) + '"'
 
                 Itext(
-                    self.screen,
+                    self.layer_buttons,
                     self.font,
                     (255, 255, 255),
                     520,
@@ -557,7 +664,7 @@ class MainScene:
                 current_text = '"' + save.current_text(20) + '"'
 
             Itext(
-                self.screen,
+                self.layer_buttons,
                 self.font,
                 (255, 255, 255),
                 50,
@@ -566,7 +673,7 @@ class MainScene:
             )
 
         elif self.save_command.is_match(".[0-1]"):
-            Itext(self.screen, self.font, (255, 255, 255), 50, 40, "ほんとに?")
+            Itext(self.layer_buttons, self.font, (255, 255, 255), 50, 40, "ほんとに?")
 
         # print(self.save_command.branch, self.save_command.num)
 
@@ -582,7 +689,6 @@ class MainScene:
 
             self.save_command.cancel(3)
 
-            self.log = []
             self.mode = "text"
 
         elif self.save_command.is_match(".10"):
@@ -599,6 +705,7 @@ class MainScene:
             self.saves[save_data_number]["branch"] = self.branch
             self.saves[save_data_number]["text_num"] = self.text_num
             self.saves[save_data_number]["credits"] = self.credits
+            self.saves[save_data_number]["footprints"] = self.footprints
 
             with open("save.dat", "w") as f:
                 f.write(json.dumps([save.save_data for save in self.saves]))
@@ -617,27 +724,75 @@ class MainScene:
             self.save_command.cancel(2)
 
     def load_save_data(self, save_data_number):
+        Itext(
+            self.screen,
+            self.font,
+            (255, 255, 255),
+            950,
+            700,
+            "NOW LOADING...",
+        )
+        pygame.display.update()
+
         self.chapter = 0
         self.text_num = 0
-        self.branch = ""
+        self.branch = "first"
         self.credits = [0, 0, 0]
+        self.footprints = {}
 
+        self.log = []
         self.frame = 0
-        self.images = []
-        self.background_image = None
+        self.images = {}
+
         pygame.mixer.music.fadeout(1000)
 
         if save_data_number is not None:
-            self.name = self.saves[save_data_number]["name"]
-            self.chapter = self.saves[save_data_number]["chapter"]
-            self.branch = self.saves[save_data_number]["branch"]
-            self.text_num = self.saves[save_data_number]["text_num"]
-            self.credits = self.saves[save_data_number]["credits"]
+            save = self.saves[save_data_number]
+            self.name = save["name"]
+            self.chapter = save["chapter"]
+            self.branch = save["branch"]
+            self.text_num = save["text_num"]
+            self.credits = save["credits"]
+            self.footprints = save["footprints"]
+
+            chapter = save["chapter"]
+            branch = "first"
+            text_num = 0
+
+            while branch != save["branch"] or text_num != save["text_num"]:
+                self.frame = 1
+
+                element = serifs[chapter][branch][text_num]
+                text_num += 1
+
+                if type(element) == str:
+                    self.solve_text(element)
+                    continue
+
+                if element[0] == "goto":
+                    branch = self.get_next_branch(element)
+                    text_num = 0
+
+                elif element[0] == "question":
+                    # print(self.footprints)
+                    branch = element[2][save["footprints"][branch]]
+                    text_num = 0
+
+                elif element[0] != "sound":
+                    self.solve_1frame_command(element)
+
+            self.frame = 0
+
+            self.name = save["name"]
+            self.chapter = save["chapter"]
+            self.branch = save["branch"]
+            self.text_num = save["text_num"]
+            self.credits = save["credits"]
+            self.footprints = save["footprints"]
 
     def mode_pause(self):
-
         Itext(
-            self.screen,
+            self.layer_buttons,
             self.font,
             (255, 255, 255),
             50,
@@ -654,7 +809,7 @@ class MainScene:
 
         if self.title_command.is_match("0"):
             Itext(
-                self.screen,
+                self.layer_buttons,
                 self.font,
                 (255, 255, 255),
                 50,
