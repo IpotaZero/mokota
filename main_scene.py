@@ -286,7 +286,7 @@ class MainScene:
             self.buffer_screen,
             (1200 * screen_option["ratio"], 800 * screen_option["ratio"]),
         )
-        self.screen.blit(scr, (0, 0))
+        self.screen.blit(scr, screen_option["offset"])
         pygame.display.update()  # 画面更新
 
     def mode_text(self):

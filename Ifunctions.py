@@ -20,7 +20,11 @@ mouse = {
     "last_click_time": 0,
 }
 
-screen_option = {"ratio": 1}
+screen_option = {
+    "ratio": 1,
+    "offset": (0, 0),
+    "real_size": (0, 0),
+}
 
 
 def Iadjust(font: pygame.font.Font, text: str, max_width: int):
@@ -174,12 +178,12 @@ def Ibutton(
 
     if (
         mouse["clicked"]
-        and x * screen_option["ratio"]
+        and x * screen_option["ratio"] + screen_option["offset"][0]
         <= mouse["position"][0]
-        <= (x + width) * screen_option["ratio"]
-        and y * screen_option["ratio"]
+        <= (x + width) * screen_option["ratio"] + screen_option["offset"][0]
+        and y * screen_option["ratio"] + screen_option["offset"][1]
         <= mouse["position"][1]
-        <= (y + height) * screen_option["ratio"]
+        <= (y + height) * screen_option["ratio"] + screen_option["offset"][1]
     ):
         return True
 
@@ -191,12 +195,12 @@ def Iscroll(x: int, y: int, width: int, height: int) -> tuple[bool, str]:
         return (False, "none")
 
     if (
-        x * screen_option["ratio"]
+        x * screen_option["ratio"] + screen_option["offset"][0]
         <= mouse["position"][0]
-        <= (x + width) * screen_option["ratio"]
-        and y * screen_option["ratio"]
+        <= (x + width) * screen_option["ratio"] + screen_option["offset"][0]
+        and y * screen_option["ratio"] + screen_option["offset"][1]
         <= mouse["position"][1]
-        <= (y + height) * screen_option["ratio"]
+        <= (y + height) * screen_option["ratio"] + screen_option["offset"][1]
     ):
         if mouse["up"]:
             return (True, "up")

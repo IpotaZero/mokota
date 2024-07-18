@@ -12,7 +12,7 @@ import name_scene
 import darkening_scene
 from story import Save
 
-from Ifunctions import keyboard, mouse
+from Ifunctions import keyboard, mouse, screen_option, Irect
 
 
 def main():
@@ -32,6 +32,7 @@ def main():
 
     pygame.init()  # Pygameの初期化
     screen = pygame.display.set_mode((1200, 800))
+    screen_option["real_size"] = pygame.display.get_desktop_sizes()[0]
 
     pygame.display.set_caption("MicroComputerReserch!")
 
@@ -108,6 +109,12 @@ def main():
                 keyboard["long_pressed"].append(key)
 
         keyboard["long_pressed"] += keyboard["pushed"]
+
+        # scr = pygame.Surface(
+        #     (screen_option["real_size"][0], screen_option["real_size"][1]),
+        # )
+        # scr.fill((255, 201, 214))
+        # screen.blit(scr, (0, 0))
 
         result = current_scene.mainloop()
 

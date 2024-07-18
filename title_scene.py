@@ -46,6 +46,7 @@ class TitleScene:
                     "2": ["やめる", "???", "???", "???"],
                     "3": ["やめる", "画面サイズ", "編集(デバッグ)"],
                     "31": [
+                        "フルスクリーン",
                         "600x400",
                         "800x533",
                         "900x600",
@@ -219,7 +220,33 @@ class TitleScene:
             )
 
         elif self.command.is_match("31."):
-            if self.command[2] == 7:
+            if self.command[2] == 8:
+                self.command.cancel(2)
+                return
+
+            if self.command[2] == 0:
+                # 画面サイズの取得
+                real_width, real_height = screen_option["real_size"]
+
+                # print(current_width, current_height)
+
+                # それぞれの比率を計算
+                width_ratio = real_width / 1200
+                height_ratio = real_height / 800
+
+                pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+
+                if width_ratio <= height_ratio:
+                    ratio = width_ratio
+                    screen_option["offset"] = (0, (real_height - ratio * 800) / 2)
+                else:
+                    ratio = height_ratio
+                    screen_option["offset"] = ((real_width - ratio * 1200) / 2, 0)
+
+                # 収まる最大の比率を決定
+                # ratio = min(width_ratio, height_ratio)
+                screen_option["ratio"] = ratio
+
                 self.command.cancel(2)
                 return
 
@@ -231,9 +258,13 @@ class TitleScene:
                 (1500, 1000, 1.25),
                 (1800, 1200, 1.5),
                 (2400, 1600, 2),
-            ][self.command[2]]
+            ][self.command[2] - 1]
+
+            screen_option["offset"] = (0, 0)
 
             pygame.display.set_mode(size[:2])
+
+            # print(size[2])
 
             screen_option["ratio"] = size[2]
 
@@ -265,5 +296,5 @@ class TitleScene:
             self.buffer_screen,
             (1200 * screen_option["ratio"], 800 * screen_option["ratio"]),
         )
-        self.screen.blit(scr, (0, 0))
+        self.screen.blit(scr, screen_option["offset"])
         pygame.display.update()  # 画面更新

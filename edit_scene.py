@@ -42,7 +42,7 @@ class EditScene:
             for branch_name in chapter:
                 nexts = []
 
-                print(chapter[branch_name])
+                # print(chapter[branch_name])
 
                 element = chapter[branch_name][-1]
 
@@ -179,5 +179,5 @@ class EditScene:
             self.buffer_screen,
             (1200 * screen_option["ratio"], 800 * screen_option["ratio"]),
         )
-        self.screen.blit(scr, (0, 0))
+        self.screen.blit(scr, screen_option["offset"])
         pygame.display.update()  # 画面更新
