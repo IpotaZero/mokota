@@ -52,6 +52,7 @@ def main():
     frame = 0
 
     while True:
+        # print(screen_ratio)
         # イベント処理
         for event in pygame.event.get():  # イベントを取得
             if event.type == QUIT:  # 閉じるボタンが押されたら

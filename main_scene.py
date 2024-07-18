@@ -14,6 +14,7 @@ class MainScene:
         self.name = "ERROR"
 
         self.screen = screen
+        self.buffer_screen = pygame.Surface((1200, 800))
 
         self.saves = saves
 
@@ -278,9 +279,14 @@ class MainScene:
         if self.frame == 0:
             return
 
-        self.screen.blit(self.layer_background, (0, 0))
-        self.screen.blit(self.layer_buttons, (0, 0))
+        self.buffer_screen.blit(self.layer_background, (0, 0))
+        self.buffer_screen.blit(self.layer_buttons, (0, 0))
 
+        scr = pygame.transform.scale(
+            self.buffer_screen,
+            (1200 * screen_option["ratio"], 800 * screen_option["ratio"]),
+        )
+        self.screen.blit(scr, (0, 0))
         pygame.display.update()  # 画面更新
 
     def mode_text(self):
@@ -755,7 +761,7 @@ class MainScene:
 
     def load_save_data(self, save_data_number):
         Itext(
-            self.screen,
+            self.buffer_screen,
             self.font,
             (255, 255, 255),
             950,

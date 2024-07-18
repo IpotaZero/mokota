@@ -11,6 +11,7 @@ class NameScene:
     def __init__(self, screen: pygame.Surface) -> None:
         self.scene_name = "name"
         self.screen = screen
+        self.buffer_screnn = pygame.Surface((1200, 800))
 
         self.font = pygame.font.Font("DotGothic16-Regular.ttf", 48)
 
@@ -25,7 +26,7 @@ class NameScene:
 
     def mainloop(self):
         row_letter_num = 20
-        self.screen.fill((255, 201, 224))
+        self.buffer_screnn.fill((255, 201, 224))
 
         if K_RIGHT in keyboard["long_pressed"]:
             self.num += 1
@@ -60,7 +61,7 @@ class NameScene:
                 self.name = self.name[:-1]
 
         Itext(
-            self.screen,
+            self.buffer_screnn,
             self.font,
             (255, 255, 255),
             40,
@@ -69,7 +70,7 @@ class NameScene:
         )
 
         Itext(
-            self.screen,
+            self.buffer_screnn,
             self.font,
             (255, 255, 255),
             440,
@@ -94,7 +95,7 @@ class NameScene:
             y = 112 + math.floor(i / row_letter_num) * self.font.get_height()
 
             selected = Ibutton(
-                self.screen,
+                self.buffer_screnn,
                 self.font,
                 (255, 255, 255),
                 (255, 255, 255),
@@ -108,7 +109,7 @@ class NameScene:
 
             if i == self.num:
                 Itext(
-                    self.screen,
+                    self.buffer_screnn,
                     self.font,
                     (255, 240, 0),
                     x + 4,
@@ -144,4 +145,9 @@ class NameScene:
         #     m,
         # )
 
+        scr = pygame.transform.scale(
+            self.buffer_screnn,
+            (1200 * screen_option["ratio"], 800 * screen_option["ratio"]),
+        )
+        self.screen.blit(scr, (0, 0))
         pygame.display.update()  # 画面更新

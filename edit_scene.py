@@ -10,6 +10,7 @@ class EditScene:
         self.scene_name = "edit"
 
         self.screen = screen
+        self.buffer_screen = pygame.Surface((1200, 800))
         self.font = pygame.font.Font("DotGothic16-Regular.ttf", 32)
 
         self.start()
@@ -21,7 +22,7 @@ class EditScene:
         self.frame = 0
 
         self.command = Icommand(
-            self.screen,
+            self.buffer_screen,
             self.font,
             (255, 255, 255),
             800,
@@ -85,10 +86,10 @@ class EditScene:
         # print(self.nodes)
 
     def mainloop(self) -> None:
-        self.screen.fill((255, 201, 224))
+        self.buffer_screen.fill((255, 201, 224))
 
         is_clicked_next_chapter = Ibutton(
-            self.screen,
+            self.buffer_screen,
             self.font,
             (255, 255, 255),
             (255, 255, 255),
@@ -122,7 +123,7 @@ class EditScene:
                 if "nexts" in value:
                     for next_branch in value["nexts"]:
                         pygame.draw.line(
-                            self.screen,
+                            self.buffer_screen,
                             (255, 255, 255),
                             (
                                 value["pos"][0] + self.camera[0] + 200,
@@ -139,7 +140,7 @@ class EditScene:
                         )
 
                 clicked = Ibutton(
-                    self.screen,
+                    self.buffer_screen,
                     self.font,
                     (255, 255, 255),
                     (255, 255, 255),
@@ -156,7 +157,7 @@ class EditScene:
                     print(branch)
 
             Itext(
-                self.screen,
+                self.buffer_screen,
                 self.font,
                 (255, 255, 255),
                 800,
@@ -174,4 +175,9 @@ class EditScene:
             elif self.command.is_match("2"):
                 pass
 
+        scr = pygame.transform.scale(
+            self.buffer_screen,
+            (1200 * screen_option["ratio"], 800 * screen_option["ratio"]),
+        )
+        self.screen.blit(scr, (0, 0))
         pygame.display.update()  # 画面更新
