@@ -39,8 +39,6 @@ class MainScene:
 
         self.frame = 0
 
-        self.load_save_data(self.save_data_num)
-
         self.story_command = Icommand(
             self.layer_buttons,
             self.font,
@@ -68,6 +66,8 @@ class MainScene:
 
         pygame.mixer.init()  # 初期化
 
+        self.load_save_data(self.save_data_num)
+
     def set_save_command(self):
         save_data_list = [
             save["name"] + ": chapter " + str(save["chapter"]) for save in self.saves
@@ -92,7 +92,7 @@ class MainScene:
     def mainloop(self):
         self.layer_background.fill((0, 0, 0))  # 背景を黒
         for image in self.images.values():
-            if image["on"] != None or image["on"] == True:
+            if image["is_shown"]:
                 self.layer_background.blit(image["size"], image["pos"])
 
         self.layer_buttons.fill((0, 0, 0, 0))  # 透明?
@@ -246,8 +246,8 @@ class MainScene:
 
             Irect(self.layer_background, (0, 0, 0, 255 // 2), 30, 530, 1140, 250)
 
-            self.mode_text()
             self.frame += 1
+            self.mode_text()
 
         elif self.mode == "log":
             if is_pushed_log:
@@ -272,6 +272,9 @@ class MainScene:
             Irect(self.layer_background, (0, 0, 0, 255 // 2), 30, 30, 1140, 750)
 
             self.mode_pause()
+
+        if self.frame == 0:
+            return
 
         self.screen.blit(self.layer_background, (0, 0))
         self.screen.blit(self.layer_buttons, (0, 0))
@@ -355,6 +358,7 @@ class MainScene:
             else:
                 self.text_num += 1
                 self.frame = 0
+                return
 
             # if self.text_num == len(element_list):
             #     self.text_num = 0
@@ -373,28 +377,29 @@ class MainScene:
             frame=self.frame / 2,
         )
 
-    def get_next_branch(self, element: str) -> str:
+    def get_next_branch(self, command: str) -> str:
+        element = command[1]
         if type(element) == str:
             return element
-        else:
-            return element(
+        elif type(element) == list:
+            index = command[2](
                 {
                     "footprints": self.footprints,
                     "max_credit": self.credits.index(max(self.credits)),
                 }
             )
+            self.footprints[self.branch] = index
+
+            return element[index]
 
     def solve_command(self, command):
-        element = command[0]
+        if self.solve_1frame_command(command):
+            self.solve_long_frame_command(command)
 
-        if element == "goto":
-            self.branch = self.get_next_branch(command[1])
+    def solve_long_frame_command(self, command):
+        command_type = command[0]
 
-            self.text_num = 0
-            self.frame = 0
-            return
-
-        elif element == "question":
+        if command_type == "question":
             if self.frame == 1:
                 self.story_command.options.regex_dict[""] = command[1]
 
@@ -406,56 +411,14 @@ class MainScene:
                 # 分岐履歴
                 self.footprints[self.branch] = self.story_command[0]
                 # 次のbranch
-                self.branch = self.get_next_branch(command[2][self.story_command[0]])
+                self.branch = command[2][self.story_command[0]]
 
                 # リセット
                 self.text_num = 0
                 self.frame = 0
                 self.story_command.reset()
 
-        # elif element == "go":
-        #     self.branch += str(self.credits.index(max(self.credits)))
-        #     self.text_num = 0
-        #     self.frame = 0
-
-        elif element == "credit":
-            num = command[1]
-            self.credits[num] += 5
-            self.text_num += 1
-            self.frame = 0
-
-            self.popups.append({"text": "LEVEL UP!", "life": 120})
-
-        elif element == "next_chapter":
-            self.chapter += 1
-            self.branch = "first"
-            self.text_num = 0
-            self.frame = 0
-
-        elif element == "sound":
-            pygame.mixer.Sound("sounds/" + command[1]).play()
-            self.text_num += 1
-            self.frame = 0
-
-        elif element == "bgm":
-            pygame.mixer.music.stop()
-            pygame.mixer.music.load("sounds/" + command[1])
-            pygame.mixer.music.play(-1)
-            self.text_num += 1
-            self.frame = 0
-
-        elif element == "stop_bgm":
-            pygame.mixer.music.fadeout(1000)
-            self.text_num += 1
-            self.frame = 0
-
-        elif element == "sleep":
-            if command[1] * 60 <= self.frame:
-                self.text_num += 1
-                # self.pushed.clear()
-                self.frame = 0
-
-        elif element == "darken":
+        elif command_type == "darken":
             Irect(
                 self.layer_background,
                 (0, 0, 0, 255 * self.frame // 60),
@@ -469,7 +432,7 @@ class MainScene:
                 self.text_num += 1
                 self.frame = 0
 
-        elif element == "rdarken":
+        elif command_type == "rdarken":
             scr = pygame.Surface((1200, 800), flags=pygame.SRCALPHA)
             scr.fill((0, 0, 0, 255 * (1 - self.frame / 60)))
             self.layer_background.blit(scr, (0, 0))
@@ -478,27 +441,102 @@ class MainScene:
                 self.text_num += 1
                 self.frame = 0
 
-        elif element == "image_back":
+        elif command_type == "sleep":
+            if command[1] * 60 <= self.frame:
+                self.text_num += 1
+                # self.pushed.clear()
+                self.frame = 0
+        else:
+            Itext(
+                self.layer_buttons,
+                self.font,
+                (255, 255, 255),
+                50,
+                540,
+                f"知らないコマンド: {command_type}",
+                max_width=1100,
+            )
+
+            if K_RETURN in keyboard["pushed"]:
+                self.text_num += 1
+                self.frame = 0
+
+    def solve_1frame_command(self, command):
+        command_type = command[0]
+
+        if command_type == "goto":
+            self.branch = self.get_next_branch(command)
+
+            self.text_num = 0
+            self.frame = 0
+
+        elif command_type == "credit":
+            num = command[1]
+            self.credits[num] += 5
+            self.text_num += 1
+            self.frame = 0
+
+            self.popups.append({"text": "LEVEL UP!", "life": 120})
+
+        elif command_type == "next_chapter":
+            self.chapter += 1
+            self.branch = "first"
+            self.text_num = 0
+            self.frame = 0
+
+        elif command_type == "sound":
+            pygame.mixer.Sound("sounds/" + command[1]).play()
+            self.text_num += 1
+            self.frame = 0
+
+        elif command_type == "bgm":
+            pygame.mixer.music.stop()
+            pygame.mixer.music.load("sounds/" + command[1])
+            pygame.mixer.music.play(-1)
+            self.text_num += 1
+            self.frame = 0
+
+        elif command_type == "stop_bgm":
+            pygame.mixer.music.fadeout(1000)
+            self.text_num += 1
+            self.frame = 0
+
+        elif command_type == "image_back":
             path = "images/background/" + command[1]
             img = pygame.image.load(path).convert()
+
             if len(command) >= 3:
                 self.images["background"] = command[2]
+
             else:
                 self.images["background"] = {
                     "size": pygame.transform.scale(img, (1200, 800)),
                     "pos": (0, 0),
-                    "on": True,
+                    "is_shown": True,
                 }
-            self.text_num += 1
 
-        elif element == "image_one":
+            self.text_num += 1
+            self.frame = 0
+
+        elif command_type == "image_one":
             path = "images/" + command[1]
             img = pygame.image.load(path).convert()
-            self.images[command[1]] = command[2]
-            self.text_num += 1
 
-        elif element == "image_onoff":
-            self.images[command[1]]["on"] = command[2]
+            image_name = command[1]
+
+            self.images[image_name] = command[2]
+
+            self.text_num += 1
+            self.frame = 0
+
+        elif command_type == "image_onoff":
+            image_name = command[1]
+
+            self.images[image_name]["is_shown"] = command[2]
+
+            self.text_num += 1
+            self.frame = 0
+
         # elif element == "image":
         #     img = pygame.image.load(
         #         "images/" + element_list[self.text_num + 1]
@@ -509,24 +547,16 @@ class MainScene:
         #     self.images.append((pygame.transform.scale(img, scale), pos))
         #     self.text_num += 3
 
-        elif element == "delete_image":
+        elif command_type == "delete_image":
             r = command[1]
             del self.images[r]
             self.text_num += 1
+            self.frame = 0
 
         else:
-            Itext(
-                self.layer_buttons,
-                self.font,
-                (255, 255, 255),
-                50,
-                540,
-                f"知らないコマンド: {element}",
-                max_width=1100,
-            )
+            return True
 
-            if K_RETURN in keyboard["pushed"]:
-                self.text_num += 1
+        return False
 
     def mode_log(self):
         text = Iadjust(self.font, ";".join(self.log), 1100)
@@ -659,7 +689,6 @@ class MainScene:
 
             self.save_command.cancel(3)
 
-            self.log = []
             self.mode = "text"
 
         elif self.save_command.is_match(".10"):
@@ -695,27 +724,68 @@ class MainScene:
             self.save_command.cancel(2)
 
     def load_save_data(self, save_data_number):
+        Itext(
+            self.screen,
+            self.font,
+            (255, 255, 255),
+            950,
+            700,
+            "NOW LOADING...",
+        )
+        pygame.display.update()
+
         self.chapter = 0
         self.text_num = 0
         self.branch = "first"
         self.credits = [0, 0, 0]
         self.footprints = {}
 
+        self.log = []
         self.frame = 0
-        self.images = []
-        self.background_image = None
+        self.images = {}
+
         pygame.mixer.music.fadeout(1000)
 
         if save_data_number is not None:
-            self.name = self.saves[save_data_number]["name"]
-            self.chapter = self.saves[save_data_number]["chapter"]
-            self.branch = self.saves[save_data_number]["branch"]
-            self.text_num = self.saves[save_data_number]["text_num"]
-            self.credits = self.saves[save_data_number]["credits"]
-            self.footprints = self.saves[save_data_number]["footprints"]
+            save = self.saves[save_data_number]
+            self.name = save["name"]
+
+            chapter = save["chapter"]
+            branch = "first"
+            text_num = 0
+
+            while branch != save["branch"] or text_num != save["text_num"]:
+                self.frame = 1
+
+                element = serifs[chapter][branch][text_num]
+                text_num += 1
+
+                if type(element) == str:
+                    self.solve_text(element)
+                    continue
+
+                if element[0] == "goto":
+                    branch = self.get_next_branch(element)
+                    text_num = 0
+
+                elif element[0] == "question":
+                    # print(self.footprints)
+                    branch = element[2][save["footprints"][branch]]
+                    text_num = 0
+
+                elif element[0] != "sound":
+                    self.solve_1frame_command(element)
+
+            self.frame = 0
+
+            self.name = save["name"]
+            self.chapter = save["chapter"]
+            self.branch = save["branch"]
+            self.text_num = save["text_num"]
+            self.credits = save["credits"]
+            self.footprints = save["footprints"]
 
     def mode_pause(self):
-
         Itext(
             self.layer_buttons,
             self.font,
