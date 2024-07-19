@@ -239,6 +239,49 @@ def Iscroll(x: int, y: int, width: int, height: int) -> tuple[bool, str]:
     return (False, "none")
 
 
+def Irange(screen, font: pygame.font.Font, colour, x, y, value):
+    height = font.get_height()
+    text = " " + str(value) + " "
+    width = font.render(text, False, colour).get_rect().w
+
+    is_clicked_left = Ibutton(
+        screen,
+        font,
+        colour,
+        colour,
+        x,
+        y,
+        height,
+        height,
+        "◁",
+        line_width=0,
+    )
+
+    Itext(screen, font, colour, x + height, y, text)
+
+    is_clicked_right = Ibutton(
+        screen,
+        font,
+        colour,
+        colour,
+        x + height + width,
+        y,
+        height,
+        height,
+        "▷",
+        line_width=0,
+    )
+
+    s = Iscroll(x, y, x + width, height)
+
+    if is_clicked_left or (s[0] and s[1] == "up"):
+        return -1
+    elif is_clicked_right or (s[0] and s[1] == "down"):
+        return 1
+
+    return 0
+
+
 class RegexDict:
     def __init__(self, regex_dict: dict):
         self.regex_dict = regex_dict
@@ -248,6 +291,12 @@ class RegexDict:
             if re.match("^" + pattern + "$", target_string):
                 return value
         return None
+
+    def __setitem__(self, target_string, value):
+        for pattern in self.regex_dict:
+            if re.match("^" + pattern + "$", target_string):
+                self.regex_dict[pattern] = value
+                return
 
     def get_all(self, target_string: str):
         l = []
@@ -271,6 +320,7 @@ class Icommand:
         options: RegexDict,
         outline_width: int = 0,
         outline_colour: tuple[int, int, int] = (0, 0, 0),
+        title=RegexDict({}),
     ) -> None:
         self.screen = screen
         self.font = font
@@ -278,9 +328,20 @@ class Icommand:
         self.x = x
         self.y = y
         self.options = options
+        self.title = title
 
         self.outline_width = outline_width
         self.outline_colour = outline_colour
+
+        self.range_values = RegexDict({})
+
+        for key in options.regex_dict:
+            for option in options.regex_dict[key]:
+                if type(option) == list:
+                    if key not in self.range_values.regex_dict:
+                        self.range_values.regex_dict[key] = []
+
+                    self.range_values.regex_dict[key].append(option[1])
 
         self.reset()
 
@@ -289,62 +350,114 @@ class Icommand:
         self.num = 0
 
     def run(self):
-        option = self.options[self.branch]
+        title = self.title[self.branch]
 
-        if option is None:
-            return
-
-        if K_RETURN in keyboard["pushed"] or K_SPACE in keyboard["pushed"]:
-            self.branch += suuji[self.num]
-            self.num = 0
-            return
-        elif (
-            K_ESCAPE in keyboard["pushed"] or K_BACKSPACE in keyboard["pushed"]
-        ) and self.branch != "":
-            self.cancel()
-            return
-
-        if len(option) > 0:
-            if K_UP in keyboard["long_pressed"]:
-                self.num += len(option) - 1
-                self.num %= len(option)
-            elif K_DOWN in keyboard["long_pressed"]:
-                self.num += 1
-                self.num %= len(option)
-
-        for i, text in enumerate(option):
-            width = self.font.render(text, False, (255, 255, 255)).get_rect().w
-            selected = Ibutton(
+        if title is not None:
+            Itext(
                 self.screen,
                 self.font,
                 self.colour,
-                self.colour,
-                self.x + self.font.get_height(),
-                self.y + self.font.get_height() * i,
-                width,
-                self.font.get_height(),
-                text,
-                line_width=0,
-                text_align="left",
-                outline_width=self.outline_width,
+                self.x,
+                self.y,
+                title,
                 outline_colour=self.outline_colour,
+                outline_width=self.outline_width,
             )
 
-            if selected:
-                self.branch += suuji[i]
+        option = self.options[self.branch]
+
+        if option is None or len(option) == 0:
+            return
+
+        if type(option[self.num]) == str:
+            if K_RETURN in keyboard["pushed"] or K_SPACE in keyboard["pushed"]:
+                self.branch += suuji[self.num]
                 self.num = 0
                 return
+            elif (
+                K_ESCAPE in keyboard["pushed"] or K_BACKSPACE in keyboard["pushed"]
+            ) and self.branch != "":
+                self.cancel()
+                return
+
+        if K_UP in keyboard["long_pressed"]:
+            self.num += len(option) - 1
+            self.num %= len(option)
+        elif K_DOWN in keyboard["long_pressed"]:
+            self.num += 1
+            self.num %= len(option)
+
+        j = 0
+        for i, element in enumerate(option):
+            if type(element) == list:
+                Itext(
+                    self.screen,
+                    self.font,
+                    self.colour,
+                    self.x + self.font.get_height(),
+                    self.y + self.font.get_height() * (i + 1),
+                    option[i][0],
+                    outline_width=self.outline_width,
+                    outline_colour=self.outline_colour,
+                )
+
+                w = self.font.render(option[i][0], False, (0, 0, 0)).get_rect().w
+
+                s = Irange(
+                    self.screen,
+                    self.font,
+                    self.colour,
+                    self.x + self.font.get_height() + w,
+                    self.y + self.font.get_height() * (i + 1),
+                    self.range_values[self.branch][j],
+                )
+
+                if i == self.num:
+                    if K_RIGHT in keyboard["long_pressed"]:
+                        s += 1
+                    elif K_LEFT in keyboard["long_pressed"]:
+                        s -= 1
+
+                self.range_values[self.branch][j] = max(
+                    min(self.range_values[self.branch][j] + s, element[3]), element[2]
+                )
+                j += 1
+            else:
+                width = self.font.render(element, False, (255, 255, 255)).get_rect().w
+                selected = Ibutton(
+                    self.screen,
+                    self.font,
+                    self.colour,
+                    self.colour,
+                    self.x + self.font.get_height(),
+                    self.y + self.font.get_height() * (i + 1),
+                    width,
+                    self.font.get_height(),
+                    element,
+                    line_width=0,
+                    text_align="left",
+                    outline_width=self.outline_width,
+                    outline_colour=self.outline_colour,
+                )
+
+                if selected:
+                    self.branch += suuji[i]
+                    self.num = 0
+                    return
 
         Itext(
             self.screen,
             self.font,
             self.colour,
             self.x,
-            self.y + self.font.get_height() * self.num,
+            self.y + self.font.get_height() * (self.num + 1),
             "→",
             outline_width=self.outline_width,
             outline_colour=self.outline_colour,
         )
+
+    def get_range_value(self):
+        return self.range_values[self.branch]
 
     def cancel(self, n=1):
         for _ in range(n):

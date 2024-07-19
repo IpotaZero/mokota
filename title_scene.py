@@ -3,7 +3,6 @@ import sys
 import pygame
 from pygame.locals import *
 
-import Ifunctions
 from Ifunctions import *
 from story import Save
 
@@ -47,7 +46,7 @@ class TitleScene:
                     "1.": ["ロード", "削除", "やめる"],
                     "1.1": ["はい", "いいえ"],
                     "2": ["やめる", "???", "???", "???"],
-                    "3": ["やめる", "画面サイズ", "編集(デバッグ)"],
+                    "3": ["やめる", "画面サイズ", "音量", "編集(デバッグ)"],
                     "31": [
                         "フルスクリーン",
                         "600x400",
@@ -59,7 +58,20 @@ class TitleScene:
                         "2400x1600",
                         "やめる",
                     ],
+                    "32": ["やめる", ["BGM:", 0, 0, 9], ["SE :", 0, 0, 9]],
                     "4": ["はい", "いいえ"],
+                },
+            ),
+            title=RegexDict(
+                {
+                    "1": "セーブデータを選択",
+                    "1.": "どうする?",
+                    "1.1": "ほんとに?",
+                    "2": "どのイラストを見る?",
+                    "3": "設定",
+                    "31": "画面サイズの変更",
+                    "32": "音量設定",
+                    "4": "ほんとに?",
                 }
             ),
             # outline_width=2,
@@ -95,17 +107,6 @@ class TitleScene:
             self.is_end = True
 
         elif self.command.is_match("1"):
-            Itext(
-                self.buffer_screen,
-                self.font2,
-                (255, 255, 255),
-                20,
-                130,
-                "セーブデータを選択",
-                # outline_width=2,
-                # outline_colour=[(255, 255, 255)],
-            )
-
             for i, save in enumerate(self.saves):
                 Itext(
                     self.buffer_screen,
@@ -124,35 +125,11 @@ class TitleScene:
                 self.command.cancel(2)
                 return
 
-            Itext(
-                self.buffer_screen,
-                self.font2,
-                (255, 255, 255),
-                20,
-                130,
-                "どうする?",
-                # outline_width=2,
-                # outline_colour=[(255, 255, 255)],
-            )
-
         elif self.command.is_match("1.0"):
             # load->load
             pygame.mixer.music.fadeout(1000)
             self.is_end = True
             return self.command[1]
-
-        elif self.command.is_match("1.1"):
-            # load->delete
-            Itext(
-                self.buffer_screen,
-                self.font2,
-                (255, 255, 255),
-                20,
-                130,
-                "ほんとに?",
-                # outline_width=2,
-                # outline_colour=[(255, 255, 255)],
-            )
 
         elif self.command.is_match("1.10"):
             # load->delete->yes
@@ -176,18 +153,6 @@ class TitleScene:
             # load->cancel
             self.command.cancel(2)
 
-        elif self.command.is_match("2"):
-            Itext(
-                self.buffer_screen,
-                self.font2,
-                (255, 255, 255),
-                20,
-                130,
-                "どのイラストを見る?",
-                # outline_width=2,
-                # outline_colour=[(255, 255, 255)],
-            )
-
         elif self.command.is_match("2."):
             if self.command[1] == 0:
                 self.command.cancel(2)
@@ -197,30 +162,8 @@ class TitleScene:
                 self.command.cancel()
                 return
 
-        elif self.command.is_match("3"):
-            Itext(
-                self.buffer_screen,
-                self.font2,
-                (255, 255, 255),
-                20,
-                130,
-                "設定",
-                # outline_width=2,
-                # outline_colour=[(255, 255, 255)],
-            )
-
         elif self.command.is_match("30"):
             self.command.cancel(2)
-
-        elif self.command.is_match("31"):
-            Itext(
-                self.buffer_screen,
-                self.font2,
-                (255, 255, 255),
-                20,
-                130,
-                "画面サイズの変更",
-            )
 
         elif self.command.is_match("31."):
             if self.command[2] == 8:
@@ -248,20 +191,20 @@ class TitleScene:
             self.command.cancel(2)
 
         elif self.command.is_match("32"):
+            g, h = self.command.get_range_value()
+
+            if g != self.config["volume_bgm"] or h != self.config["volume_se"]:
+                self.config["volume_bgm"], self.config["volume_se"] = g, h
+                with open("config.dat", "w") as f:
+                    f.write(json.dumps(self.config))
+
+        elif self.command.is_match("320"):
+            self.command.cancel(2)
+
+        elif self.command.is_match("33"):
             self.is_end = True
             return "edit"
 
-        elif self.command.is_match("4"):
-            Itext(
-                self.buffer_screen,
-                self.font2,
-                (255, 255, 255),
-                20,
-                130,
-                "ほんとに?",
-                # outline_width=2,
-                # outline_colour=[(255, 255, 255)],
-            )
         elif self.command.is_match("40"):
             pygame.quit()  # 全てのpygameモジュールの初期化を解除
             sys.exit()  # 終了（ないとエラーで終了することになる）

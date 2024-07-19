@@ -34,7 +34,13 @@ def make_save_data():
 
 
 def make_config_data():
-    config = {"window_size": (1200, 800), "passed_branches": {}, "debug_skip": True}
+    config = {
+        "window_size": (1200, 800),
+        "volume_bgm": 0,
+        "volume_se": 0,
+        "passed_branches": {},
+        "debug_skip": True,
+    }
 
     if not os.path.isfile("config.dat"):
         with open("config.dat", "w") as f:
