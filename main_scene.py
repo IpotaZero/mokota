@@ -7,7 +7,7 @@ from story import Save, serifs
 
 
 class MainScene:
-    def __init__(self, screen: pygame.Surface, saves: list[Save]) -> None:
+    def __init__(self, screen: pygame.Surface, saves: list[Save], config: dict) -> None:
         self.scene_name = "main"
 
         # このまま出てきたらえらー
@@ -17,6 +17,7 @@ class MainScene:
         self.buffer_screen = pygame.Surface((1200, 800))
 
         self.saves = saves
+        self.config = config
 
         self.font = pygame.font.Font("DotGothic16-Regular.ttf", 32)
 
@@ -327,6 +328,36 @@ class MainScene:
         elif type(element) == list:
             self.solve_command(element)
 
+    def update_passed_branches(self):
+        passed_branches: list = self.config["passed_branches"]
+        chapter = str(self.chapter)
+
+        if chapter not in passed_branches:
+            passed_branches[chapter] = {}
+
+        if self.branch not in passed_branches[chapter]:
+            passed_branches[chapter][self.branch] = 0
+
+        passed_branches[chapter][self.branch] = max(
+            self.text_num, passed_branches[chapter][self.branch]
+        )
+
+        with open("config.dat", "w") as f:
+            f.write(json.dumps(self.config))
+
+    def get_skip_flag(self):
+        passed_branches: list = self.config["passed_branches"]
+        chapter = str(self.chapter)
+
+        return self.skip and (
+            self.config["debug_skip"]
+            or (
+                chapter in passed_branches
+                and self.branch in passed_branches[chapter]
+                and self.text_num < passed_branches[chapter][self.branch]
+            )
+        )
+
     def solve_text(self, text: str):
         formated_text = text.format(name=self.name)
 
@@ -353,7 +384,7 @@ class MainScene:
             K_RETURN in keyboard["pushed"]
             or K_SPACE in keyboard["pushed"]
             or clicked
-            or self.skip
+            or self.get_skip_flag()
             or (
                 text_length + 30 <= self.frame
                 and (
@@ -368,6 +399,7 @@ class MainScene:
             else:
                 self.text_num += 1
                 self.frame = 0
+                self.update_passed_branches()
                 return
 
             # if self.text_num == len(element_list):
@@ -387,7 +419,7 @@ class MainScene:
             frame=self.frame / 2,
         )
 
-    def get_next_branch(self, command: str) -> str:
+    def get_next_branch(self, command) -> str:
         element = command[1]
         if type(element) == str:
             return element
@@ -477,7 +509,7 @@ class MainScene:
         # 次のブランチに進む
         if command_type == "goto":
             self.branch = self.get_next_branch(command)
-            print(self.branch)
+            # print(self.branch)
             self.text_num = -1
 
         # 好感度を上げる
@@ -770,10 +802,12 @@ class MainScene:
             700,
             "NOW LOADING...",
         )
+
         scr = pygame.transform.scale(
             self.buffer_screen,
             (1200 * screen_option["ratio"], 800 * screen_option["ratio"]),
         )
+
         self.screen.blit(scr, screen_option["offset"])
         pygame.display.update()
 

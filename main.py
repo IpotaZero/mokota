@@ -34,7 +34,7 @@ def make_save_data():
 
 
 def make_config_data():
-    config = {"window_size": (600, 400)}
+    config = {"window_size": (1200, 800), "passed_branches": {}, "debug_skip": True}
 
     if not os.path.isfile("config.dat"):
         with open("config.dat", "w") as f:
@@ -69,7 +69,7 @@ def main():
     key_pressed_time = {}
 
     scenes = {
-        "main": main_scene.MainScene(screen, saves),
+        "main": main_scene.MainScene(screen, saves, config),
         "name": name_scene.NameScene(screen),
         "title": title_scene.TitleScene(screen, saves, config),
         "darkening": darkening_scene.DarkeningScene(screen),
