@@ -144,6 +144,8 @@ class MainScene:
                     100,
                     40,
                     "PAUSE",
+                    outline_colour=[(0, 0, 0)],
+                    outline_width=2,
                 )
                 or K_ESCAPE in keyboard["pushed"]
             )
@@ -768,6 +770,11 @@ class MainScene:
             700,
             "NOW LOADING...",
         )
+        scr = pygame.transform.scale(
+            self.buffer_screen,
+            (1200 * screen_option["ratio"], 800 * screen_option["ratio"]),
+        )
+        self.screen.blit(scr, screen_option["offset"])
         pygame.display.update()
 
         self.chapter = 0
@@ -825,6 +832,8 @@ class MainScene:
             self.text_num = save["text_num"]
             self.credits = save["credits"]
             self.footprints = save["footprints"]
+
+            print(save.save_data)
 
     def mode_pause(self):
         Itext(

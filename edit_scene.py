@@ -72,7 +72,11 @@ class EditScene:
                 for i, next_branch in enumerate(nexts):
                     if next_branch not in self.nodes_list[chapter_num]:
                         self.nodes_list[chapter_num][next_branch] = {
-                            "pos": (400 * i, 100 * layer)
+                            "pos": (
+                                400 * i
+                                + self.nodes_list[chapter_num][branch_name]["pos"][0],
+                                100 * layer,
+                            )
                         }
 
                     else:

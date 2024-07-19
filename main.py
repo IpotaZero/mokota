@@ -12,27 +12,55 @@ import name_scene
 import darkening_scene
 from story import Save
 
-from Ifunctions import keyboard, mouse, screen_option, Irect
+from Ifunctions import keyboard, mouse, screen_option, set_window_size
+
+
+def make_save_data():
+    saves: list[Save] = []
+
+    if not os.path.isfile("save.dat"):
+        with open("save.dat", "w") as f:
+            f.write(json.dumps(saves))
+        return saves
+
+    with open("save.dat") as f:
+        try:
+            for save in json.loads(f.read()):
+                saves.append(Save(save))
+        except json.JSONDecodeError:
+            print("データが破損しているのです!")
+
+    return saves
+
+
+def make_config_data():
+    config = {"window_size": (600, 400)}
+
+    if not os.path.isfile("config.dat"):
+        with open("config.dat", "w") as f:
+            f.write(json.dumps(config))
+        return config
+
+    with open("config.dat") as f:
+        try:
+            for key, value in json.loads(f.read()).items():
+                config[key] = value
+        except json.JSONDecodeError:
+            print("データが破損しているのです!")
+
+    return config
 
 
 def main():
-    saves: list[Save] = []
-
-    if os.path.isfile("save.dat"):
-        with open("save.dat") as f:
-            try:
-                for save in json.loads(f.read()):
-                    saves.append(Save(save))
-            except json.JSONDecodeError:
-                print("データが破損しているのです!")
-
-    else:
-        with open("save.dat", "w") as f:
-            f.write(json.dumps(saves))
+    saves = make_save_data()
+    config = make_config_data()
 
     pygame.init()  # Pygameの初期化
+
     screen = pygame.display.set_mode((1200, 800))
     screen_option["real_size"] = pygame.display.get_desktop_sizes()[0]
+
+    set_window_size(config["window_size"])
 
     pygame.display.set_caption("MicroComputerReserch!")
 
@@ -43,7 +71,7 @@ def main():
     scenes = {
         "main": main_scene.MainScene(screen, saves),
         "name": name_scene.NameScene(screen),
-        "title": title_scene.TitleScene(screen, saves),
+        "title": title_scene.TitleScene(screen, saves, config),
         "darkening": darkening_scene.DarkeningScene(screen),
         "edit": edit_scene.EditScene(screen),
     }
@@ -109,12 +137,6 @@ def main():
                 keyboard["long_pressed"].append(key)
 
         keyboard["long_pressed"] += keyboard["pushed"]
-
-        # scr = pygame.Surface(
-        #     (screen_option["real_size"][0], screen_option["real_size"][1]),
-        # )
-        # scr.fill((255, 201, 214))
-        # screen.blit(scr, (0, 0))
 
         result = current_scene.mainloop()
 

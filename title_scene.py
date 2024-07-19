@@ -9,11 +9,14 @@ from story import Save
 
 
 class TitleScene:
-    def __init__(self, screen: pygame.Surface, saves: list[Save]) -> None:
+    def __init__(
+        self, screen: pygame.Surface, saves: list[Save], config: dict[str]
+    ) -> None:
         self.scene_name = "title"
         self.screen = screen
         self.buffer_screen = pygame.Surface((1200, 800))
         self.saves = saves
+        self.config = config
 
         self.font = pygame.font.Font("DotGothic16-Regular.ttf", 64)
         self.font2 = pygame.font.Font("DotGothic16-Regular.ttf", 32)
@@ -224,49 +227,23 @@ class TitleScene:
                 self.command.cancel(2)
                 return
 
-            if self.command[2] == 0:
-                # 画面サイズの取得
-                real_width, real_height = screen_option["real_size"]
-
-                # print(current_width, current_height)
-
-                # それぞれの比率を計算
-                width_ratio = real_width / 1200
-                height_ratio = real_height / 800
-
-                pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
-
-                if width_ratio <= height_ratio:
-                    ratio = width_ratio
-                    screen_option["offset"] = (0, (real_height - ratio * 800) / 2)
-                else:
-                    ratio = height_ratio
-                    screen_option["offset"] = ((real_width - ratio * 1200) / 2, 0)
-
-                # 収まる最大の比率を決定
-                # ratio = min(width_ratio, height_ratio)
-                screen_option["ratio"] = ratio
-
-                self.command.cancel(2)
-                return
-
             size = [
-                (600, 400, 0.5),
-                (800, 533, 0.67),
-                (900, 600, 0.75),
-                (1200, 800, 1),
-                (1500, 1000, 1.25),
-                (1800, 1200, 1.5),
-                (2400, 1600, 2),
-            ][self.command[2] - 1]
+                (0, 0),
+                (600, 400),
+                (800, 533),
+                (900, 600),
+                (1200, 800),
+                (1500, 1000),
+                (1800, 1200),
+                (2400, 1600),
+            ][self.command[2]]
 
-            screen_option["offset"] = (0, 0)
+            set_window_size(size)
 
-            pygame.display.set_mode(size[:2])
+            self.config["window_size"] = size
 
-            # print(size[2])
-
-            screen_option["ratio"] = size[2]
+            with open("config.dat", "w") as f:
+                f.write(json.dumps(self.config))
 
             self.command.cancel(2)
 
