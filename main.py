@@ -57,7 +57,7 @@ def main():
 
     pygame.init()  # Pygameの初期化
 
-    screen = pygame.display.set_mode((1200, 800))
+    screen = pygame.display.set_mode(config["window_size"])
     screen_option["real_size"] = pygame.display.get_desktop_sizes()[0]
 
     set_window_size(config["window_size"])
