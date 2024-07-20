@@ -38,6 +38,7 @@ def make_config_data():
         "window_size": (1200, 800),
         "volume_bgm": 0,
         "volume_se": 0,
+        "text_speed": 3,
         "passed_branches": {},
         "debug_skip": True,
     }
@@ -63,7 +64,11 @@ def main():
 
     pygame.init()  # Pygameの初期化
 
-    screen = pygame.display.set_mode(config["window_size"])
+    if config["window_size"] == [0, 0]:
+        screen = pygame.display.set_mode((1200, 800))
+    else:
+        screen = pygame.display.set_mode(config["window_size"])
+
     screen_option["real_size"] = pygame.display.get_desktop_sizes()[0]
 
     set_window_size(config["window_size"])
@@ -94,8 +99,8 @@ def main():
                 pygame.quit()  # 全てのpygameモジュールの初期化を解除
                 sys.exit()  # 終了（ないとエラーで終了することになる）
             elif event.type == KEYDOWN:
-                keyboard["pressed"].append(event.key)
-                keyboard["pushed"].append(event.key)
+                keyboard["pressed"].add(event.key)
+                keyboard["pushed"].add(event.key)
 
                 if event.key not in key_pressed_time:
                     key_pressed_time[event.key] = time.time()
@@ -140,9 +145,9 @@ def main():
                     is_long_pressed = True
 
             if is_long_pressed:
-                keyboard["long_pressed"].append(key)
+                keyboard["long_pressed"].add(key)
 
-        keyboard["long_pressed"] += keyboard["pushed"]
+        keyboard["long_pressed"] |= keyboard["pushed"]
 
         result = current_scene.mainloop()
 

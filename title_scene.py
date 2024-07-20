@@ -28,7 +28,7 @@ class TitleScene:
             self.font2,
             (255, 255, 255),
             20,
-            180,
+            150,
             RegexDict(
                 {
                     "": [
@@ -46,7 +46,13 @@ class TitleScene:
                     "1.": ["ロード", "削除", "やめる"],
                     "1.1": ["はい", "いいえ"],
                     "2": ["やめる", "???", "???", "???"],
-                    "3": ["やめる", "画面サイズ", "音量", "編集(デバッグ)"],
+                    "3": [
+                        "やめる",
+                        "画面サイズ",
+                        "音量",
+                        ["テキストの速さ:", self.config["text_speed"], 1, 5],
+                        "編集(デバッグ)",
+                    ],
                     "31": [
                         "フルスクリーン",
                         "600x400",
@@ -58,7 +64,11 @@ class TitleScene:
                         "2400x1600",
                         "やめる",
                     ],
-                    "32": ["やめる", ["BGM:", 0, 0, 9], ["SE :", 0, 0, 9]],
+                    "32": [
+                        "やめる",
+                        ["BGM:", self.config["volume_bgm"], 0, 9],
+                        ["SE :", self.config["volume_se"], 0, 9],
+                    ],
                     "4": ["はい", "いいえ"],
                 },
             ),
@@ -83,8 +93,9 @@ class TitleScene:
         pygame.mixer.init()  # 初期化
 
         pygame.mixer.music.stop()
-        # pygame.mixer.music.load("sounds/試作19 2.mp3")
-        # pygame.mixer.music.play(-1)
+        pygame.mixer.music.load("sounds/bgm/試作19 2.mp3")
+        pygame.mixer.music.set_volume(self.config["volume_bgm"] / 9)
+        pygame.mixer.music.play(-1)
 
     def mainloop(self):
         self.buffer_screen.fill((255, 201, 224))
@@ -113,7 +124,7 @@ class TitleScene:
                     self.font2,
                     (255, 255, 255),
                     500,
-                    180 + self.font2.get_height() * i,
+                    150 + self.font2.get_height() * (i + 1),
                     '"' + save.current_text(18) + '"',
                     # outline_width=2,
                     # outline_colour=[(255, 255, 255)],
@@ -161,6 +172,13 @@ class TitleScene:
             elif self.command.get_selected_option() == "???":
                 self.command.cancel()
                 return
+        elif self.command.is_match("3"):
+            s = self.command.get_range_value()[0]
+
+            if s != self.config["text_speed"]:
+                self.config["text_speed"] = s
+                with open("config.dat", "w") as f:
+                    f.write(json.dumps(self.config))
 
         elif self.command.is_match("30"):
             self.command.cancel(2)
@@ -188,13 +206,14 @@ class TitleScene:
             with open("config.dat", "w") as f:
                 f.write(json.dumps(self.config))
 
-            self.command.cancel(2)
+            self.command.cancel(1)
 
         elif self.command.is_match("32"):
             g, h = self.command.get_range_value()
 
             if g != self.config["volume_bgm"] or h != self.config["volume_se"]:
                 self.config["volume_bgm"], self.config["volume_se"] = g, h
+                pygame.mixer.music.set_volume(g / 9)
                 with open("config.dat", "w") as f:
                     f.write(json.dumps(self.config))
 

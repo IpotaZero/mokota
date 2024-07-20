@@ -4,9 +4,9 @@ import re
 from pygame.locals import *
 
 keyboard = {
-    "pressed": [],
-    "pushed": [],
-    "long_pressed": [],
+    "pressed": set(),
+    "pushed": set(),
+    "long_pressed": set(),
 }
 
 mouse = {
@@ -28,7 +28,7 @@ screen_option = {
 
 
 def set_window_size(size):
-    if size == (0, 0):
+    if size == [0, 0] or size == (0, 0):
         # 画面サイズの取得
         real_width, real_height = screen_option["real_size"]
 
@@ -350,35 +350,22 @@ class Icommand:
         self.num = 0
 
     def run(self):
-        title = self.title[self.branch]
-
-        if title is not None:
-            Itext(
-                self.screen,
-                self.font,
-                self.colour,
-                self.x,
-                self.y,
-                title,
-                outline_colour=self.outline_colour,
-                outline_width=self.outline_width,
-            )
-
         option = self.options[self.branch]
 
         if option is None or len(option) == 0:
             return
 
         if type(option[self.num]) == str:
-            if K_RETURN in keyboard["pushed"] or K_SPACE in keyboard["pushed"]:
+            if len({K_RETURN, K_SPACE} & keyboard["pushed"]) > 0:
                 self.branch += suuji[self.num]
                 self.num = 0
                 return
-            elif (
-                K_ESCAPE in keyboard["pushed"] or K_BACKSPACE in keyboard["pushed"]
-            ) and self.branch != "":
-                self.cancel()
-                return
+
+        if (
+            len({K_BACKSPACE, K_ESCAPE} & keyboard["pushed"]) > 0
+        ) and self.branch != "":
+            self.cancel()
+            return
 
         if K_UP in keyboard["long_pressed"]:
             self.num += len(option) - 1
@@ -444,6 +431,20 @@ class Icommand:
                     self.branch += suuji[i]
                     self.num = 0
                     return
+
+        title = self.title[self.branch]
+
+        if title is not None:
+            Itext(
+                self.screen,
+                self.font,
+                self.colour,
+                self.x,
+                self.y,
+                title,
+                outline_colour=self.outline_colour,
+                outline_width=self.outline_width,
+            )
 
         Itext(
             self.screen,
