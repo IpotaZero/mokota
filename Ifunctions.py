@@ -28,7 +28,7 @@ screen_option = {
 
 
 def set_window_size(size):
-    if size == [0, 0] or size == (0, 0):
+    if size in [[0, 0], (0, 0)]:
         # 画面サイズの取得
         real_width, real_height = screen_option["real_size"]
 
@@ -206,15 +206,15 @@ def Ibutton(
         )
 
     if (
-        mouse["clicked"]
-        and x * screen_option["ratio"] + screen_option["offset"][0]
+        x * screen_option["ratio"] + screen_option["offset"][0]
         <= mouse["position"][0]
         <= (x + width) * screen_option["ratio"] + screen_option["offset"][0]
         and y * screen_option["ratio"] + screen_option["offset"][1]
         <= mouse["position"][1]
         <= (y + height) * screen_option["ratio"] + screen_option["offset"][1]
     ):
-        return True
+        if mouse["clicked"]:
+            return True
 
     return False
 
@@ -239,7 +239,14 @@ def Iscroll(x: int, y: int, width: int, height: int) -> tuple[bool, str]:
     return (False, "none")
 
 
-def Irange(screen, font: pygame.font.Font, colour, x, y, value):
+def Irange(
+    screen: pygame.Surface,
+    font: pygame.font.Font,
+    colour: tuple[int, int, int],
+    x: int,
+    y: int,
+    value,
+):
     height = font.get_height()
     text = " " + str(value) + " "
     width = font.render(text, False, colour).get_rect().w
@@ -320,6 +327,7 @@ class Icommand:
         options: RegexDict,
         outline_width: int = 0,
         outline_colour: tuple[int, int, int] = (0, 0, 0),
+        max_row=0,
         title=RegexDict({}),
     ) -> None:
         self.screen = screen
@@ -328,6 +336,7 @@ class Icommand:
         self.x = x
         self.y = y
         self.options = options
+        self.max_row = max_row
         self.title = title
 
         self.outline_width = outline_width
@@ -390,13 +399,22 @@ class Icommand:
 
                 w = self.font.render(option[i][0], False, (0, 0, 0)).get_rect().w
 
+                if type(element[2]) == int:
+                    range_min = element[2]
+                    range_max = element[3]
+                    disp = self.range_values[self.branch][j]
+                elif type(element[2]) == list:
+                    range_min = 0
+                    range_max = len(element[2]) - 1
+                    disp = element[2][self.range_values[self.branch][j]]
+
                 s = Irange(
                     self.screen,
                     self.font,
                     self.colour,
                     self.x + self.font.get_height() + w,
                     self.y + self.font.get_height() * (i + 1),
-                    self.range_values[self.branch][j],
+                    disp,
                 )
 
                 if i == self.num:
@@ -406,7 +424,7 @@ class Icommand:
                         s -= 1
 
                 self.range_values[self.branch][j] = max(
-                    min(self.range_values[self.branch][j] + s, element[3]), element[2]
+                    min(self.range_values[self.branch][j] + s, range_max), range_min
                 )
                 j += 1
             else:

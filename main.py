@@ -12,7 +12,7 @@ import name_scene
 import darkening_scene
 from story import Save
 
-from Ifunctions import keyboard, mouse, screen_option, set_window_size
+from Ifunctions import *
 
 
 def make_save_data():

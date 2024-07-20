@@ -48,6 +48,7 @@ class MainScene:
             50,
             540,
             RegexDict({}),
+            title=RegexDict({"": "選択肢"}),
         )
 
         self.set_save_command()
@@ -58,7 +59,18 @@ class MainScene:
             (255, 255, 255),
             50,
             540,
-            RegexDict({"": ["タイトルに戻る", "再開する"], "0": ["はい", "いいえ"]}),
+            RegexDict(
+                {
+                    "": ["タイトルに戻る", "設定", "再開する"],
+                    "0": ["はい", "いいえ"],
+                    "1": [
+                        ["BGM:", self.config["volume_bgm"], 0, 9],
+                        ["SE :", self.config["volume_se"], 0, 9],
+                        ["TEXT_SPEED:", self.config["text_speed"], 1, 5],
+                        "やめる",
+                    ],
+                }
+            ),
             title=RegexDict({"0": "ほんとに?"}),
         )
 
@@ -85,12 +97,12 @@ class MainScene:
             RegexDict(
                 {
                     "": save_data_list,
-                    ".": ["ロード", "セーブ", "やめる"],
-                    ".[0-1]": ["はい", "いいえ"],
+                    ".": ["ロード", "セーブ", "削除", "やめる"],
+                    ".[0-2]": ["はい", "いいえ"],
                     # ".2": ["ERROR"],
                 }
             ),
-            title=RegexDict({"": "セーブデータを選択", ".[0-1]": "ほんとに?"}),
+            title=RegexDict({"": "セーブデータを選択", ".[0-2]": "ほんとに?"}),
         )
 
     def mainloop(self):
@@ -103,7 +115,7 @@ class MainScene:
 
         self.layer_buttons.fill((0, 0, 0, 0))  # 透明
 
-        if self.mode == "text" or self.mode == "log":
+        if self.mode in ["text", "log"]:
             is_pushed_log = (
                 Ibutton(
                     self.layer_buttons,
@@ -119,7 +131,7 @@ class MainScene:
                 or K_l in keyboard["pushed"]
             )
 
-        if self.mode == "text" or self.mode == "save":
+        if self.mode in ["text", "save"]:
             is_pushed_save = (
                 Ibutton(
                     self.layer_buttons,
@@ -135,7 +147,7 @@ class MainScene:
                 or K_s in keyboard["pushed"]
             )
 
-        if self.mode == "text" or self.mode == "pause":
+        if self.mode in ["text", "pause"]:
             is_pushed_escape = (
                 Ibutton(
                     self.layer_buttons,
@@ -769,15 +781,31 @@ class MainScene:
             with open("save.dat", "w") as f:
                 f.write(json.dumps([save.save_data for save in self.saves]))
 
+            self.set_save_command()
+
             self.save_command.cancel(3)
+
+        elif self.save_command.is_match(".20"):
+            save_data_number = self.save_command[0]
+
+            if len(self.saves) == save_data_number:
+                self.save_command.cancel()
+                return
+
+            self.saves.pop(save_data_number)
+
+            with open("save.dat", "w") as f:
+                f.write(json.dumps([save.save_data for save in self.saves]))
 
             self.set_save_command()
 
-        elif self.save_command.is_match(".[0-1]1"):
+            self.save_command.cancel(3)
+
+        elif self.save_command.is_match(".[0-2]1"):
             # yes/no
             self.save_command.cancel(2)
 
-        elif self.save_command.is_match(".2"):
+        elif self.save_command.is_match(".3"):
             # cancel
             # print(0)
             self.save_command.cancel(2)
@@ -883,4 +911,24 @@ class MainScene:
             self.title_command.cancel(2)
 
         elif self.title_command.is_match("1"):
+            g, h, i = self.title_command.get_range_value()
+            if (
+                self.config["volume_bgm"],
+                self.config["volume_se"],
+                self.config["text_speed"],
+            ) != (g, h, i):
+                (
+                    self.config["volume_bgm"],
+                    self.config["volume_se"],
+                    self.config["text_speed"],
+                ) = (g, h, i)
+                pygame.mixer.music.set_volume(g / 9)
+
+                with open("config.dat", "w") as f:
+                    f.write(json.dumps(self.config))
+
+        elif self.title_command.is_match("13"):
+            self.title_command.cancel(2)
+
+        elif self.title_command.is_match("2"):
             self.mode = "text"

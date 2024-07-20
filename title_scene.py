@@ -68,6 +68,7 @@ class TitleScene:
                         "やめる",
                         ["BGM:", self.config["volume_bgm"], 0, 9],
                         ["SE :", self.config["volume_se"], 0, 9],
+                        # ["オーディオ:", 0, ["ステレオ", "モノラル"]],
                     ],
                     "4": ["はい", "いいえ"],
                 },
@@ -211,7 +212,7 @@ class TitleScene:
         elif self.command.is_match("32"):
             g, h = self.command.get_range_value()
 
-            if g != self.config["volume_bgm"] or h != self.config["volume_se"]:
+            if (g, h) != (self.config["volume_bgm"], self.config["volume_se"]):
                 self.config["volume_bgm"], self.config["volume_se"] = g, h
                 pygame.mixer.music.set_volume(g / 9)
                 with open("config.dat", "w") as f:
@@ -220,7 +221,7 @@ class TitleScene:
         elif self.command.is_match("320"):
             self.command.cancel(2)
 
-        elif self.command.is_match("33"):
+        elif self.command.is_match("34"):
             self.is_end = True
             return "edit"
 
