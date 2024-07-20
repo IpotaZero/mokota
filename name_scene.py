@@ -8,10 +8,10 @@ moji = "あいうえおかきくけこさしすせそたちつてとなにぬね
 
 
 class NameScene:
-    def __init__(self, screen: pygame.Surface) -> None:
+    def __init__(self) -> None:
         self.scene_name = "name"
-        self.screen = screen
-        self.buffer_screnn = pygame.Surface((1200, 800))
+        self.screen = self.screen = pygame.display.get_surface()
+        self.buffer_screnn = pygame.Surface(screen_option["default_size"])
 
         self.font = pygame.font.Font("DotGothic16-Regular.ttf", 48)
 
@@ -147,7 +147,10 @@ class NameScene:
 
         scr = pygame.transform.scale(
             self.buffer_screnn,
-            (1200 * screen_option["ratio"], 800 * screen_option["ratio"]),
+            (
+                screen_option["default_size"][0] * screen_option["ratio"],
+                screen_option["default_size"][1] * screen_option["ratio"],
+            ),
         )
         self.screen.blit(scr, screen_option["offset"])
         pygame.display.update()  # 画面更新

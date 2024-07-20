@@ -24,6 +24,7 @@ screen_option = {
     "ratio": 1,
     "offset": (0, 0),
     "real_size": (0, 0),
+    "default_size": (1200, 800),
 }
 
 
@@ -33,24 +34,30 @@ def set_window_size(size):
         real_width, real_height = screen_option["real_size"]
 
         # それぞれの比率を計算
-        width_ratio = real_width / 1200
-        height_ratio = real_height / 800
+        width_ratio = real_width / screen_option["default_size"][0]
+        height_ratio = real_height / screen_option["default_size"][1]
 
         pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
 
         if width_ratio <= height_ratio:
             ratio = width_ratio
-            screen_option["offset"] = (0, (real_height - ratio * 800) / 2)
+            screen_option["offset"] = (
+                0,
+                (real_height - ratio * screen_option["default_size"][1]) / 2,
+            )
         else:
             ratio = height_ratio
-            screen_option["offset"] = ((real_width - ratio * 1200) / 2, 0)
+            screen_option["offset"] = (
+                (real_width - ratio * screen_option["default_size"][0]) / 2,
+                0,
+            )
 
         # 収まる最大の比率を決定
         # ratio = min(width_ratio, height_ratio)
         screen_option["ratio"] = ratio
         return
 
-    screen_option["ratio"] = size[0] / 1200
+    screen_option["ratio"] = size[0] / screen_option["default_size"][0]
     screen_option["offset"] = (0, 0)
 
     pygame.display.set_mode(size)

@@ -5,10 +5,10 @@ from Ifunctions import *
 
 
 class DarkeningScene:
-    def __init__(self, screen: pygame.Surface) -> None:
+    def __init__(self) -> None:
         self.scene_name = "darkening"
 
-        self.screen = screen
+        self.screen = pygame.display.get_surface()
 
         self.start()
 
@@ -18,7 +18,10 @@ class DarkeningScene:
 
     def mainloop(self) -> None:
         scr = pygame.Surface(
-            (1200 * screen_option["ratio"], 800 * screen_option["ratio"]),
+            (
+                screen_option["default_size"][0] * screen_option["ratio"],
+                screen_option["default_size"][1] * screen_option["ratio"],
+            ),
             flags=pygame.SRCALPHA,
         )
         scr.fill((0, 0, 0, 255 * self.frame / 120))

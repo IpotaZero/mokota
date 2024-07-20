@@ -8,12 +8,10 @@ from story import Save
 
 
 class TitleScene:
-    def __init__(
-        self, screen: pygame.Surface, saves: list[Save], config: dict[str]
-    ) -> None:
+    def __init__(self, saves: list[Save], config: dict[str]) -> None:
         self.scene_name = "title"
-        self.screen = screen
-        self.buffer_screen = pygame.Surface((1200, 800))
+        self.screen = pygame.display.get_surface()
+        self.buffer_screen = pygame.Surface(screen_option["default_size"])
         self.saves = saves
         self.config = config
 
@@ -234,7 +232,10 @@ class TitleScene:
 
         scr = pygame.transform.scale(
             self.buffer_screen,
-            (1200 * screen_option["ratio"], 800 * screen_option["ratio"]),
+            (
+                screen_option["default_size"][0] * screen_option["ratio"],
+                screen_option["default_size"][1] * screen_option["ratio"],
+            ),
         )
         self.screen.blit(scr, screen_option["offset"])
         pygame.display.update()  # 画面更新

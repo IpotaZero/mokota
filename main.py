@@ -35,7 +35,7 @@ def make_save_data():
 
 def make_config_data():
     config = {
-        "window_size": (1200, 800),
+        "window_size": screen_option["default_size"],
         "volume_bgm": 0,
         "volume_se": 0,
         "text_speed": 3,
@@ -65,9 +65,9 @@ def main():
     pygame.init()  # Pygameの初期化
 
     if config["window_size"] == [0, 0]:
-        screen = pygame.display.set_mode((1200, 800))
+        pygame.display.set_mode(screen_option["default_size"])
     else:
-        screen = pygame.display.set_mode(config["window_size"])
+        pygame.display.set_mode(config["window_size"])
 
     screen_option["real_size"] = pygame.display.get_desktop_sizes()[0]
 
@@ -80,11 +80,11 @@ def main():
     key_pressed_time = {}
 
     scenes = {
-        "main": main_scene.MainScene(screen, saves, config),
-        "name": name_scene.NameScene(screen),
-        "title": title_scene.TitleScene(screen, saves, config),
-        "darkening": darkening_scene.DarkeningScene(screen),
-        "edit": edit_scene.EditScene(screen),
+        "main": main_scene.MainScene(saves, config),
+        "name": name_scene.NameScene(),
+        "title": title_scene.TitleScene(saves, config),
+        "darkening": darkening_scene.DarkeningScene(),
+        "edit": edit_scene.EditScene(),
     }
 
     current_scene = scenes["title"]

@@ -7,14 +7,14 @@ from story import Save, serifs
 
 
 class MainScene:
-    def __init__(self, screen: pygame.Surface, saves: list[Save], config: dict) -> None:
+    def __init__(self, saves: list[Save], config: dict) -> None:
         self.scene_name = "main"
 
         # このまま出てきたらえらー
         self.name = "ERROR"
 
-        self.screen = screen
-        self.buffer_screen = pygame.Surface((1200, 800))
+        self.screen = self.screen = pygame.display.get_surface()
+        self.buffer_screen = pygame.Surface(screen_option["default_size"])
 
         self.saves = saves
         self.config = config
@@ -26,8 +26,10 @@ class MainScene:
         self.start()
 
     def start(self):
-        self.layer_background = pygame.Surface((1200, 800))
-        self.layer_buttons = pygame.Surface((1200, 800), pygame.SRCALPHA)
+        self.layer_background = pygame.Surface(screen_option["default_size"])
+        self.layer_buttons = pygame.Surface(
+            screen_option["default_size"], pygame.SRCALPHA
+        )
 
         self.popups = []
 
@@ -301,7 +303,10 @@ class MainScene:
 
         scr = pygame.transform.scale(
             self.buffer_screen,
-            (1200 * screen_option["ratio"], 800 * screen_option["ratio"]),
+            (
+                screen_option["default_size"][0] * screen_option["ratio"],
+                screen_option["default_size"][1] * screen_option["ratio"],
+            ),
         )
         self.screen.blit(scr, screen_option["offset"])
         pygame.display.update()  # 画面更新
@@ -479,8 +484,8 @@ class MainScene:
                 (0, 0, 0, 255 * self.frame // 60),
                 0,
                 0,
-                1200,
-                800,
+                screen_option["default_size"][0],
+                screen_option["default_size"][1],
             )
 
             if self.frame == 60:
@@ -488,7 +493,7 @@ class MainScene:
                 self.frame = 0
 
         elif command_type == "rdarken":
-            scr = pygame.Surface((1200, 800), flags=pygame.SRCALPHA)
+            scr = pygame.Surface(screen_option["default_size"], flags=pygame.SRCALPHA)
             scr.fill((0, 0, 0, 255 * (1 - self.frame / 60)))
             self.layer_background.blit(scr, (0, 0))
 
@@ -565,7 +570,7 @@ class MainScene:
             # デフォルト値
             img_data = {
                 "img": img,
-                "size": (1200, 800),
+                "size": screen_option["default_size"],
                 "pos": (0, 0),
                 "is_shown": True,
             }
@@ -586,7 +591,7 @@ class MainScene:
             # デフォルト値
             img_data = {
                 "img": img,
-                "size": (1200, 800),
+                "size": screen_option["default_size"],
                 "pos": (0, 0),
                 "is_shown": True,
             }
@@ -822,7 +827,10 @@ class MainScene:
 
         scr = pygame.transform.scale(
             self.buffer_screen,
-            (1200 * screen_option["ratio"], 800 * screen_option["ratio"]),
+            (
+                screen_option["default_size"][0] * screen_option["ratio"],
+                screen_option["default_size"][1] * screen_option["ratio"],
+            ),
         )
 
         self.screen.blit(scr, screen_option["offset"])
