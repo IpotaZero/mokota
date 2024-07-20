@@ -44,7 +44,7 @@ class NameScene:
             if len(self.name) > 0:
                 self.is_end = True
                 return self.name
-        elif K_RETURN in keyboard["pushed"] or K_SPACE in keyboard["pushed"]:
+        elif len({K_RETURN, K_SPACE} & keyboard["pushed"]) > 0:
             if self.num == len(moji) - 1:
                 if len(self.name) > 0:
                     self.is_end = True
@@ -56,7 +56,7 @@ class NameScene:
             elif len(self.name) < 7:
                 self.name += moji[self.num]
 
-        elif K_BACKSPACE in keyboard["pushed"] or K_ESCAPE in keyboard["pushed"]:
+        elif len({K_BACKSPACE, K_ESCAPE} & keyboard["pushed"]) > 0:
             if len(self.name) > 0:
                 self.name = self.name[:-1]
 

@@ -57,8 +57,9 @@ class MainScene:
             self.font,
             (255, 255, 255),
             50,
-            540 + self.font.get_height(),
+            540,
             RegexDict({"": ["タイトルに戻る", "再開する"], "0": ["はい", "いいえ"]}),
+            title=RegexDict({"0": "ほんとに?"}),
         )
 
         self.is_end = False
@@ -80,7 +81,7 @@ class MainScene:
             self.font,
             (255, 255, 255),
             50,
-            80,
+            80 - self.font.get_height(),
             RegexDict(
                 {
                     "": save_data_list,
@@ -89,6 +90,7 @@ class MainScene:
                     # ".2": ["ERROR"],
                 }
             ),
+            title=RegexDict({"": "セーブデータを選択", ".[0-1]": "ほんとに?"}),
         )
 
     def mainloop(self):
@@ -378,19 +380,18 @@ class MainScene:
             line_width=0,
         )
 
-        text_length = len(formated_text) * 2
+        text_speed = [3, 2.5, 2, 1.5, 1][self.config["text_speed"] - 1]
+
+        text_length = len(formated_text) * text_speed
 
         if (
-            K_RETURN in keyboard["pushed"]
-            or K_SPACE in keyboard["pushed"]
+            len({K_RETURN, K_SPACE} & keyboard["pushed"]) > 0
             or clicked
             or self.get_skip_flag()
             or (
                 text_length + 30 <= self.frame
                 and (
-                    self.auto
-                    or K_RETURN in keyboard["long_pressed"]
-                    or K_SPACE in keyboard["long_pressed"]
+                    self.auto or len({K_RETURN, K_SPACE} & keyboard["long_pressed"]) > 0
                 )
             )
         ):
@@ -416,7 +417,7 @@ class MainScene:
             540,
             formated_text,
             max_width=1100,
-            frame=self.frame / 2,
+            frame=self.frame / text_speed,
         )
 
     def get_next_branch(self, command) -> str:
@@ -530,12 +531,14 @@ class MainScene:
 
         # 効果音を流す
         elif command_type == "sound":
-            pygame.mixer.Sound("sounds/" + command[1]).play()
+            se = pygame.mixer.Sound("sounds/se/" + command[1])
+            se.set_volume(self.config["volume_se"] / 9)
+            se.play()
 
         # BGMを流す
         elif command_type == "bgm":
             pygame.mixer.music.stop()
-            pygame.mixer.music.load("sounds/" + command[1])
+            pygame.mixer.music.load("sounds/bgm/" + command[1])
             pygame.mixer.music.play(-1)
 
         # BGMを止める
@@ -703,15 +706,6 @@ class MainScene:
         self.save_command.run()
 
         if self.save_command.is_match(""):
-            Itext(
-                self.layer_buttons,
-                self.font,
-                (255, 255, 255),
-                50,
-                40,
-                "セーブデータを選択",
-            )
-
             for i, save in enumerate(self.saves):
                 current_text = '"' + save.current_text(18) + '"'
 
@@ -741,11 +735,6 @@ class MainScene:
                 40,
                 self.save_command.get_selected_option() + current_text,
             )
-
-        elif self.save_command.is_match(".[0-1]"):
-            Itext(self.layer_buttons, self.font, (255, 255, 255), 50, 40, "ほんとに?")
-
-        # print(self.save_command.branch, self.save_command.num)
 
         if self.save_command.is_match(".00"):
             # load->yes
@@ -886,17 +875,9 @@ class MainScene:
 
         self.title_command.run()
 
-        if self.title_command.is_match("0"):
-            Itext(
-                self.layer_buttons,
-                self.font,
-                (255, 255, 255),
-                50,
-                540,
-                "ほんとに?",
-            )
-        elif self.title_command.is_match("00"):
+        if self.title_command.is_match("00"):
             self.is_end = True
+            pygame.mixer.music.fadeout(1000)
 
         elif self.title_command.is_match("01"):
             self.title_command.cancel(2)
