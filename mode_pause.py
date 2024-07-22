@@ -1,8 +1,10 @@
 import json
 from Ifunctions import *
 
+from pre_scene_main import PreSceneMain
 
-class ModePause:
+
+class ModePause(PreSceneMain):
     def mode_pause(self):
         Itext(
             self.layer_buttons,

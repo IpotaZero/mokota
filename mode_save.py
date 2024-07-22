@@ -1,9 +1,13 @@
+import copy
 import json
 from Ifunctions import *
 from save import Save
+from story import serifs
+
+from pre_scene_main import PreSceneMain
 
 
-class ModeSave:
+class ModeSave(PreSceneMain):
     def mode_save(self):
         self.save_command.run()
 
@@ -99,3 +103,110 @@ class ModeSave:
             # cancel
             # print(0)
             self.save_command.cancel(2)
+
+    def set_save_command(self):
+        save_data_list = [
+            save["name"] + ": chapter " + str(save["chapter"]) for save in self.saves
+        ] + ["空のデータ"]
+
+        self.save_command = Icommand(
+            self.layer_buttons,
+            self.font,
+            (255, 255, 255),
+            50,
+            80 - self.font.get_height(),
+            RegexDict(
+                {
+                    "": save_data_list,
+                    ".": ["ロード", "セーブ", "削除", "やめる"],
+                    ".[0-2]": ["はい", "いいえ"],
+                    # ".2": ["ERROR"],
+                }
+            ),
+            title=RegexDict({"": "セーブデータを選択", ".[0-2]": "ほんとに?"}),
+        )
+
+    def load_save_data(self, save_data_number):
+        Itext(
+            self.buffer_screen,
+            self.font,
+            (255, 255, 255),
+            950,
+            700,
+            "NOW LOADING...",
+        )
+
+        scr = pygame.transform.scale(
+            self.buffer_screen,
+            (
+                screen_option["default_size"][0] * screen_option["ratio"],
+                screen_option["default_size"][1] * screen_option["ratio"],
+            ),
+        )
+
+        self.screen.blit(scr, screen_option["offset"])
+        pygame.display.update()
+
+        self.chapter = 0
+        self.text_num = 0
+        self.branch = "first"
+        self.credits = [0, 0, 0]
+        self.footprints = {}
+
+        self.log = []
+        self.frame = 0
+        self.images = {}
+
+        pygame.mixer.music.fadeout(1000)
+
+        if save_data_number is not None:
+            save: Save = self.saves[save_data_number]
+            self.name = save["name"]
+            self.chapter = save["chapter"]
+            self.branch = save["branch"]
+            self.text_num = save["text_num"]
+            self.credits = copy.deepcopy(save["credits"])
+            self.footprints = copy.deepcopy(save["footprints"])
+
+            # print(save["credits"])
+
+            chapter = save["chapter"]
+            branch = "first"
+            text_num = 0
+
+            while branch != save["branch"] or text_num != save["text_num"]:
+                self.frame = 1
+
+                element = serifs[chapter][branch][text_num]
+                text_num += 1
+
+                if type(element) == str:
+                    self.solve_text(element)
+                    continue
+
+                if element[0] == "goto":
+                    branch = self.get_next_branch(element)
+                    text_num = 0
+
+                elif element[0] == "question":
+                    # print(self.footprints)
+                    branch = element[2][save["footprints"][branch]]
+                    text_num = 0
+
+                elif element[0] not in ["sound", "credit"]:
+                    self.solve_1frame_command(element)
+
+            # self.frame = 0
+
+            # print(save["credits"])
+
+            self.name = save["name"]
+            self.chapter = save["chapter"]
+            self.branch = save["branch"]
+            self.text_num = save["text_num"]
+            self.credits = copy.deepcopy(save["credits"])
+            self.footprints = copy.deepcopy(save["footprints"])
+
+            self.frame = 0
+
+            # print(self.frame)

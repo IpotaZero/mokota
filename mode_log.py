@@ -1,7 +1,9 @@
 from Ifunctions import *
 
+from pre_scene_main import PreSceneMain
 
-class ModeLog:
+
+class ModeLog(PreSceneMain):
     def mode_log(self):
         text = Iadjust(self.font, ";".join(self.log), 1100)
 

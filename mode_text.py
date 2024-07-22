@@ -2,8 +2,10 @@ import json
 from story import serifs
 from Ifunctions import *
 
+from pre_scene_main import PreSceneMain
 
-class ModeText:
+
+class ModeText(PreSceneMain):
     def mode_text(self):
         chapter = serifs[self.chapter]
         if self.branch not in chapter:
@@ -39,36 +41,6 @@ class ModeText:
             self.solve_text(element)
         elif type(element) == list:
             self.solve_command(element)
-
-    def update_passed_branches(self):
-        passed_branches: list = self.config["passed_branches"]
-        chapter = str(self.chapter)
-
-        if chapter not in passed_branches:
-            passed_branches[chapter] = {}
-
-        if self.branch not in passed_branches[chapter]:
-            passed_branches[chapter][self.branch] = 0
-
-        passed_branches[chapter][self.branch] = max(
-            self.text_num, passed_branches[chapter][self.branch]
-        )
-
-        with open("config.dat", "w") as f:
-            f.write(json.dumps(self.config))
-
-    def get_skip_flag(self):
-        passed_branches: list = self.config["passed_branches"]
-        chapter = str(self.chapter)
-
-        return self.skip and (
-            self.config["debug_skip"]
-            or (
-                chapter in passed_branches
-                and self.branch in passed_branches[chapter]
-                and self.text_num < passed_branches[chapter][self.branch]
-            )
-        )
 
     def solve_text(self, text: str):
         formated_text = text.format(name=self.name)
@@ -130,6 +102,23 @@ class ModeText:
             frame=self.frame / text_speed,
         )
 
+    def update_passed_branches(self):
+        passed_branches: list = self.config["passed_branches"]
+        chapter = str(self.chapter)
+
+        if chapter not in passed_branches:
+            passed_branches[chapter] = {}
+
+        if self.branch not in passed_branches[chapter]:
+            passed_branches[chapter][self.branch] = 0
+
+        passed_branches[chapter][self.branch] = max(
+            self.text_num, passed_branches[chapter][self.branch]
+        )
+
+        with open("config.dat", "w") as f:
+            f.write(json.dumps(self.config))
+
     def get_next_branch(self, command) -> str:
         element = command[1]
         if type(element) == str:
@@ -144,75 +133,6 @@ class ModeText:
             self.footprints[self.branch] = index
 
             return element[index]
-
-    def solve_command(self, command):
-        if self.solve_1frame_command(command):
-            self.solve_long_frame_command(command)
-
-    def solve_long_frame_command(self, command):
-        command_type = command[0]
-
-        if command_type == "question":
-            if self.frame == 1:
-                self.story_command.options.regex_dict[""] = command[1]
-
-            self.story_command.run()
-
-            if self.story_command.is_match("."):
-                # ログに追加
-                self.log.append(self.story_command.get_selected_option() + ";")
-                # 分岐履歴
-                self.footprints[self.branch] = self.story_command[0]
-                # 次のbranch
-                self.branch = command[2][self.story_command[0]]
-
-                # リセット
-                self.text_num = 0
-                self.frame = 0
-                self.story_command.reset()
-
-        elif command_type == "darken":
-            Irect(
-                self.layer_background,
-                (0, 0, 0, 255 * self.frame // 60),
-                0,
-                0,
-                screen_option["default_size"][0],
-                screen_option["default_size"][1],
-            )
-
-            if self.frame == 60:
-                self.text_num += 1
-                self.frame = 0
-
-        elif command_type == "rdarken":
-            scr = pygame.Surface(screen_option["default_size"], flags=pygame.SRCALPHA)
-            scr.fill((0, 0, 0, 255 * (1 - self.frame / 60)))
-            self.layer_background.blit(scr, (0, 0))
-
-            if self.frame == 60:
-                self.text_num += 1
-                self.frame = 0
-
-        elif command_type == "sleep":
-            if command[1] * 60 <= self.frame:
-                self.text_num += 1
-                # self.pushed.clear()
-                self.frame = 0
-        else:
-            Itext(
-                self.layer_buttons,
-                self.font,
-                (255, 255, 255),
-                50,
-                540,
-                f"知らないコマンド: {command_type}",
-                max_width=1100,
-            )
-
-            if K_RETURN in keyboard["pushed"]:
-                self.text_num += 1
-                self.frame = 0
 
     def solve_1frame_command(self, command):
         command_type = command[0]
@@ -340,3 +260,85 @@ class ModeText:
         self.frame = 0
 
         return False
+
+    def get_skip_flag(self):
+        passed_branches: list = self.config["passed_branches"]
+        chapter = str(self.chapter)
+
+        return self.skip and (
+            self.config["debug_skip"]
+            or (
+                chapter in passed_branches
+                and self.branch in passed_branches[chapter]
+                and self.text_num < passed_branches[chapter][self.branch]
+            )
+        )
+
+    def solve_command(self, command):
+        if self.solve_1frame_command(command):
+            self.solve_long_frame_command(command)
+
+    def solve_long_frame_command(self, command):
+        command_type = command[0]
+
+        if command_type == "question":
+            if self.frame == 1:
+                self.story_command.options.regex_dict[""] = command[1]
+
+            self.story_command.run()
+
+            if self.story_command.is_match("."):
+                # ログに追加
+                self.log.append(self.story_command.get_selected_option() + ";")
+                # 分岐履歴
+                self.footprints[self.branch] = self.story_command[0]
+                # 次のbranch
+                self.branch = command[2][self.story_command[0]]
+
+                # リセット
+                self.text_num = 0
+                self.frame = 0
+                self.story_command.reset()
+
+        elif command_type == "darken":
+            Irect(
+                self.layer_background,
+                (0, 0, 0, 255 * self.frame // 60),
+                0,
+                0,
+                screen_option["default_size"][0],
+                screen_option["default_size"][1],
+            )
+
+            if self.frame == 60:
+                self.text_num += 1
+                self.frame = 0
+
+        elif command_type == "rdarken":
+            scr = pygame.Surface(screen_option["default_size"], flags=pygame.SRCALPHA)
+            scr.fill((0, 0, 0, 255 * (1 - self.frame / 60)))
+            self.layer_background.blit(scr, (0, 0))
+
+            if self.frame == 60:
+                self.text_num += 1
+                self.frame = 0
+
+        elif command_type == "sleep":
+            if command[1] * 60 <= self.frame:
+                self.text_num += 1
+                # self.pushed.clear()
+                self.frame = 0
+        else:
+            Itext(
+                self.layer_buttons,
+                self.font,
+                (255, 255, 255),
+                50,
+                540,
+                f"知らないコマンド: {command_type}",
+                max_width=1100,
+            )
+
+            if K_RETURN in keyboard["pushed"]:
+                self.text_num += 1
+                self.frame = 0
