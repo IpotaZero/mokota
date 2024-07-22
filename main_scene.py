@@ -1,3 +1,4 @@
+import copy
 import json
 import pygame
 from pygame.locals import *
@@ -116,6 +117,8 @@ class MainScene:
                 )
 
         self.layer_buttons.fill((0, 0, 0, 0))  # 透明
+
+        # print(self.frame, self.text_num, self.branch)
 
         if self.mode in ["text", "log"]:
             is_pushed_log = (
@@ -301,7 +304,7 @@ class MainScene:
         self.buffer_screen.blit(self.layer_background, (0, 0))
         self.buffer_screen.blit(self.layer_buttons, (0, 0))
 
-        scr = pygame.transform.scale(
+        scr = pygame.transform.smoothscale(
             self.buffer_screen,
             (
                 screen_option["default_size"][0] * screen_option["ratio"],
@@ -535,7 +538,8 @@ class MainScene:
             num = command[1]
             self.credits[num] += 5
 
-            self.popups.append({"text": "LEVEL UP!", "life": 120})
+            # self.popups.append({"text": "LEVEL UP!", "life": 120})
+            # print(self.saves[1].save_data)
 
         # 次のチャプターに進む
         elif command_type == "next_chapter":
@@ -849,13 +853,15 @@ class MainScene:
         pygame.mixer.music.fadeout(1000)
 
         if save_data_number is not None:
-            save = self.saves[save_data_number]
+            save: Save = self.saves[save_data_number]
             self.name = save["name"]
             self.chapter = save["chapter"]
             self.branch = save["branch"]
             self.text_num = save["text_num"]
-            self.credits = save["credits"]
-            self.footprints = save["footprints"]
+            self.credits = copy.deepcopy(save["credits"])
+            self.footprints = copy.deepcopy(save["footprints"])
+
+            # print(save["credits"])
 
             chapter = save["chapter"]
             branch = "first"
@@ -880,19 +886,23 @@ class MainScene:
                     branch = element[2][save["footprints"][branch]]
                     text_num = 0
 
-                elif element[0] != "sound":
+                elif element[0] not in ["sound", "credit"]:
                     self.solve_1frame_command(element)
 
-            self.frame = 0
+            # self.frame = 0
+
+            # print(save["credits"])
 
             self.name = save["name"]
             self.chapter = save["chapter"]
             self.branch = save["branch"]
             self.text_num = save["text_num"]
-            self.credits = save["credits"]
-            self.footprints = save["footprints"]
+            self.credits = copy.deepcopy(save["credits"])
+            self.footprints = copy.deepcopy(save["footprints"])
 
-            print(save.save_data)
+            self.frame=0
+
+            # print(self.frame)
 
     def mode_pause(self):
         Itext(

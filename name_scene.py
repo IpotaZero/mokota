@@ -145,7 +145,7 @@ class NameScene:
         #     m,
         # )
 
-        scr = pygame.transform.scale(
+        scr = pygame.transform.smoothscale(
             self.buffer_screnn,
             (
                 screen_option["default_size"][0] * screen_option["ratio"],

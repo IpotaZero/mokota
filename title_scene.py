@@ -230,7 +230,7 @@ class TitleScene:
         elif self.command.is_match("41"):
             self.command.cancel(2)
 
-        scr = pygame.transform.scale(
+        scr = pygame.transform.smoothscale(
             self.buffer_screen,
             (
                 screen_option["default_size"][0] * screen_option["ratio"],
