@@ -17,6 +17,10 @@ class MainScene:
 
         self.screen = self.screen = pygame.display.get_surface()
         self.buffer_screen = pygame.Surface(screen_option["default_size"])
+        self.layer_background = pygame.Surface(screen_option["default_size"])
+        self.layer_buttons = pygame.Surface(
+            screen_option["default_size"], pygame.SRCALPHA
+        )
 
         self.saves = saves
         self.config = config
@@ -25,14 +29,11 @@ class MainScene:
 
         self.save_data_num = None
 
+        self.is_end = False
+
         self.start()
 
     def start(self):
-        self.layer_background = pygame.Surface(screen_option["default_size"])
-        self.layer_buttons = pygame.Surface(
-            screen_option["default_size"], pygame.SRCALPHA
-        )
-
         self.popups = []
 
         self.skip = False
@@ -89,8 +90,6 @@ class MainScene:
             ),
             title=RegexDict({"0": "ほんとに?"}),
         )
-
-        self.is_end = False
 
         self.images: dict = {}
         self.letter_colour = (255, 255, 255)
@@ -616,9 +615,8 @@ class MainScene:
             # オーダーメイド
             if len(command) >= 4:
                 commands: dict = command[3]
-                for key in img_data.keys():
-                    if key in commands:
-                        img_data[key] = commands[key]
+                for key in commands:
+                    img_data[key] = commands[key]
 
             self.images[command[2]] = img_data
 
@@ -983,7 +981,7 @@ class MainScene:
 
             self.title_command.cancel(1)
 
-        elif self.title_command.is_match("13"):
+        elif self.title_command.is_match("14"):
             self.title_command.cancel(2)
 
         elif self.title_command.is_match("2"):
