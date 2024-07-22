@@ -1,48 +1,3 @@
-class Save:
-    def __init__(self, save) -> None:
-        # if "chapter" not in save:
-        #     save["chapter"] = 0
-        # if "branch" not in save:
-        #     save["branch"] = "first"
-        # if "text_num" not in save:
-        #     save["text_num"] = 0
-        # if "name" not in save:
-        #     save["name"] = "もこた"
-        # if "credits" not in save:
-        #     save["credits"] = [0, 0, 0]
-
-        self.save_data = save
-
-    def current_text(self, max_letter_num: int):
-        element_list = serifs[self["chapter"]][self["branch"]]
-
-        # もし今いるブランチの長さを越えているならデータ破損
-        if len(element_list) <= self["text_num"]:
-            return "Error"
-
-        current_text = element_list[self["text_num"]]
-
-        num = 1
-        while type(current_text) == list:
-            current_text = element_list[self["text_num"] - num]
-            num += 1
-
-        if type(current_text) != str:
-            current_text = "ERROR"
-        # print(type(current_text))
-
-        if len(current_text) > max_letter_num:
-            current_text = current_text[:max_letter_num] + "..."
-
-        return current_text.replace(";", "  ").format(name=self["name"])
-
-    def __setitem__(self, index, value):
-        self.save_data[index] = value
-
-    def __getitem__(self, index):
-        return self.save_data[index]
-
-
 serifs = [
     {
         "first": [
@@ -51,7 +6,7 @@ serifs = [
             # ["a", "b", "c"],
             # "next_chapter",
             ["bgm", "試作21 2.mp3"],
-            ["image_back", "omu_anime.png", dict(size=(1920 / 1.5, 1080 / 1.5))],
+            ["image_back", "omu_anime.png", dict(size=(1200, 800))],
             ["rdarken"],
             "俺の名前は{name}",
             "今年大阪公立大に入学するしがない猫(?)だ",
@@ -60,7 +15,7 @@ serifs = [
             "どのサークルに入るかが大学生活の行き先を決めるといっても過言ではない",
             "しかし、俺にはこれといって得意なこともないし;どうすっかなー...",
             "そんなことを考えていると、あるチラシが目に留まった",
-            ["image_back", "mcr_poster.png", dict(size=(1920 / 1.5, 1080 / 1.5))],
+            ["image_back", "mcr_poster.png", dict(size=(1200, 800))],
             ["rdarken"],
             "{name}:;マイコン研究会...?",
             "俺はコンピュータには全く詳しくないが、ここなら俺みたいなオタクもいるかもしれないな",
@@ -97,7 +52,7 @@ serifs = [
             ["stop_bgm"],
             ["darken"],
             #
-            ["image_back", "部室背景_anime.png", dict(size=(1920 / 1.5, 1080 / 1.5))],
+            ["image_back", "部室背景_anime.png", dict(size=(1200, 800))],
             ["character", "mokoko", 1, False],
             ["character", "mokomi", 1, False],
             ["rdarken"],
