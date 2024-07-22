@@ -4,7 +4,7 @@ from pygame.locals import *
 from Ifunctions import *
 
 
-class DarkeningScene:
+class SceneDarkening:
     def __init__(self) -> None:
         self.scene_name = "darkening"
 

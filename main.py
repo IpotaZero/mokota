@@ -5,11 +5,12 @@ from pygame.locals import *
 import sys
 import time
 
-import edit_scene
-import title_scene
-import main_scene
-import name_scene
-import darkening_scene
+from scene_main import SceneMain
+from scene_title import SceneTitle
+from scene_name import SceneName
+from scene_darkening import SceneDarkening
+from scene_edit import SceneEdit
+
 from save import Save
 
 from Ifunctions import *
@@ -80,11 +81,11 @@ def main():
     key_pressed_time = {}
 
     scenes = {
-        "main": main_scene.MainScene(saves, config),
-        "name": name_scene.NameScene(),
-        "title": title_scene.TitleScene(saves, config),
-        "darkening": darkening_scene.DarkeningScene(),
-        "edit": edit_scene.EditScene(),
+        "main": SceneMain(saves, config),
+        "name": SceneName(),
+        "title": SceneTitle(saves, config),
+        "darkening": SceneDarkening(),
+        "edit": SceneEdit(),
     }
 
     current_scene = scenes["title"]

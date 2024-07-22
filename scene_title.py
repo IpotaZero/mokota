@@ -7,7 +7,7 @@ from Ifunctions import *
 from save import Save
 
 
-class TitleScene:
+class SceneTitle:
     def __init__(self, saves: list[Save], config: dict[str]) -> None:
         self.scene_name = "title"
         self.screen = pygame.display.get_surface()

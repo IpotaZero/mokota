@@ -7,7 +7,7 @@ from Ifunctions import *
 moji = "あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもらりるれろやゆよわをがぎぐげござじずぜぞだぢづでどばびぶべぼぱぴぷぺぽぁぃぅぇぉゃゅょっんアイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモラリルレロヤユヨワヲガギグゲゴザジズゼゾダヂヅデドバビブベボパピプペポァィゥェォャュョッンー消終"
 
 
-class NameScene:
+class SceneName:
     def __init__(self) -> None:
         self.scene_name = "name"
         self.screen = self.screen = pygame.display.get_surface()

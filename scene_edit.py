@@ -5,7 +5,7 @@ from Ifunctions import *
 from story import serifs
 
 
-class EditScene:
+class SceneEdit:
     def __init__(self) -> None:
         self.scene_name = "edit"
 
