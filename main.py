@@ -10,7 +10,7 @@ import title_scene
 import main_scene
 import name_scene
 import darkening_scene
-from story import Save
+from save import Save
 
 from Ifunctions import *
 

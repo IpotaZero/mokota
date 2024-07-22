@@ -4,7 +4,8 @@ import pygame
 from pygame.locals import *
 
 from Ifunctions import *
-from story import Save, serifs
+from story import serifs
+from save import Save
 
 
 class MainScene:

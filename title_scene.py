@@ -4,7 +4,7 @@ import pygame
 from pygame.locals import *
 
 from Ifunctions import *
-from story import Save
+from save import Save
 
 
 class TitleScene:
