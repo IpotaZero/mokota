@@ -61,15 +61,27 @@ class MainScene:
             self.font,
             (255, 255, 255),
             50,
-            540,
+            200,
             RegexDict(
                 {
                     "": ["タイトルに戻る", "設定", "再開する"],
                     "0": ["はい", "いいえ"],
                     "1": [
+                        "画面サイズ",
                         ["BGM:", self.config["volume_bgm"], 0, 9],
                         ["SE :", self.config["volume_se"], 0, 9],
                         ["TEXT_SPEED:", self.config["text_speed"], 1, 5],
+                        "やめる",
+                    ],
+                    "10": [
+                        "フルスクリーン",
+                        "600x400",
+                        "800x533",
+                        "900x600",
+                        "1200x800",
+                        "1500x1000",
+                        "1800x1200",
+                        "2400x1600",
                         "やめる",
                     ],
                 }
@@ -900,7 +912,7 @@ class MainScene:
             self.credits = copy.deepcopy(save["credits"])
             self.footprints = copy.deepcopy(save["footprints"])
 
-            self.frame=0
+            self.frame = 0
 
             # print(self.frame)
 
@@ -944,6 +956,31 @@ class MainScene:
 
                 with open("config.dat", "w") as f:
                     f.write(json.dumps(self.config))
+
+        elif self.title_command.is_match("10."):
+            if self.title_command[2] == 8:
+                self.title_command.cancel(2)
+                return
+
+            size = [
+                (0, 0),
+                (600, 400),
+                (800, 533),
+                (900, 600),
+                (1200, 800),
+                (1500, 1000),
+                (1800, 1200),
+                (2400, 1600),
+            ][self.title_command[2]]
+
+            set_window_size(size)
+
+            self.config["window_size"] = size
+
+            with open("config.dat", "w") as f:
+                f.write(json.dumps(self.config))
+
+            self.title_command.cancel(1)
 
         elif self.title_command.is_match("13"):
             self.title_command.cancel(2)
