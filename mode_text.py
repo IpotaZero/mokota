@@ -134,6 +134,23 @@ class ModeText(PreSceneMain):
 
             return element[index]
 
+    def get_skip_flag(self):
+        passed_branches: dict = self.config["passed_branches"]
+        chapter = str(self.chapter)
+
+        return self.skip and (
+            self.config["debug_skip"]
+            or (
+                chapter in passed_branches
+                and self.branch in passed_branches[chapter]
+                and self.text_num < passed_branches[chapter][self.branch]
+            )
+        )
+
+    def solve_command(self, command):
+        if self.solve_1frame_command(command):
+            self.solve_long_frame_command(command)
+
     def solve_1frame_command(self, command):
         command_type = command[0]
 
@@ -246,7 +263,7 @@ class ModeText(PreSceneMain):
                 "size": size,
                 "pos": (
                     (place - 1) * 400
-                    + self.layer_background.get_size()[0] / 2
+                    + screen_option["default_size"][0] / 2
                     - size[0] / 2,
                     200,
                 ),
@@ -260,23 +277,6 @@ class ModeText(PreSceneMain):
         self.frame = 0
 
         return False
-
-    def get_skip_flag(self):
-        passed_branches: list = self.config["passed_branches"]
-        chapter = str(self.chapter)
-
-        return self.skip and (
-            self.config["debug_skip"]
-            or (
-                chapter in passed_branches
-                and self.branch in passed_branches[chapter]
-                and self.text_num < passed_branches[chapter][self.branch]
-            )
-        )
-
-    def solve_command(self, command):
-        if self.solve_1frame_command(command):
-            self.solve_long_frame_command(command)
 
     def solve_long_frame_command(self, command):
         command_type = command[0]

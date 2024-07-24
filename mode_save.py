@@ -104,28 +104,6 @@ class ModeSave(PreSceneMain):
             # print(0)
             self.save_command.cancel(2)
 
-    def set_save_command(self):
-        save_data_list = [
-            save["name"] + ": chapter " + str(save["chapter"]) for save in self.saves
-        ] + ["空のデータ"]
-
-        self.save_command = Icommand(
-            self.layer_buttons,
-            self.font,
-            (255, 255, 255),
-            50,
-            80 - self.font.get_height(),
-            RegexDict(
-                {
-                    "": save_data_list,
-                    ".": ["ロード", "セーブ", "削除", "やめる"],
-                    ".[0-2]": ["はい", "いいえ"],
-                    # ".2": ["ERROR"],
-                }
-            ),
-            title=RegexDict({"": "セーブデータを選択", ".[0-2]": "ほんとに?"}),
-        )
-
     def load_save_data(self, save_data_number):
         Itext(
             self.buffer_screen,
@@ -154,6 +132,7 @@ class ModeSave(PreSceneMain):
         self.footprints = {}
 
         self.log = []
+        self.log_slicer = 0
         self.frame = 0
         self.images = {}
 
@@ -168,13 +147,14 @@ class ModeSave(PreSceneMain):
             self.credits = copy.deepcopy(save["credits"])
             self.footprints = copy.deepcopy(save["footprints"])
 
-            # print(save["credits"])
-
             chapter = save["chapter"]
             branch = "first"
             text_num = 0
 
-            while branch != save["branch"] or text_num != save["text_num"]:
+            # bgmがちょっと漏れる
+            pygame.mixer.music.set_volume(0)
+
+            while (branch, text_num) != (save["branch"], save["text_num"]):
                 self.frame = 1
 
                 element = serifs[chapter][branch][text_num]
@@ -193,12 +173,8 @@ class ModeSave(PreSceneMain):
                     branch = element[2][save["footprints"][branch]]
                     text_num = 0
 
-                elif element[0] not in ["sound", "credit"]:
+                elif element[0] not in ["sound"]:
                     self.solve_1frame_command(element)
-
-            # self.frame = 0
-
-            # print(save["credits"])
 
             self.name = save["name"]
             self.chapter = save["chapter"]
@@ -209,4 +185,4 @@ class ModeSave(PreSceneMain):
 
             self.frame = 0
 
-            # print(self.frame)
+            pygame.mixer.music.set_volume(self.config["volume_bgm"] / 9)
