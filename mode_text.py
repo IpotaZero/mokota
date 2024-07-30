@@ -6,7 +6,104 @@ from pre_scene_main import PreSceneMain
 
 
 class ModeText(PreSceneMain):
+    def mainloop_text(self):
+        if self.mode == "text":
+            if self.skip:
+                is_pushed_skip = (
+                    Ibutton(
+                        self.layer_buttons,
+                        self.font,
+                        (255, 255, 255),
+                        (255, 255, 255),
+                        160,
+                        740,
+                        100,
+                        40,
+                        "SKIP",
+                        line_width=100,
+                        outline_colour=[(0, 0, 0)],
+                        outline_width=2,
+                    )
+                    or K_k in keyboard["pushed"]
+                )
+            else:
+                is_pushed_skip = (
+                    Ibutton(
+                        self.layer_buttons,
+                        self.font,
+                        (255, 255, 255),
+                        (255, 255, 255),
+                        160,
+                        740,
+                        100,
+                        40,
+                        "SKIP",
+                    )
+                    or K_k in keyboard["pushed"]
+                )
+
+            if self.auto:
+                is_pushed_auto = (
+                    Ibutton(
+                        self.layer_buttons,
+                        self.font,
+                        (255, 255, 255),
+                        (255, 255, 255),
+                        290,
+                        740,
+                        100,
+                        40,
+                        "AUTO",
+                        line_width=100,
+                        outline_colour=[(0, 0, 0)],
+                        outline_width=2,
+                    )
+                    or K_a in keyboard["pushed"]
+                )
+            else:
+                is_pushed_auto = (
+                    Ibutton(
+                        self.layer_buttons,
+                        self.font,
+                        (255, 255, 255),
+                        (255, 255, 255),
+                        290,
+                        740,
+                        100,
+                        40,
+                        "AUTO",
+                    )
+                    or K_a in keyboard["pushed"]
+                )
+
+            if is_pushed_skip:
+                self.skip = not self.skip
+
+            elif is_pushed_auto:
+                self.auto = not self.auto
+
+            # for popup in self.popups:
+            #     Itext(
+            #         self.layer_buttons,
+            #         self.font,
+            #         (255, 255, 255),
+            #         30,
+            #         30,
+            #         popup["text"],
+            #     )
+            #     popup["life"] -= 1
+            #     if popup["life"] == 0:
+            #         self.popups.remove(popup)
+
+            self.frame += 1
+            self.mode_text()
+
+    def draw_backscreen(self):
+        Irect(self.layer_background, (0, 0, 0, 255 // 2), 30, 530, 1140, 250)
+
     def mode_text(self):
+        self.draw_backscreen()
+
         chapter = serifs[self.chapter]
         if self.branch not in chapter:
             Itext(

@@ -5,7 +5,39 @@ from pre_scene_main import PreSceneMain
 
 
 class ModePause(PreSceneMain):
+    def mainloop_pause(self):
+        if self.mode in ["text", "pause"]:
+            is_pushed_escape = (
+                Ibutton(
+                    self.layer_buttons,
+                    self.font,
+                    (255, 255, 255),
+                    (255, 255, 255),
+                    1070,
+                    30,
+                    100,
+                    40,
+                    "PAUSE",
+                    outline_colour=[(0, 0, 0)],
+                    outline_width=2,
+                )
+                or K_ESCAPE in keyboard["pushed"]
+            )
+
+        if self.mode == "pause":
+            if is_pushed_escape:
+                self.mode = "text"
+
+            self.mode_pause()
+
+        elif self.mode == "text":
+            if is_pushed_escape:
+                self.mode = "pause"
+                self.title_command.reset()
+
     def mode_pause(self):
+        Irect(self.layer_background, (0, 0, 0, 255 // 2), 30, 30, 1140, 750)
+
         Itext(
             self.layer_buttons,
             self.font,
@@ -22,12 +54,8 @@ class ModePause(PreSceneMain):
 
         self.title_command.run()
 
-        if self.title_command.is_match("00"):
-            self.is_end = True
-            pygame.mixer.music.fadeout(1000)
-
-        elif self.title_command.is_match("01"):
-            self.title_command.cancel(2)
+        if self.title_command.is_match("0"):
+            self.mode = "text"
 
         elif self.title_command.is_match("1"):
             g, h, i = self.title_command.get_range_value()
@@ -74,5 +102,9 @@ class ModePause(PreSceneMain):
         elif self.title_command.is_match("14"):
             self.title_command.cancel(2)
 
-        elif self.title_command.is_match("2"):
-            self.mode = "text"
+        elif self.title_command.is_match("20"):
+            self.is_end = True
+            pygame.mixer.music.fadeout(1000)
+
+        elif self.title_command.is_match("21"):
+            self.title_command.cancel(2)

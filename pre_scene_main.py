@@ -63,6 +63,20 @@ class PreSceneMain:
             title=RegexDict({"": "セーブデータを選択", ".[0-2]": "ほんとに?"}),
         )
 
+        self.start()
+
+    def start(self):
+        self.popups = []
+
+        self.skip = False
+        self.auto = False
+
+        self.mode = "text"
+
+        self.story_command.reset()
+
+        self.set_save_command()
+
         self.title_command = Icommand(
             self.layer_buttons,
             self.font,
@@ -71,8 +85,7 @@ class PreSceneMain:
             200,
             RegexDict(
                 {
-                    "": ["タイトルに戻る", "設定", "再開する"],
-                    "0": ["はい", "いいえ"],
+                    "": ["再開する", "設定", "タイトルに戻る"],
                     "1": [
                         "画面サイズ",
                         ["BGM:", self.config["volume_bgm"], 0, 9],
@@ -91,26 +104,11 @@ class PreSceneMain:
                         "2400x1600",
                         "やめる",
                     ],
+                    "2": ["はい", "いいえ"],
                 }
             ),
             title=RegexDict({"0": "ほんとに?"}),
         )
-
-        self.start()
-
-    def start(self):
-        self.popups = []
-
-        self.skip = False
-        self.auto = False
-
-        self.mode = "text"
-
-        self.story_command.reset()
-
-        self.set_save_command()
-
-        self.title_command.reset()
 
         self.letter_colour = (255, 255, 255)
 

@@ -8,7 +8,37 @@ from pre_scene_main import PreSceneMain
 
 
 class ModeSave(PreSceneMain):
+    def mainloop_save(self):
+        if self.mode in ["text", "save"]:
+            is_pushed_save = (
+                Ibutton(
+                    self.layer_buttons,
+                    self.font,
+                    (255, 255, 255),
+                    (255, 255, 255),
+                    1070,
+                    740,
+                    100,
+                    40,
+                    "SAVE",
+                )
+                or K_s in keyboard["pushed"]
+            )
+
+        if self.mode == "save":
+            if is_pushed_save:
+                self.mode = "text"
+
+            self.mode_save()
+
+        elif self.mode == "text":
+            if is_pushed_save:
+                self.mode = "save"
+                self.save_command.reset()
+
     def mode_save(self):
+        Irect(self.layer_background, (0, 0, 0, 255 // 2), 30, 30, 1140, 750)
+
         self.save_command.run()
 
         if self.save_command.is_match(""):
