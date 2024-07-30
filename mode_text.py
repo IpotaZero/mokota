@@ -353,17 +353,23 @@ class ModeText(PreSceneMain):
 
             size = (1536 / 2.5, 2048 / 2.5)
 
+            pos = ((place - 1) * 400 + screen_option["default_size"][0] / 2 - size[0] / 2, 200)
+
             self.images[name] = {
                 "img": pygame.image.load(
                     "images/character/" + name + ".png"
                 ).convert_alpha(),
                 "size": size,
-                "pos": (
-                    (place - 1) * 400
-                    + screen_option["default_size"][0] / 2
-                    - size[0] / 2,
-                    200,
-                ),
+                "pos": pos,
+                "is_shown": is_shown,
+            }
+            
+            self.images[name + "eye"] = {
+                "img": pygame.image.load(
+                    "images/character/" + "face" + ".png"
+                ).convert_alpha(),
+                "size": size,
+                "pos": pos,
                 "is_shown": is_shown,
             }
 
