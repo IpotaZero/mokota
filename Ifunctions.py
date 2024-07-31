@@ -288,9 +288,9 @@ def Irange(
 
     s = Iscroll(x, y, x + width, height)
 
-    if is_clicked_left or (s[0] and s[1] == "up"):
+    if is_clicked_left or (s[0] and s[1] == "down"):
         return -1
-    elif is_clicked_right or (s[0] and s[1] == "down"):
+    elif is_clicked_right or (s[0] and s[1] == "up"):
         return 1
 
     return 0
