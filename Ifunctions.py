@@ -295,6 +295,15 @@ def Irange(
 
     return 0
 
+def IImage(
+    screen: pygame.Surface,
+    path: str,
+    x: int,
+    y: int,
+    width: int,
+    height: int,
+):
+    screen.blit(pygame.transform.scale(pygame.image.load(path).convert_alpha(), (width, height)), (x, y))
 
 class RegexDict:
     def __init__(self, regex_dict: dict):
