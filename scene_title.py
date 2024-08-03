@@ -52,6 +52,7 @@ class SceneTitle:
                         "編集(デバッグ)",
                     ],
                     "31": [
+                        "やめる",
                         "フルスクリーン",
                         "600x400",
                         "800x533",
@@ -60,7 +61,6 @@ class SceneTitle:
                         "1500x1000",
                         "1800x1200",
                         "2400x1600",
-                        "やめる",
                     ],
                     "32": [
                         "やめる",
@@ -183,7 +183,7 @@ class SceneTitle:
             self.command.cancel(2)
 
         elif self.command.is_match("31."):
-            if self.command[2] == 8:
+            if self.command[2] == 0:
                 self.command.cancel(2)
                 return
 
@@ -196,7 +196,7 @@ class SceneTitle:
                 (1500, 1000),
                 (1800, 1200),
                 (2400, 1600),
-            ][self.command[2]]
+            ][self.command[2] - 1]
 
             set_window_size(size)
 

@@ -113,6 +113,7 @@ def main():
                     del key_pressed_time[event.key]
 
             elif event.type == MOUSEBUTTONDOWN:
+                # print(event.button)
                 if event.button == 1:
                     current_time = time.time()
                     if current_time - mouse["last_click_time"] <= 0.3:
