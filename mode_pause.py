@@ -6,36 +6,7 @@ from pre_scene_main import PreSceneMain
 
 class ModePause(PreSceneMain):
     def mainloop_pause(self):
-        if self.mode in ["text", "pause"]:
-            IImage(self.layer_buttons, "images/UI/メニュー.png", 30, 30, 75, 75)
-            is_pushed_escape = (
-                Ibutton(
-                    self.layer_buttons,
-                    self.font,
-                    (255, 255, 255),
-                    (255, 255, 255),
-                    30,
-                    30,
-                    75,
-                    75,
-                    "",
-                    outline_colour=[(0, 0, 0)],
-                    outline_width=0,
-                    line_width=0,
-                )
-                or K_ESCAPE in keyboard["pushed"]
-            )
-
-        if self.mode == "pause":
-            if is_pushed_escape:
-                self.mode = "text"
-
-            self.mode_pause()
-
-        elif self.mode == "text":
-            if is_pushed_escape:
-                self.mode = "pause"
-                self.title_command.reset()
+        pass
 
     def mode_pause(self):
         Irect(self.layer_background, (0, 0, 0, 255 // 2), 30, 30, 1140, 750)

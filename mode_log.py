@@ -5,31 +5,7 @@ from pre_scene_main import PreSceneMain
 
 class ModeLog(PreSceneMain):
     def mainloop_log(self):
-        if self.mode in ["text", "log"]:
-            is_pushed_log = (
-                Ibutton(
-                    self.layer_buttons,
-                    self.font,
-                    (255, 255, 255),
-                    (255, 255, 255),
-                    30,
-                    740,
-                    100,
-                    40,
-                    "LOG",
-                )
-                or K_l in keyboard["pushed"]
-            )
-
-        if self.mode == "log":
-            if is_pushed_log:
-                self.mode = "text"
-
-            self.mode_log()
-
-        elif self.mode == "text":
-            if is_pushed_log:
-                self.mode = "log"
+        pass
 
     def mode_log(self):
         Irect(self.layer_background, (0, 0, 0, 255 // 2), 30, 30, 1140, 750)

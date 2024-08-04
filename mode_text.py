@@ -7,96 +7,7 @@ from pre_scene_main import PreSceneMain
 
 class ModeText(PreSceneMain):
     def mainloop_text(self):
-        if self.mode == "text":
-            if self.skip:
-                is_pushed_skip = (
-                    Ibutton(
-                        self.layer_buttons,
-                        self.font,
-                        (255, 255, 255),
-                        (255, 255, 255),
-                        160,
-                        740,
-                        100,
-                        40,
-                        "SKIP",
-                        line_width=100,
-                        outline_colour=[(0, 0, 0)],
-                        outline_width=2,
-                    )
-                    or K_k in keyboard["pushed"]
-                )
-            else:
-                is_pushed_skip = (
-                    Ibutton(
-                        self.layer_buttons,
-                        self.font,
-                        (255, 255, 255),
-                        (255, 255, 255),
-                        160,
-                        740,
-                        100,
-                        40,
-                        "SKIP",
-                    )
-                    or K_k in keyboard["pushed"]
-                )
-
-            if self.auto:
-                is_pushed_auto = (
-                    Ibutton(
-                        self.layer_buttons,
-                        self.font,
-                        (255, 255, 255),
-                        (255, 255, 255),
-                        290,
-                        740,
-                        100,
-                        40,
-                        "AUTO",
-                        line_width=100,
-                        outline_colour=[(0, 0, 0)],
-                        outline_width=2,
-                    )
-                    or K_a in keyboard["pushed"]
-                )
-            else:
-                is_pushed_auto = (
-                    Ibutton(
-                        self.layer_buttons,
-                        self.font,
-                        (255, 255, 255),
-                        (255, 255, 255),
-                        290,
-                        740,
-                        100,
-                        40,
-                        "AUTO",
-                    )
-                    or K_a in keyboard["pushed"]
-                )
-
-            if is_pushed_skip:
-                self.skip = not self.skip
-
-            elif is_pushed_auto:
-                self.auto = not self.auto
-
-            # for popup in self.popups:
-            #     Itext(
-            #         self.layer_buttons,
-            #         self.font,
-            #         (255, 255, 255),
-            #         30,
-            #         30,
-            #         popup["text"],
-            #     )
-            #     popup["life"] -= 1
-            #     if popup["life"] == 0:
-            #         self.popups.remove(popup)
-
-            self.frame += 1
-            self.mode_text()
+        pass
 
     def draw_backscreen(self):
         Irect(self.layer_background, (0, 0, 0, 255 // 2), 30, 530, 1140, 250)
@@ -353,7 +264,10 @@ class ModeText(PreSceneMain):
 
             size = (1536 / 2.5, 2048 / 2.5)
 
-            pos = ((place - 1) * 400 + screen_option["default_size"][0] / 2 - size[0] / 2, 200)
+            pos = (
+                (place - 1) * 400 + screen_option["default_size"][0] / 2 - size[0] / 2,
+                200,
+            )
 
             self.images[name] = {
                 "img": pygame.image.load(
@@ -363,7 +277,7 @@ class ModeText(PreSceneMain):
                 "pos": pos,
                 "is_shown": is_shown,
             }
-            
+
             self.images[name + "eye"] = {
                 "img": pygame.image.load(
                     "images/character/" + "face" + ".png"
