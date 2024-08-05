@@ -47,7 +47,7 @@ class ModePause(PreSceneMain):
                 with open("config.dat", "w") as f:
                     f.write(json.dumps(self.config))
 
-        elif self.title_command.is_match("10."):
+        elif self.title_command.is_match("11."):
             if self.title_command[2] == 8:
                 self.title_command.cancel(2)
                 return

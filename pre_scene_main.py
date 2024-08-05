@@ -87,11 +87,11 @@ class PreSceneMain:
                 {
                     "": ["再開する", "設定", "タイトルに戻る"],
                     "1": [
+                        "やめる",
                         "画面サイズ",
                         ["BGM:", self.config["volume_bgm"], 0, 9],
                         ["SE :", self.config["volume_se"], 0, 9],
                         ["TEXT_SPEED:", self.config["text_speed"], 1, 5],
-                        "やめる",
                     ],
                     "10": [
                         "フルスクリーン",

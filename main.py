@@ -193,7 +193,7 @@ def main():
         mouse["right_clicked"] = False
         mouse["up"] = False
         mouse["down"] = False
-        clock.tick(5)
+        clock.tick(60)
         frame += 1
 
 
