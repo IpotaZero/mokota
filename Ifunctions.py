@@ -113,9 +113,13 @@ def Itext(
     max_height: int = 10000,
     outline_width: int = 0,
     outline_colour: list[tuple[int, int, int]] = [(0, 0, 0)],
+    line_size=0,
 ):
     blitx = 0
     blity = 0
+
+    if line_size == 0:
+        line_size = font.get_height()
 
     for i, char in enumerate(text):
         if i > frame:
@@ -127,13 +131,13 @@ def Itext(
 
         if char == ";":
             blitx = 0
-            blity += jtext.get_rect().h
+            blity += line_size
             continue
 
         # blit の前にはみ出さないかチェック
         if blitx + jtext.get_rect().w >= max_width:
             blitx = 0
-            blity += jtext.get_rect().h
+            blity += line_size
 
         if blity >= max_height:
             break
@@ -295,6 +299,7 @@ def Irange(
 
     return 0
 
+
 def IImage(
     screen: pygame.Surface,
     path: str,
@@ -303,7 +308,13 @@ def IImage(
     width: int,
     height: int,
 ):
-    screen.blit(pygame.transform.scale(pygame.image.load(path).convert_alpha(), (width, height)), (x, y))
+    screen.blit(
+        pygame.transform.scale(
+            pygame.image.load(path).convert_alpha(), (width, height)
+        ),
+        (x, y),
+    )
+
 
 class RegexDict:
     def __init__(self, regex_dict: dict):

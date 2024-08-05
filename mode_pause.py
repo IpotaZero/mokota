@@ -72,7 +72,7 @@ class ModePause(PreSceneMain):
 
             self.title_command.cancel(1)
 
-        elif self.title_command.is_match("14"):
+        elif self.title_command.is_match("10"):
             self.title_command.cancel(2)
 
         elif self.title_command.is_match("20"):

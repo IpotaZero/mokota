@@ -108,6 +108,7 @@ class ModeText(PreSceneMain):
             formated_text,
             max_width=1100,
             frame=self.frame / text_speed,
+            line_size=60,
         )
 
     def update_passed_branches(self):
