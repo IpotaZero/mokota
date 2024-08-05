@@ -10,9 +10,16 @@ class ModeText(PreSceneMain):
         pass
 
     def draw_backscreen(self):
-        IImage(self.layer_background, "images/UI/テキスト背景.png", 13, 575, 1726 /1.5, 315/1.5)
-            
-        #Irect(self.layer_background, (0, 0, 0, 255 // 2), 30, 530, 1140, 250)
+        IImage(
+            self.layer_background,
+            "images/UI/テキスト背景.png",
+            13,
+            575,
+            1726 / 1.5,
+            315 / 1.5,
+        )
+
+        # Irect(self.layer_background, (0, 0, 0, 255 // 2), 30, 530, 1140, 250)
 
     def mode_text(self):
         self.draw_backscreen()
@@ -110,7 +117,7 @@ class ModeText(PreSceneMain):
             formated_text,
             max_width=1100,
             frame=self.frame / text_speed,
-            line_size=60,
+            line_size=30,
         )
 
     def update_passed_branches(self):
