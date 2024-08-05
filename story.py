@@ -3,9 +3,9 @@ from chapter_1 import chapter_1
 from chapter_2 import chapter_2
 
 serifs = [
-    chapter_0,
-    chapter_1,
-    chapter_2,
+    *chapter_0,
+    *chapter_1,
+    *chapter_2,
     # もこ音の好感度が高い状態で禁忌肢を2回選んだ時
     # 禁忌肢: もこ音が好きなものに興味を持つ
     {
