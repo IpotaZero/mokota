@@ -72,6 +72,7 @@ class SceneMain(ModeText, ModeSave, ModeLog, ModePause):
             )
 
         if self.mode == "text":
+            
             if self.skip:
                 is_pushed_skip = (
                     Ibutton(

@@ -10,7 +10,9 @@ class ModeText(PreSceneMain):
         pass
 
     def draw_backscreen(self):
-        Irect(self.layer_background, (0, 0, 0, 255 // 2), 30, 530, 1140, 250)
+        IImage(self.layer_background, "images/UI/テキスト背景.png", 13, 575, 1726 /1.5, 315/1.5)
+            
+        #Irect(self.layer_background, (0, 0, 0, 255 // 2), 30, 530, 1140, 250)
 
     def mode_text(self):
         self.draw_backscreen()
@@ -102,9 +104,9 @@ class ModeText(PreSceneMain):
         Itext(
             self.layer_buttons,
             self.font,
-            (255, 255, 255),
-            50,
-            540,
+            (0, 0, 0),
+            90,
+            647,
             formated_text,
             max_width=1100,
             frame=self.frame / text_speed,
@@ -267,7 +269,7 @@ class ModeText(PreSceneMain):
 
             pos = (
                 (place - 1) * 400 + screen_option["default_size"][0] / 2 - size[0] / 2,
-                200,
+                185,
             )
 
             self.images[name] = {
