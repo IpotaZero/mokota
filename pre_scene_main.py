@@ -14,7 +14,7 @@ class PreSceneMain:
             screen_option["default_size"], pygame.SRCALPHA
         )
 
-        self.font = pygame.font.Font("DotGothic16-Regular.ttf", 32)
+        self.font = pygame.font.Font("VL-Gothic-Regular.ttf", 26)
 
         # このまま出てきたらえらー
         self.name = "ERROR"
