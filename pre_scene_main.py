@@ -93,7 +93,7 @@ class PreSceneMain:
                         ["SE :", self.config["volume_se"], 0, 9],
                         ["TEXT_SPEED:", self.config["text_speed"], 1, 5],
                     ],
-                    "10": [
+                    "11": [
                         "フルスクリーン",
                         "600x400",
                         "800x533",
