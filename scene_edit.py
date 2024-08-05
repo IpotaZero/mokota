@@ -16,6 +16,7 @@ class SceneEdit:
         self.start()
 
     def start(self):
+        return
         self.chapter = 0
         self.camera = [0, 0]
         self.is_end = False
