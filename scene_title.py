@@ -94,9 +94,13 @@ class SceneTitle:
         pygame.mixer.music.stop()
         pygame.mixer.music.load("sounds/bgm/試作19 2.mp3")
         pygame.mixer.music.set_volume(self.config["volume_bgm"] / 9)
-        pygame.mixer.music.play(-1)
+        pygame.mixer.music.play()
+
+        self.is_first_looped = False
 
     def mainloop(self):
+        self.check_music_end(2.292, 77.847)
+
         self.buffer_screen.fill((255, 201, 224))
 
         Itext(
@@ -239,3 +243,17 @@ class SceneTitle:
         )
         self.screen.blit(scr, screen_option["offset"])
         pygame.display.update()  # 画面更新
+
+    def check_music_end(self, loop_start, loop_end):
+        if pygame.mixer.music.get_busy():
+
+            # 現在の再生時間を取得
+            current_time = pygame.mixer.music.get_pos()
+            if self.is_first_looped:
+                current_time += loop_start
+            if current_time >= loop_end * 1000:
+                self.is_first_looped = True
+                print(0)
+                # 音楽を停止してループ開始位置から再生
+                pygame.mixer.music.stop()
+                pygame.mixer.music.play(start=loop_start)
