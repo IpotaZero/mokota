@@ -253,7 +253,7 @@ class SceneTitle:
             if self.is_first_looped:
                 current_time += loop_start
 
-            print(current_time)
+            # print(current_time)
             if current_time >= loop_end:
                 self.is_first_looped = True
                 # 音楽を停止してループ開始位置から再生

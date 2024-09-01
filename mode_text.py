@@ -22,16 +22,14 @@ class ModeText(PreSceneMain):
         # Irect(self.layer_background, (0, 0, 0, 255 // 2), 30, 530, 1140, 250)
 
     def mode_text(self):
-        self.draw_backscreen()
-
         chapter = serifs[self.chapter]
         if self.branch not in chapter:
             Itext(
                 self.layer_buttons,
                 self.font,
                 (255, 255, 255),
-                50,
-                540,
+                90,
+                640,
                 "知らないbranch: " + self.branch,
                 max_width=1100,
                 frame=self.frame / 2,
@@ -44,8 +42,8 @@ class ModeText(PreSceneMain):
                 self.layer_buttons,
                 self.font,
                 (255, 255, 255),
-                50,
-                540,
+                90,
+                640,
                 "elementが存在しないtext_num",
                 max_width=1100,
                 frame=self.frame / 2,
@@ -60,6 +58,8 @@ class ModeText(PreSceneMain):
             self.solve_command(element)
 
     def solve_text(self, text: str):
+        self.draw_backscreen()
+
         formated_text = text.format(name=self.name)
 
         if self.frame == 1:
@@ -115,7 +115,7 @@ class ModeText(PreSceneMain):
             90,
             647,
             formated_text,
-            max_width=1100,
+            max_width=1025,
             frame=self.frame / text_speed,
             line_size=30,
         )
@@ -309,6 +309,8 @@ class ModeText(PreSceneMain):
         command_type = command[0]
 
         if command_type == "question":
+            self.draw_backscreen()
+
             if self.frame == 1:
                 self.story_command.options.regex_dict[""] = command[1]
 

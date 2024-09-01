@@ -53,6 +53,7 @@ class SceneMain(ModeText, ModeSave, ModeLog, ModePause):
 
         if self.mode in ["text", "pause"]:
             IImage(self.layer_buttons, "images/UI/メニュー.png", 30, 30, 75, 75)
+
             is_pushed_escape = (
                 Ibutton(
                     self.layer_buttons,
@@ -72,7 +73,6 @@ class SceneMain(ModeText, ModeSave, ModeLog, ModePause):
             )
 
         if self.mode == "text":
-            
             if self.skip:
                 is_pushed_skip = (
                     Ibutton(

@@ -8,14 +8,17 @@ moji = "あいうえおかきくけこさしすせそたちつてとなにぬね
 
 
 class SceneName:
-    def __init__(self) -> None:
+    def __init__(self, config) -> None:
         self.scene_name = "name"
+
+        self.config = config
+
         self.screen = self.screen = pygame.display.get_surface()
         self.buffer_screnn = pygame.Surface(screen_option["default_size"])
 
         self.font = pygame.font.Font("DotGothic16-Regular.ttf", 48)
-        self.moved_se = pygame.mixer.Sound("sounds/se/カーソル移動1.mp3")
-        self.finishd_se = pygame.mixer.Sound("sounds/se/カーソル移動11.mp3")
+        self.moved_se = pygame.mixer.Sound("sounds/se/select.wav")
+        self.finishd_se = pygame.mixer.Sound("sounds/se/ok.wav")
         self.start()
 
     def start(self):
@@ -23,7 +26,12 @@ class SceneName:
 
         self.num = 0
         self.name = "もこた"
-        
+
+        pygame.mixer.music.stop()
+        pygame.mixer.music.load("sounds/bgm/試作25.mp3")
+        pygame.mixer.music.set_volume(self.config["volume_bgm"] / 9)
+        pygame.mixer.music.play(-1)
+
     def add_num(self, num):
         self.moved_se.play()
         self.num += num

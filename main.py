@@ -82,7 +82,7 @@ def main():
 
     scenes = {
         "main": SceneMain(saves, config),
-        "name": SceneName(),
+        "name": SceneName(config),
         "title": SceneTitle(saves, config),
         "darkening": SceneDarkening(),
         "edit": SceneEdit(),
