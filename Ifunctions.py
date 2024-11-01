@@ -392,13 +392,13 @@ class Icommand:
             return
 
         if type(option[self.num]) == str:
-            if len({K_RETURN, K_SPACE} & keyboard["pushed"]) > 0:
+            if len({K_RETURN, K_SPACE, K_z} & keyboard["pushed"]) > 0:
                 self.branch += suuji[self.num]
                 self.num = 0
                 return
 
         if (
-            len({K_BACKSPACE, K_ESCAPE} & keyboard["pushed"]) > 0
+            len({K_BACKSPACE, K_ESCAPE, K_x} & keyboard["pushed"]) > 0
         ) and self.branch != "":
             self.cancel()
             return

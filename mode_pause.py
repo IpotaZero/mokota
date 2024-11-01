@@ -11,19 +11,19 @@ class ModePause(PreSceneMain):
     def mode_pause(self):
         Irect(self.layer_background, (0, 0, 0, 255 // 2), 30, 30, 1140, 750)
 
-        Itext(
-            self.layer_buttons,
-            self.font,
-            (255, 255, 255),
-            50,
-            30,
-            ";".join(
-                [
-                    ["もこ音", "もこ子", "もこ美"][i] + ": " + str(self.credits[i])
-                    for i in range(3)
-                ]
-            ),
-        )
+        # Itext(
+        #     self.layer_buttons,
+        #     self.font,
+        #     (255, 255, 255),
+        #     50,
+        #     30,
+        #     ";".join(
+        #         [
+        #             ["もこ音", "もこ子", "もこ美"][i] + ": " + str(self.credits[i])
+        #             for i in range(3)
+        #         ]
+        #     ),
+        # )
 
         self.title_command.run()
 

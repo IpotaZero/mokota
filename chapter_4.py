@@ -14,6 +14,7 @@ def get_branch(o):
 
 
 def get_owakare_branch(o):
+    print(o)
     # 好感度が20以上かつ、禁忌肢を2回選ぶ
     if o["credits"][0] >= 20 and {"hoge", "fuga"} <= {*o["footprints"]}:
         return 1
@@ -24,6 +25,9 @@ def get_owakare_branch(o):
 chapter_4 = {
     "first": [
         "2月...",
+        ["darken"],
+        ["image_back", "部室背景_anime.png", dict(size=(1200, 800))],
+        ["rdarken"],
         "ついに大学最初の1年が終わり、春休みを迎えようとしている",
         "この1年何をしてきたかを思い返すと、つい最近入学したような錯覚に襲われる",
         "{name}:;もう1年か... 早かったな",
@@ -45,9 +49,9 @@ chapter_4 = {
             get_branch,
         ],
     ],
-    "choco_mokoko": ["END1 もこもこもここ(仮)"],
-    "choco_mokomi": ["END2 芸術と俺(仮)"],
-    "choco_mokone": ["END3 (仮)"],
+    "choco_mokoko": ["END1 もこもこもこ子"],
+    "choco_mokomi": ["END2 あーと"],
+    "choco_mokone": ["END3 基準は0dB"],
     "choco0": [
         "もこ助:;よお! 今日はバレンタインデーだな! チョコ、何個もらえた?",
         "もこ助は部室に入って来るや否や俺に問いかける",
@@ -60,6 +64,9 @@ chapter_4 = {
         "もこ助:;なあ、今日お前んち泊まっていい?",
         "{name}:;え、いいけど 突然だな?",
         # 理由
+        ["darken"],
+        ["image_back", "room.png", dict(size=(1200, 800))],
+        ["rdarken"],
         "もこ助:;へえー、ここがお前の部屋か、せまー",
         "{name}:;うっさい、はよ入れ",
         "もこ助:;お、映画あるじゃん",

@@ -39,9 +39,9 @@ class PreSceneMain:
         self.story_command = Icommand(
             self.layer_buttons,
             self.font,
-            (0, 0, 0),
+            (255, 255, 255),
             90,
-            647 - self.font.get_height(),
+            600 - self.font.get_height(),
             RegexDict({}),
             # title=RegexDict({"": "選択肢"}),
         )

@@ -54,7 +54,7 @@ class SceneName:
                 self.finishd_se.play()
                 self.is_end = True
                 return self.name
-        elif len({K_RETURN, K_SPACE} & keyboard["pushed"]) > 0:
+        elif len({K_RETURN, K_SPACE, K_z} & keyboard["pushed"]) > 0:
             if self.num == len(moji) - 1:
                 if len(self.name) > 0:
                     self.finishd_se.play()
@@ -67,7 +67,7 @@ class SceneName:
             elif len(self.name) < 7:
                 self.name += moji[self.num]
 
-        elif len({K_BACKSPACE, K_ESCAPE} & keyboard["pushed"]) > 0:
+        elif len({K_BACKSPACE, K_ESCAPE, K_x} & keyboard["pushed"]) > 0:
             if len(self.name) > 0:
                 self.name = self.name[:-1]
 

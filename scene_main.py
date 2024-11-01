@@ -52,7 +52,7 @@ class SceneMain(ModeText, ModeSave, ModeLog, ModePause):
             )
 
         if self.mode in ["text", "pause"]:
-            IImage(self.layer_buttons, "images/UI/メニュー.png", 30, 30, 75, 75)
+            # IImage(self.layer_buttons, "images/UI/メニュー.png", 30, 30, 75, 75)
 
             is_pushed_escape = (
                 Ibutton(
@@ -62,12 +62,12 @@ class SceneMain(ModeText, ModeSave, ModeLog, ModePause):
                     (255, 255, 255),
                     30,
                     30,
-                    75,
-                    75,
-                    "",
+                    100,
+                    40,
+                    "PAUSE",
                     outline_colour=[(0, 0, 0)],
                     outline_width=0,
-                    line_width=0,
+                    line_width=2,
                 )
                 or K_ESCAPE in keyboard["pushed"]
             )

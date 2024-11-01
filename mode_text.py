@@ -10,16 +10,16 @@ class ModeText(PreSceneMain):
         pass
 
     def draw_backscreen(self):
-        IImage(
-            self.layer_background,
-            "images/UI/テキスト背景.png",
-            13,
-            575,
-            1726 / 1.5,
-            315 / 1.5,
-        )
+        # IImage(
+        #     self.layer_background,
+        #     "images/UI/テキスト背景.png",
+        #     13,
+        #     575,
+        #     1726 / 1.5,
+        #     315 / 1.5,
+        # )
 
-        # Irect(self.layer_background, (0, 0, 0, 255 // 2), 30, 530, 1140, 250)
+        Irect(self.layer_background, (0, 0, 12, 255 // 2), 30, 580, 1140, 200)
 
     def mode_text(self):
         chapter = serifs[self.chapter]
@@ -84,13 +84,14 @@ class ModeText(PreSceneMain):
         text_length = len(formated_text) * text_speed
 
         if (
-            len({K_RETURN, K_SPACE} & keyboard["pushed"]) > 0
+            len({K_RETURN, K_SPACE, K_z} & keyboard["pushed"]) > 0
             or clicked
             or self.get_skip_flag()
             or (
                 text_length + 30 <= self.frame
                 and (
-                    self.auto or len({K_RETURN, K_SPACE} & keyboard["long_pressed"]) > 0
+                    self.auto
+                    or len({K_RETURN, K_SPACE, K_z} & keyboard["long_pressed"]) > 0
                 )
             )
         ):
@@ -111,9 +112,9 @@ class ModeText(PreSceneMain):
         Itext(
             self.layer_buttons,
             self.font,
-            (0, 0, 0),
+            (255, 255, 255),
             90,
-            647,
+            600,
             formated_text,
             max_width=1025,
             frame=self.frame / text_speed,
@@ -146,6 +147,7 @@ class ModeText(PreSceneMain):
                 {
                     "footprints": self.footprints,
                     "max_credit": self.credits.index(max(self.credits)),
+                    "credits": self.credits,
                 }
             )
             self.footprints[self.branch] = index
