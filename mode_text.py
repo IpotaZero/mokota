@@ -106,7 +106,7 @@ class ModeText(PreSceneMain):
             # if self.text_num == len(element_list):
             #     self.text_num = 0
 
-        if self.frame % 60 < 30:
+        if self.frame % 60 >= 30:
             formated_text += "▼"
 
         Itext(
