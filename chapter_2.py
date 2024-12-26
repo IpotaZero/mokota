@@ -20,6 +20,7 @@ chapter_2 = {
         #
         "{name}:;確か...この辺で集合だったよな...",
         "駅から出てきょろきょろとあたりを見回すと、浴衣の集団が目についた",
+        ["bgm", "試作20.mp3"],
         [
             "goto",
             ["gouryuu_mokone", "gouryuu_mokoko", "gouryuu_mokomi"],
